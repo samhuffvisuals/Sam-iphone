@@ -12,10 +12,10 @@ Open it from the Home Screen icon before adding leads. The Home Screen app keeps
 
 ## Using it
 
-- **+** (top right, tab bar, or the "New lead" circle) adds a lead: name, project type, budget, shoot date, phone, email, Instagram and notes.
-- The story circles at the top filter the feed: All, Hot, Warm, Cold.
-- Each lead card has Hot / Warm / Cold buttons to retag it. Double-tap the colored card to cycle through them.
-- Call, text and email buttons show up on the card when the lead has a phone number or email.
+- **+** (top right, tab bar, or the "New lead" circle) adds a lead: profile picture, name, project type, budget, shoot date, phone, email, Instagram and notes.
+- Leads show as a follower-style list. Tap the colored Hot / Warm / Cold button on a lead to retag it, or tap the lead to edit it.
+- The story circles at the top filter the list: All, Hot, Warm, Cold.
+- Budgets are formatted automatically: `10000` → `$10,000`, `12k` → `$12,000`, `5k-10k` → `$5,000-$10,000`.
 - The 🔥 tab shows only Hot leads. Search finds leads by name, project, notes or contact info.
 - **Profile → Back up** saves your leads to a file (Files, AirDrop, email). **Restore** loads a backup.
 

@@ -120,59 +120,34 @@
     font-size: 16px; font-weight: 700; line-height: 1;
   }
 
-  /* ---------- Feed post ---------- */
-  .post { border-bottom: 1px solid var(--line); padding-bottom: 12px; animation: pop .25s ease-out; }
-  @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .post-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
-  .avatar {
-    width: 38px; height: 38px; border-radius: 50%; padding: 2px; flex: 0 0 auto;
-    background: var(--line);
-  }
-  .avatar > span {
-    width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--bg); background: var(--surface);
-    display: grid; place-items: center; font-size: 13px; font-weight: 700; letter-spacing: .3px;
-  }
-  .t-hot .avatar { background: var(--hot-grad); }
-  .t-warm .avatar { background: var(--warm-grad); }
-  .t-cold .avatar { background: var(--cold-grad); }
-  .post-head .who { flex: 1; min-width: 0; }
-  .post-head .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .post-head .sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .media {
-    aspect-ratio: 4 / 3; max-height: 62vh; width: 100%;
-    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-    color: #fff; padding: 24px; position: relative; overflow: hidden;
-    background: var(--surface);
-  }
-  .t-hot .media { background: var(--hot-grad); }
-  .t-warm .media { background: var(--warm-grad); }
-  .t-cold .media { background: var(--cold-grad); }
-  .media .temp-big { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: .9; }
-  .media .project { font-size: 30px; font-weight: 800; line-height: 1.1; margin: 8px 0 6px; text-shadow: 0 1px 12px rgba(0,0,0,.15); word-break: break-word; }
-  .media .budget { font-size: 18px; font-weight: 600; opacity: .95; }
-  .media .when { font-size: 13px; margin-top: 10px; opacity: .9; display: inline-flex; gap: 6px; align-items: center; background: rgba(0,0,0,.18); padding: 4px 10px; border-radius: 999px; }
-  .media .emoji-bg { position: absolute; font-size: 160px; opacity: .14; right: -20px; bottom: -40px; pointer-events: none; }
-  .media .heart { position: absolute; inset: 0; display: grid; place-items: center; font-size: 96px; opacity: 0; pointer-events: none; }
-  .media .heart.burst { animation: burst .8s ease-out; }
-  @keyframes burst { 0% { opacity: 0; transform: scale(.4); } 25% { opacity: 1; transform: scale(1.15); } 60% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } }
-
-  .post-actions { display: flex; align-items: center; padding: 8px 8px 4px; gap: 4px; }
+  /* ---------- Lead list (follower-list style) ---------- */
+  .list-head { display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px 6px; }
+  .list-head h2 { margin: 0; font-size: 16px; font-weight: 700; }
+  .list-head span { font-size: 13px; color: var(--muted); }
+  .lead { display: flex; align-items: center; gap: 12px; padding: 8px 16px; animation: pop .25s ease-out; }
+  .lead:active { background: var(--bg-2); }
+  @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .lead .open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
+  .lead .who { flex: 1; min-width: 0; }
+  .lead .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lead .sub { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lead .money { color: var(--text); }
   .temp-btn {
-    display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border-radius: 17px;
-    font-size: 13px; font-weight: 600; border: 1px solid var(--line); transition: transform .12s, background .15s;
+    flex: 0 0 auto; height: 32px; min-width: 84px; padding: 0 14px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: #fff; transition: transform .12s;
   }
-  .temp-btn:active { transform: scale(.92); }
-  .temp-btn.on { color: #fff; border-color: transparent; }
-  .temp-btn.on.hot { background: var(--hot); }
-  .temp-btn.on.warm { background: var(--warm); }
-  .temp-btn.on.cold { background: var(--cold); }
-  .post-actions .spacer { flex: 1; }
-  .post-actions .icon-btn { width: 38px; height: 38px; }
-  .post-actions .icon-btn svg { width: 24px; height: 24px; }
-  .caption { padding: 4px 12px 0; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
-  .caption b { font-weight: 600; margin-right: 4px; }
-  .contact-line { padding: 2px 12px 0; font-size: 13px; color: var(--muted); word-break: break-all; }
-  .time { padding: 6px 12px 0; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .2px; }
+  .temp-btn:active { transform: scale(.94); }
+  .temp-btn.hot { background: var(--hot); } .temp-btn.warm { background: var(--warm); } .temp-btn.cold { background: var(--cold); }
+  .avatar {
+    width: 56px; height: 56px; border-radius: 50%; padding: 2px; flex: 0 0 auto; background: var(--line);
+  }
+  .avatar > span, .avatar > img {
+    width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--bg); background: var(--surface);
+    display: grid; place-items: center; font-size: 17px; font-weight: 700; letter-spacing: .3px; object-fit: cover;
+  }
+  .t-hot .avatar, .avatar.t-hot { background: var(--hot-grad); }
+  .t-warm .avatar, .avatar.t-warm { background: var(--warm-grad); }
+  .t-cold .avatar, .avatar.t-cold { background: var(--cold-grad); }
 
   .empty { text-align: center; padding: 64px 32px; color: var(--muted); }
   .empty .big-ring { width: 96px; height: 96px; border-radius: 50%; border: 2px solid var(--text); margin: 0 auto 18px; display: grid; place-items: center; color: var(--text); }
@@ -188,15 +163,6 @@
   }
   .search svg { width: 16px; height: 16px; color: var(--muted); flex: 0 0 auto; }
   .search input { flex: 1; border: 0; outline: 0; background: transparent; font-size: 16px; min-width: 0; }
-  .row { display: flex; align-items: center; gap: 12px; padding: 8px 16px; width: 100%; text-align: left; }
-  .row:active { background: var(--bg-2); }
-  .row .avatar { width: 50px; height: 50px; }
-  .row .avatar > span { font-size: 16px; }
-  .row .who { flex: 1; min-width: 0; }
-  .row .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .row .sub { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; text-transform: uppercase; letter-spacing: .5px; }
-  .pill.hot { background: var(--hot); } .pill.warm { background: var(--warm); } .pill.cold { background: var(--cold); }
 
   /* ---------- Profile ---------- */
   .profile { padding: 12px 16px 0; }
@@ -220,6 +186,7 @@
     text-align: left; overflow: hidden; position: relative; background: var(--surface);
   }
   .tile.hot { background: var(--hot-grad); } .tile.warm { background: var(--warm-grad); } .tile.cold { background: var(--cold-grad); }
+  .tile.has-photo { background-size: cover; background-position: center; }
   .tile .e { position: absolute; top: 6px; right: 8px; font-size: 16px; }
   .tile b { font-size: 13px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile span { font-size: 11px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -287,9 +254,34 @@
   .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0 4px; }
   .chip { padding: 6px 12px; border-radius: 999px; background: var(--surface); font-size: 13px; font-weight: 600; }
   .chip.on { background: var(--text); color: var(--bg); }
+  .photo-pick { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 2px 0 16px; }
+  .photo-pick .avatar { width: 92px; height: 92px; padding: 3px; }
+  .photo-pick .avatar > span, .photo-pick .avatar > img { font-size: 30px; border-width: 3px; }
+  .photo-pick .links { display: flex; gap: 18px; }
+  .photo-pick .links button { color: var(--blue); font-weight: 600; font-size: 14px; }
+  .photo-pick .links .remove { color: var(--muted); }
   .danger { color: var(--hot); font-weight: 600; width: 100%; text-align: center; padding: 18px 0 6px; font-size: 15px; }
 
   /* ---------- Action sheet / toast ---------- */
+  .actions-sheet {
+    position: fixed; left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); z-index: 55;
+    transform: translateY(120%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .actions-sheet.open { transform: none; }
+  .actions-sheet .group { background: var(--sheet); border-radius: 14px; overflow: hidden; }
+  .actions-sheet .title { text-align: center; font-size: 13px; color: var(--muted); padding: 14px 16px 12px; border-bottom: 1px solid var(--line); }
+  .actions-sheet .group button {
+    width: 100%; height: 56px; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .actions-sheet .group button:last-child { border-bottom: 0; }
+  .actions-sheet .group button.on { font-weight: 700; }
+  .actions-sheet .group button .check { color: var(--blue); }
+  .actions-sheet .group button[data-t="hot"] { color: var(--hot); }
+  .actions-sheet .group button[data-t="warm"] { color: var(--warm); }
+  .actions-sheet .group button[data-t="cold"] { color: var(--cold); }
+  .actions-sheet .cancel { font-weight: 700; color: var(--blue); }
   .toast {
     position: fixed; left: 50%; bottom: calc(70px + var(--safe-bottom)); transform: translate(-50%, 20px);
     background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
@@ -342,7 +334,7 @@
         <div class="pic"><img src="icons/icon-192.png" alt=""></div>
         <div class="stats" id="stats"></div>
       </div>
-      <div class="bio"><b>My video leads</b><span id="bioLine">Tap a tile to edit a lead.</span></div>
+      <div class="bio"><b>My video leads</b><span id="bioLine">Tap a lead to edit it.</span></div>
       <div class="btn-row">
         <button class="btn-gray" id="exportBtn">Back up</button>
         <button class="btn-gray" id="importBtn">Restore</button>
@@ -384,6 +376,14 @@
     <button class="right" id="saveBtn">Save</button>
   </div>
   <form class="sheet-body" id="form" autocomplete="off">
+    <div class="photo-pick">
+      <button type="button" class="avatar" id="photoPreview" aria-label="Choose profile picture"></button>
+      <div class="links">
+        <button type="button" id="photoBtn">Add picture</button>
+        <button type="button" class="remove" id="photoRemove" hidden>Remove</button>
+      </div>
+      <input type="file" id="photoFile" accept="image/*" hidden>
+    </div>
     <div class="temp-pick" id="tempPick">
       <button type="button" data-t="hot"><span class="e">🔥</span>Hot</button>
       <button type="button" data-t="warm"><span class="e">☀️</span>Warm</button>
@@ -392,7 +392,7 @@
     <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" placeholder="Client or company" required autocapitalize="words"></div>
     <div class="field"><label for="f-project">Project</label><input id="f-project" name="project" placeholder="Wedding film, music video…" autocapitalize="sentences"></div>
     <div class="chips" id="projectChips"></div>
-    <div class="field"><label for="f-budget">Budget</label><input id="f-budget" name="budget" placeholder="$2,500" inputmode="decimal"></div>
+    <div class="field"><label for="f-budget">Budget</label><input id="f-budget" name="budget" placeholder="$10,000" inputmode="decimal"></div>
     <div class="field"><label for="f-date">Shoot date</label><input id="f-date" name="date" type="date"></div>
     <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" placeholder="(555) 555-5555"></div>
     <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" placeholder="name@email.com" autocapitalize="off"></div>
@@ -400,6 +400,16 @@
     <div class="field top"><label for="f-notes">Notes</label><textarea id="f-notes" name="notes" placeholder="What they want, how they found you, next step…"></textarea></div>
     <button type="button" class="danger" id="deleteBtn" hidden>Delete lead</button>
   </form>
+</div>
+
+<div class="actions-sheet" id="tempSheet" role="dialog" aria-modal="true">
+  <div class="group">
+    <div class="title" id="tempSheetTitle"></div>
+    <button data-pick="hot" data-t="hot">🔥 Hot</button>
+    <button data-pick="warm" data-t="warm">☀️ Warm</button>
+    <button data-pick="cold" data-t="cold">❄️ Cold</button>
+  </div>
+  <div class="group"><button class="cancel" id="tempCancel">Cancel</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -434,6 +444,7 @@
   let tab = 'home';
   let editingId = null;
   let formTemp = 'warm';
+  let formPhoto = null;
 
   // ---------- Helpers ----------
   const initials = name => (name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
@@ -450,10 +461,16 @@
     const [y, m, d] = iso.split('-').map(Number);
     return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   }
+  // "$10000" / "10k" / "2500.5" / "5k-10k" -> "$10,000" / "$10,000" / "$2,500.50" / "$5,000-$10,000"
   function fmtBudget(b) {
     b = (b || '').trim();
     if (!b) return '';
-    return /^[\d.,]+k?$/i.test(b) ? '$' + b : b;
+    return b.replace(/\$?\s*(\d[\d,]*(?:\.\d+)?)\s*([km])?\b/gi, (_, num, unit) => {
+      let n = parseFloat(num.replace(/,/g, ''));
+      if (unit) n *= unit.toLowerCase() === 'k' ? 1e3 : 1e6;
+      const cents = n % 1 !== 0;
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: 2 });
+    });
   }
   const sorted = list => [...list].sort((a, b) => b.updatedAt - a.updatedAt);
   const counts = () => leads.reduce((c, l) => (c[l.temp]++, c), { hot: 0, warm: 0, cold: 0 });
@@ -474,44 +491,23 @@
         </button>`).join('');
   }
 
-  const ICON = {
-    phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
-    msg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-4.6A8.5 8.5 0 1 1 20.5 11.5z"/></svg>',
-    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M22 3 2 10.5l8 3 3 8z"/><path d="m10 13.5 5-5"/></svg>',
-    more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
-    cal: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
-  };
+  function avatarHTML(l, cls = '') {
+    const inner = l.photo ? `<img src="${esc(l.photo)}" alt="">` : `<span>${esc(initials(l.name))}</span>`;
+    return `<div class="avatar ${cls}">${inner}</div>`;
+  }
 
-  function postHTML(l) {
-    const t = TEMPS[l.temp];
-    const sub = [l.ig, l.project].filter(Boolean).join(' • ');
-    const contact = [l.phone, l.email].filter(Boolean).join(' · ');
-    const tel = (l.phone || '').replace(/[^\d+]/g, '');
+  function leadHTML(l) {
+    const money = fmtBudget(l.budget);
+    const sub = [l.project && esc(l.project), money && `<span class="money">${esc(money)}</span>`].filter(Boolean).join(' · ')
+      || esc(l.ig || l.email || l.phone || '');
     return `
-      <article class="post t-${l.temp}" data-id="${l.id}">
-        <div class="post-head">
-          <div class="avatar"><span>${esc(initials(l.name))}</span></div>
-          <div class="who"><div class="name">${esc(l.name)}</div>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</div>
-          <button class="icon-btn" data-edit aria-label="Edit">${ICON.more}</button>
-        </div>
-        <div class="media" data-media>
-          <span class="emoji-bg">${t.emoji}</span>
-          <div class="temp-big">${t.emoji} ${t.label} lead</div>
-          <div class="project">${esc(l.project || 'Video project')}</div>
-          ${l.budget ? `<div class="budget">${esc(fmtBudget(l.budget))}</div>` : ''}
-          ${l.date ? `<div class="when">${ICON.cal}${esc(fmtDate(l.date))}</div>` : ''}
-          <div class="heart"></div>
-        </div>
-        <div class="post-actions">
-          ${Object.entries(TEMPS).map(([k, v]) => `<button class="temp-btn ${k} ${l.temp === k ? 'on' : ''}" data-set="${k}">${v.emoji} ${v.label}</button>`).join('')}
-          <span class="spacer"></span>
-          ${tel ? `<a class="icon-btn" href="tel:${esc(tel)}" aria-label="Call">${ICON.phone}</a><a class="icon-btn" href="sms:${esc(tel)}" aria-label="Text">${ICON.msg}</a>` : ''}
-          ${l.email ? `<a class="icon-btn" href="mailto:${esc(l.email)}" aria-label="Email">${ICON.mail}</a>` : ''}
-        </div>
-        ${l.notes ? `<div class="caption"><b>${esc(l.name)}</b>${esc(l.notes)}</div>` : ''}
-        ${contact ? `<div class="contact-line">${esc(contact)}</div>` : ''}
-        <div class="time">${l.createdAt !== l.updatedAt ? 'Updated ' + ago(l.updatedAt).toLowerCase() : ago(l.createdAt)}</div>
-      </article>`;
+      <div class="lead t-${l.temp}" data-id="${l.id}">
+        <button class="open" data-edit>
+          ${avatarHTML(l)}
+          <div class="who"><div class="name">${esc(l.name)}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div>
+        </button>
+        <button class="temp-btn ${l.temp}" data-temp aria-label="Change tag, currently ${TEMPS[l.temp].label}">${TEMPS[l.temp].emoji} ${TEMPS[l.temp].label}</button>
+      </div>`;
   }
 
   function emptyHTML(f) {
@@ -528,35 +524,31 @@
   function renderFeed() {
     const f = tab === 'hot' ? 'hot' : filter;
     const list = sorted(f === 'all' ? leads : leads.filter(l => l.temp === f));
-    $('#feed').innerHTML = list.length ? list.map(postHTML).join('') : emptyHTML(f);
-  }
-
-  function rowHTML(l) {
-    const sub = [l.project, fmtBudget(l.budget), l.date && fmtDate(l.date)].filter(Boolean).join(' · ');
-    return `<button class="row t-${l.temp}" data-id="${l.id}" data-edit>
-      <div class="avatar"><span>${esc(initials(l.name))}</span></div>
-      <div class="who"><div class="name">${esc(l.name)}</div><div class="sub">${esc(sub || l.ig || l.email || l.phone || '')}</div></div>
-      <span class="pill ${l.temp}">${TEMPS[l.temp].label}</span></button>`;
+    const title = f === 'all' ? 'All leads' : `${TEMPS[f].emoji} ${TEMPS[f].label} leads`;
+    $('#feed').innerHTML = list.length
+      ? `<div class="list-head"><h2>${title}</h2><span>${list.length}</span></div>` + list.map(leadHTML).join('')
+      : emptyHTML(f);
   }
 
   function renderSearch() {
     const q = $('#q').value.trim().toLowerCase();
     const list = sorted(leads).filter(l => !q ||
-      [l.name, l.project, l.notes, l.ig, l.email, l.phone, l.budget, TEMPS[l.temp].label].join(' ').toLowerCase().includes(q));
-    $('#results').innerHTML = list.length ? list.map(rowHTML).join('')
+      [l.name, l.project, l.notes, l.ig, l.email, l.phone, l.budget, fmtBudget(l.budget), TEMPS[l.temp].label].join(' ').toLowerCase().includes(q));
+    $('#results').innerHTML = list.length ? list.map(leadHTML).join('')
       : `<div class="empty"><p>${leads.length ? 'No leads match “' + esc(q) + '”.' : 'No leads yet.'}</p></div>`;
   }
 
   function renderProfile() {
     const c = counts();
     $('#stats').innerHTML = Object.entries(TEMPS).map(([k, v]) => `<div><b>${c[k]}</b><span>${v.emoji} ${v.label}</span></div>`).join('');
-    $('#bioLine').textContent = leads.length ? `${leads.length} lead${leads.length === 1 ? '' : 's'} · tap a tile to edit` : 'No leads yet — tap + to add one.';
+    $('#bioLine').textContent = leads.length ? `${leads.length} lead${leads.length === 1 ? '' : 's'} · tap a lead to edit it` : 'No leads yet — tap + to add one.';
     const order = { hot: 0, warm: 1, cold: 2 };
     const list = [...leads].sort((a, b) => order[a.temp] - order[b.temp] || b.updatedAt - a.updatedAt);
     $('#grid').innerHTML = list.map(l => `
-      <button class="tile ${l.temp}" data-id="${l.id}" data-edit>
+      <button class="tile ${l.temp} ${l.photo ? 'has-photo' : ''}" data-id="${l.id}" data-edit
+        ${l.photo ? `style="background-image: linear-gradient(transparent 45%, rgba(0,0,0,.65)), url(&quot;${esc(l.photo)}&quot;)"` : ''}>
         <span class="e">${TEMPS[l.temp].emoji}</span>
-        <b>${esc(l.name)}</b><span>${esc(l.project || fmtBudget(l.budget) || '')}</span>
+        <b>${esc(l.name)}</b><span>${esc(fmtBudget(l.budget) || l.project || '')}</span>
       </button>`).join('');
   }
 
@@ -596,6 +588,7 @@
   function setFormTemp(t) {
     formTemp = t;
     $$('#tempPick button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    renderPhotoPreview();
   }
   function renderChips() {
     const cur = form.project.value.trim().toLowerCase();
@@ -606,6 +599,8 @@
     const l = id ? leads.find(x => x.id === id) : null;
     form.reset();
     for (const k of ['name', 'project', 'budget', 'date', 'phone', 'email', 'ig', 'notes']) form[k].value = l?.[k] || '';
+    form.budget.value = fmtBudget(form.budget.value);
+    formPhoto = l?.photo || null;
     setFormTemp(l?.temp || (filter !== 'all' ? filter : tab === 'hot' ? 'hot' : 'warm'));
     $('#sheetTitle').textContent = l ? 'Edit lead' : 'New lead';
     $('#saveBtn').textContent = l ? 'Done' : 'Save';
@@ -633,14 +628,16 @@
     const data = {
       name, ig,
       project: form.project.value.trim(),
-      budget: form.budget.value.trim(),
+      budget: fmtBudget(form.budget.value),
       date: form.date.value,
       phone: form.phone.value.trim(),
       email: form.email.value.trim(),
       notes: form.notes.value.trim(),
       temp: formTemp,
+      photo: formPhoto || undefined,
     };
     const now = Date.now();
+    const isNew = !editingId;
     if (editingId) {
       const l = leads.find(x => x.id === editingId);
       Object.assign(l, data, { updatedAt: now });
@@ -655,32 +652,60 @@
     save();
     closeSheet();
     render();
-    if (!editingId) window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (isNew) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function setTemp(id, t, mediaEl) {
+  function setTemp(id, t) {
     const l = leads.find(x => x.id === id);
     if (!l || l.temp === t) return;
     l.temp = t; l.updatedAt = Date.now();
     save();
-    if (mediaEl) {
-      // burst animation before re-render
-      const heart = $('.heart', mediaEl);
-      heart.textContent = TEMPS[t].emoji;
-      heart.classList.remove('burst'); void heart.offsetWidth; heart.classList.add('burst');
-      const post = mediaEl.closest('.post');
-      post.className = `post t-${t}`;
-      $$('.temp-btn', post).forEach(b => b.classList.toggle('on', b.dataset.set === t));
-      $('.temp-big', post).textContent = `${TEMPS[t].emoji} ${TEMPS[t].label} lead`;
-      $('.emoji-bg', post).textContent = TEMPS[t].emoji;
-      $('.time', post).textContent = 'Updated just now';
-      renderStories();
-      if (navigator.vibrate) navigator.vibrate(10);
-      // drop out of a filtered feed after the animation
-      if ((filter !== 'all' || tab === 'hot') && t !== (tab === 'hot' ? 'hot' : filter)) setTimeout(renderFeed, 700);
-    } else {
-      render();
-    }
+    render();
+    toast(`${TEMPS[t].emoji} ${l.name} is now ${TEMPS[t].label}`);
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  // Hot / Warm / Cold action sheet
+  let tempSheetId = null;
+  function openTempSheet(id) {
+    const l = leads.find(x => x.id === id);
+    if (!l) return;
+    tempSheetId = id;
+    $('#tempSheetTitle').textContent = `Tag ${l.name} as…`;
+    $$('#tempSheet [data-pick]').forEach(b => {
+      const on = b.dataset.pick === l.temp;
+      b.classList.toggle('on', on);
+      b.innerHTML = `${TEMPS[b.dataset.pick].emoji} ${TEMPS[b.dataset.pick].label}${on ? ' <span class="check">✓</span>' : ''}`;
+    });
+    $('#tempSheet').classList.add('open');
+    $('#backdrop').classList.add('open');
+  }
+  function closeTempSheet() {
+    tempSheetId = null;
+    $('#tempSheet').classList.remove('open');
+    if (!$('#sheet').classList.contains('open')) $('#backdrop').classList.remove('open');
+  }
+
+  // ---------- Profile pictures ----------
+  // Center-crop to a square and shrink so hundreds of leads still fit in on-device storage.
+  async function loadPhoto(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      const size = Math.min(320, side);
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      c.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+      return c.toDataURL('image/jpeg', 0.82);
+    } finally { URL.revokeObjectURL(url); }
+  }
+  function renderPhotoPreview() {
+    const preview = $('#photoPreview');
+    preview.className = `avatar t-${formTemp}`;
+    preview.innerHTML = formPhoto ? `<img src="${formPhoto}" alt="">` : `<span>${esc(initials(form.name.value))}</span>`;
+    $('#photoBtn').textContent = formPhoto ? 'Change picture' : 'Add picture';
+    $('#photoRemove').hidden = !formPhoto;
   }
 
   // ---------- Toast ----------
@@ -717,6 +742,7 @@
       let added = 0;
       for (const l of incoming) {
         if (!l || !l.id || !l.name || !TEMPS[l.temp]) continue;
+        if (l.photo && !/^data:image\/[a-z+]+;base64,[\w+/=]+$/i.test(l.photo)) delete l.photo;
         const cur = byId.get(l.id);
         if (!cur) added++;
         if (!cur || (l.updatedAt || 0) > (cur.updatedAt || 0)) byId.set(l.id, l);
@@ -736,33 +762,35 @@
     if (tabBtn) { setTab(tabBtn.dataset.tab); return; }
     const story = t.closest('[data-f]');
     if (story) { filter = story.dataset.f; if (tab !== 'home') setTab('home'); else render(); return; }
-    const setBtn = t.closest('[data-set]');
-    if (setBtn) { const post = setBtn.closest('.post'); setTemp(post.dataset.id, setBtn.dataset.set, $('[data-media]', post)); return; }
+    const tempBtn = t.closest('[data-temp]');
+    if (tempBtn) { openTempSheet(tempBtn.closest('[data-id]').dataset.id); return; }
+    const pick = t.closest('[data-pick]');
+    if (pick) { const id = tempSheetId; closeTempSheet(); setTemp(id, pick.dataset.pick); return; }
     const edit = t.closest('[data-edit]');
     if (edit) { openSheet(edit.closest('[data-id]').dataset.id); return; }
   });
 
-  // Double-tap the post "photo" to cycle Hot → Warm → Cold, like double-tap to like
-  let lastTap = { id: null, time: 0 };
-  document.addEventListener('pointerup', e => {
-    const media = e.target.closest('[data-media]');
-    if (!media) return;
-    const id = media.closest('.post').dataset.id;
-    const now = Date.now();
-    if (lastTap.id === id && now - lastTap.time < 320) {
-      const l = leads.find(x => x.id === id);
-      const next = { hot: 'warm', warm: 'cold', cold: 'hot' }[l.temp];
-      setTemp(id, next, media);
-      lastTap = { id: null, time: 0 };
-    } else lastTap = { id, time: now };
-  });
-
   $('#topAdd').onclick = () => openSheet();
   $('#cancelBtn').onclick = closeSheet;
-  $('#backdrop').onclick = closeSheet;
+  $('#backdrop').onclick = () => { if (tempSheetId) closeTempSheet(); else closeSheet(); };
+  $('#tempCancel').onclick = closeTempSheet;
   $('#saveBtn').onclick = submit;
   form.addEventListener('submit', e => { e.preventDefault(); submit(); });
-  form.addEventListener('input', e => { updateSaveState(); if (e.target === form.project) renderChips(); });
+  form.addEventListener('input', e => {
+    updateSaveState();
+    if (e.target === form.project) renderChips();
+    if (e.target === form.name && !formPhoto) renderPhotoPreview();
+  });
+  form.budget.addEventListener('blur', () => { form.budget.value = fmtBudget(form.budget.value); });
+  $('#photoPreview').onclick = $('#photoBtn').onclick = () => $('#photoFile').click();
+  $('#photoRemove').onclick = () => { formPhoto = null; renderPhotoPreview(); };
+  $('#photoFile').onchange = async e => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    try { formPhoto = await loadPhoto(f); renderPhotoPreview(); }
+    catch { toast('Couldn’t open that picture'); }
+  };
   $('#tempPick').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setFormTemp(b.dataset.t); });
   $('#projectChips').addEventListener('click', e => {
     const c = e.target.closest('.chip'); if (!c) return;
@@ -779,7 +807,7 @@
   $('#exportBtn').onclick = exportLeads;
   $('#importBtn').onclick = () => $('#importFile').click();
   $('#importFile').onchange = e => { const f = e.target.files[0]; if (f) importLeads(f); e.target.value = ''; };
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeTempSheet(); closeSheet(); } });
   window.addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', window.scrollY > 4), { passive: true });
   // Refresh "x minutes ago" labels when the app comes back to the foreground
   document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('#sheet').classList.contains('open')) render(); });
