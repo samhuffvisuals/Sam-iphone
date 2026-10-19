@@ -1,5 +1,7 @@
 # Leads
 
+> Also in this repo: **[Backyard](backyard/)**, a backyard ultra race tracker. Open `/backyard/` on the same Pages site. See [backyard/README.md](backyard/README.md).
+
 An Instagram-style iPhone web app with one job: keep track of video-project leads and tag each one 🔥 Hot, ☀️ Warm or ❄️ Cold.
 
 ## Put it on your iPhone Home Screen
