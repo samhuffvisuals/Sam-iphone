@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Journey to Clean Fuel</title>
+<meta name="description" content="One landscape: a mountain, the streams, the river, the sea. Zoom in, write what is really driving you, zoom back out.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Clean Fuel">
+<meta name="theme-color" content="#fbfaf6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<style>
+  :root {
+    --paper: #fbfaf6;
+    --ink: #2f4644;
+    --ink-soft: #6f8382;
+    --line: rgba(47,70,68,.22);
+    --red: #b7584e;
+    --teal: #3f8a86;
+    --sea: #e4ecec;
+    --card: rgba(251,250,246,.92);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+    --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 15px/1.35 var(--ui);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    position: fixed; inset: 0;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  textarea, input { font: inherit; color: inherit; -webkit-user-select: text; user-select: text; }
+  .hide { display: none !important; }
+
+  /* ---------- Scene ---------- */
+  #scene {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+    touch-action: none; background: var(--paper);
+  }
+  #scene text { font-family: var(--serif); font-style: italic; fill: var(--ink); }
+  #scene .ink { stroke: var(--ink); fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  #scene .label { font-size: 30px; }
+  #scene .motto { font-size: 30px; }
+  #scene .note { cursor: pointer; }
+  #scene .note text { font-size: 22px; paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
+  #scene .note .leader { stroke: var(--red); fill: none; stroke-width: 1.4; opacity: .8; }
+  #scene .note .dot { stroke: var(--ink); stroke-width: 1.6; fill: var(--paper); }
+  #scene .note.dirty .dot { fill: var(--red); stroke: var(--red); }
+  #scene .note.clean .dot { fill: var(--teal); stroke: var(--teal); }
+  #scene .note.lit text { fill: var(--red); }
+  #scene .note.lit .dot { r: 9; }
+  #scene .note .hit { fill: transparent; stroke: none; }
+  #scene .ghost { pointer-events: none; }
+  #scene .ghost circle { fill: none; stroke: var(--red); stroke-width: 2; stroke-dasharray: 4 4; }
+
+  /* ---------- Chrome ---------- */
+  .top {
+    position: absolute; left: 0; right: 0; top: 0; z-index: 5;
+    padding: calc(var(--safe-top) + 8px) 12px 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    pointer-events: none;
+  }
+  .top > * { pointer-events: auto; }
+  .title {
+    font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.1; color: var(--ink);
+    padding: 6px 10px; border-radius: 10px; background: rgba(251,250,246,.75);
+  }
+  .title small { display: block; font-size: 12px; font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-top: 2px; }
+  .pill {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 38px; padding: 0 14px; border-radius: 19px;
+    background: var(--card); border: 1px solid var(--ink);
+    font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1; color: var(--ink);
+    box-shadow: 0 1px 0 rgba(47,70,68,.12);
+    white-space: nowrap;
+  }
+  .pill:active { transform: translateY(1px); }
+  .pill.round { width: 38px; padding: 0; }
+  .pill svg { width: 20px; height: 20px; display: block; }
+  .pill.primary { background: var(--ink); color: var(--paper); }
+  .pill.red { background: var(--red); border-color: var(--red); color: #fff; }
+  .right { display: flex; gap: 8px; }
+
+  .bottom {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 8px 12px calc(var(--safe-bottom) + 12px);
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+    pointer-events: none;
+  }
+  .bottom > * { pointer-events: auto; }
+  .hint {
+    font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink-soft);
+    background: rgba(251,250,246,.85); padding: 4px 12px; border-radius: 12px; pointer-events: none;
+    text-align: center; transition: opacity .3s;
+  }
+  .hint.red { color: var(--red); }
+  .levels { display: flex; gap: 6px; }
+  .levels button {
+    height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid var(--line);
+    background: var(--card); font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink);
+  }
+  .levels button:active { background: var(--sea); }
+  .row { display: flex; gap: 8px; width: 100%; justify-content: center; }
+  .pill.wide { flex: 1; max-width: 200px; height: 44px; border-radius: 22px; font-size: 18px; }
+
+  /* Floating "write here" bubble */
+  .bubble {
+    position: absolute; z-index: 4; transform: translate(-50%, -100%);
+    margin-top: -12px; display: none;
+  }
+  .bubble.show { display: block; }
+  .bubble .pill { height: 36px; }
+
+  /* ---------- Sheets ---------- */
+  .backdrop { position: absolute; inset: 0; z-index: 10; background: rgba(47,70,68,.28); display: none; }
+  .backdrop.open { display: block; }
+  .sheet {
+    position: absolute; left: 0; right: 0; z-index: 11;
+    background: var(--paper); border-top: 1px solid var(--ink);
+    border-radius: 20px 20px 0 0;
+    padding: 14px 16px calc(var(--safe-bottom) + 16px);
+    bottom: var(--kb, 0px);
+    transform: translateY(105%); transition: transform .28s cubic-bezier(.2,.8,.2,1), visibility 0s .3s;
+    visibility: hidden; pointer-events: none;
+    max-height: 86%; overflow: auto; -webkit-overflow-scrolling: touch;
+  }
+  .sheet.open { transform: none; visibility: visible; pointer-events: auto; transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+  .sheet h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 26px; margin: 0 0 2px; }
+  .sheet .sub { color: var(--ink-soft); margin: 0 0 12px; font-size: 14px; }
+  .prompt {
+    display: flex; gap: 8px; align-items: flex-start;
+    background: var(--sea); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+    font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.25;
+  }
+  .prompt span { flex: 1; }
+  .prompt button { font-size: 20px; line-height: 1; padding: 0 2px; color: var(--ink-soft); font-style: normal; }
+  .sheet textarea {
+    width: 100%; border: 1px solid var(--ink); border-radius: 12px; background: #fff;
+    padding: 10px 12px; font-family: var(--serif); font-style: italic; font-size: 20px; line-height: 1.3;
+    min-height: 120px; outline: none; resize: none;
+  }
+  .sheet textarea:focus { border-color: var(--red); }
+  .seg { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .seg button {
+    flex: 1 1 auto; border: 1px solid var(--line); border-radius: 12px; padding: 8px 6px;
+    font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-soft); background: #fff;
+  }
+  .seg button small { display: block; font-size: 11px; font-style: normal; letter-spacing: .08em; text-transform: uppercase; }
+  .seg button.on { border-color: var(--ink); color: var(--ink); background: var(--sea); }
+  .seg button.on.dirty { background: var(--red); border-color: var(--red); color: #fff; }
+  .seg button.on.clean { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .seglabel { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-top: 12px; }
+  .sheet .actions { display: flex; gap: 8px; margin-top: 14px; }
+  .sheet .actions .pill { flex: 1; height: 44px; border-radius: 22px; }
+  .sheet .danger { color: var(--red); border-color: var(--red); flex: 0 0 auto !important; padding: 0 16px; }
+
+  .notes-list { list-style: none; margin: 0; padding: 0; }
+  .notes-list li { border-bottom: 1px solid var(--line); }
+  .notes-list button { display: flex; gap: 10px; width: 100%; text-align: left; padding: 10px 0; align-items: flex-start; }
+  .notes-list .dot { width: 10px; height: 10px; border-radius: 5px; margin-top: 7px; flex: 0 0 auto; border: 1.5px solid var(--ink); }
+  .notes-list .dot.dirty { background: var(--red); border-color: var(--red); }
+  .notes-list .dot.clean { background: var(--teal); border-color: var(--teal); }
+  .notes-list .t { font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.25; white-space: pre-wrap; }
+  .notes-list .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .empty { color: var(--ink-soft); padding: 20px 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 18px; }
+  .menu button.item { display: block; width: 100%; text-align: left; padding: 14px 4px; font-size: 17px; border-bottom: 1px solid var(--line); }
+  .menu button.item:last-of-type { border-bottom: 0; }
+
+  .signs label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.35; }
+  .signs input { width: 22px; height: 22px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--red); }
+  .signs .score { font-family: var(--serif); font-style: italic; font-size: 22px; margin: 12px 0 2px; }
+  .how p { margin: 0 0 10px; line-height: 1.45; }
+  .how b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<svg id="scene" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+
+<div class="top">
+  <div class="title">Journey to Clean Fuel<small>Water flows downhill</small></div>
+  <div class="right">
+    <button class="pill round" id="btnMenu" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+    </button>
+    <button class="pill round" id="btnFit" aria-label="Zoom out to the whole landscape">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="bubble" id="bubble"><button class="pill red" id="bubbleWrite">+ Write here</button></div>
+
+<div class="bottom">
+  <div class="hint" id="hint">Pinch to zoom. Hold a spot to write there.</div>
+  <div class="levels">
+    <button data-go="past">1. Mountain</button>
+    <button data-go="belief">2. Streams</button>
+    <button data-go="state">3. River</button>
+    <button data-go="behavior">4. Sea</button>
+  </div>
+  <div class="row">
+    <button class="pill wide" id="btnList">All entries</button>
+    <button class="pill wide primary" id="btnAdd">+ Write</button>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<!-- Note sheet -->
+<div class="sheet" id="noteSheet">
+  <h2 id="noteTitle">New entry</h2>
+  <p class="sub" id="noteSub"></p>
+  <div class="prompt"><span id="promptText"></span><button id="promptNext" aria-label="Another question">↻</button></div>
+  <textarea id="noteText" placeholder="Write what is really going on…" rows="4"></textarea>
+  <div class="seglabel">Which level is this?</div>
+  <div class="seg" id="levelSeg">
+    <button data-level="past">Mountain<small>Past</small></button>
+    <button data-level="belief">Stream<small>Belief</small></button>
+    <button data-level="state">River<small>State</small></button>
+    <button data-level="behavior">Sea<small>Behavior</small></button>
+  </div>
+  <div class="seglabel">What kind of fuel?</div>
+  <div class="seg" id="fuelSeg">
+    <button data-fuel="dirty" class="dirty">Dirty</button>
+    <button data-fuel="clean" class="clean">Clean</button>
+    <button data-fuel="">Not sure yet</button>
+  </div>
+  <div class="actions">
+    <button class="pill danger hide" id="noteDelete">Delete</button>
+    <button class="pill" id="noteCancel">Cancel</button>
+    <button class="pill primary" id="noteSave">Save</button>
+  </div>
+</div>
+
+<!-- All entries -->
+<div class="sheet" id="listSheet">
+  <h2>All entries</h2>
+  <p class="sub">Newest first. Tap one to zoom to it on the landscape.</p>
+  <ul class="notes-list" id="notesList"></ul>
+</div>
+
+<!-- Six signs -->
+<div class="sheet signs" id="signsSheet">
+  <h2>Six signs of dirty fuel</h2>
+  <p class="sub">Be honest. Nobody is watching.</p>
+  <div id="signsList"></div>
+  <div class="score" id="signsScore"></div>
+  <p class="sub">Forget the number. One of these hitting hard can matter more than four hitting slightly. Ask yourself: am I running on dirty fuel? Notice the first answer that comes up.</p>
+</div>
+
+<!-- How to use -->
+<div class="sheet how" id="howSheet">
+  <h2>How this works</h2>
+  <p>This is one landscape. <b>Water flows downhill.</b></p>
+  <p><b>1. The mountain</b> is your past experiences, as they live in you now. The highest points are childhood.</p>
+  <p><b>2. The streams</b> are your beliefs: the conclusions a younger you drew about what you are worth, what is safe, and what you must do to deserve love, respect, approval or security.</p>
+  <p><b>3. The river</b> is your state: how it actually feels, day to day, to be you.</p>
+  <p><b>4. The sea</b> is your behavior: what the fuel makes you do, and what you can never quite make yourself do.</p>
+  <p>Most people stand by the sea with a bucket. Deeper change happens upstream. Start where you feel it (the river), then trace it up to the belief, then to the moment on the mountain where that belief first made sense.</p>
+  <p><b>Using the app:</b> pinch to zoom, drag to look around, hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 at the bottom to fly to each level. Everything stays on your phone.</p>
+</div>
+
+<!-- Menu -->
+<div class="sheet menu" id="menuSheet">
+  <h2>Journey to Clean Fuel</h2>
+  <button class="item" id="menuSigns">Six signs check-in</button>
+  <button class="item" id="menuHow">How this works</button>
+  <button class="item" id="menuBackup">Back up entries to a file</button>
+  <button class="item" id="menuRestore">Restore from a backup</button>
+  <button class="item" id="menuReset">Clear the landscape</button>
+  <input type="file" id="restoreFile" accept="application/json,.json" class="hide">
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = $('scene');
+  const KEY = 'journey-clean-fuel-v1';
+  const W = 1000, H = 1600;   // scene units
+
+  // ---------- Content ----------
+  const LEVELS = {
+    past:     { n: 1, name: 'Past experiences', place: 'On the mountain' },
+    belief:   { n: 2, name: 'Beliefs',          place: 'In a stream' },
+    state:    { n: 3, name: 'State',            place: 'In the river' },
+    behavior: { n: 4, name: 'Behavior',         place: 'In the sea' }
+  };
+  const PROMPTS = {
+    past: [
+      'What happened? Just the facts, the way a camera would have seen it.',
+      'What did the younger you decide that moment meant?',
+      'Who was there, and what did you need from them?',
+      'In your home, what kind of person got the most safety, praise or connection?',
+      'When did achievement first become the thing that got you noticed?',
+      'What did you have to become when things felt unstable?',
+      'What did that moment seem to say about you?'
+    ],
+    belief: [
+      'Finish the sentence: I am only worthy when…',
+      'What rule did you learn about how to stay safe?',
+      'What do you believe you have to do to deserve love or respect?',
+      'Finish the sentence: If I stop, then…',
+      'Which feels true in your body: my value is what I produce, being impressive is safer than being me, if I am not in control I am not safe, love is something I earn?',
+      'Where did this belief first make sense? Follow it up the mountain.',
+      'Is this a fact, or a conclusion a child drew?'
+    ],
+    state: [
+      'How does it actually feel right now? Where does it live in your body?',
+      'What water are you standing in today: pressure, anxiety, shame, flatness, drive?',
+      'Did your mood follow your results today?',
+      'Could you switch off? What kept running?',
+      'Someone in your world won this week. What happened in your chest?',
+      'What feeling are you working hard not to feel?',
+      'If you stopped fighting this feeling and let it be here, what would it do?'
+    ],
+    behavior: [
+      'What did the fuel make you do today?',
+      'What did you avoid by being productive?',
+      'What did you do today that you did not need to do?',
+      'What could you never quite make yourself do?',
+      'You hit a target. How long did it feel good for, and what did you do next?',
+      'What would you have done differently if you already felt enough?',
+      'Which belief upstream is this behavior protecting?'
+    ]
+  };
+  const SIGNS = [
+    'My emotional state is heavily dictated by my external results.',
+    'I find it really difficult to psychologically switch off.',
+    'I self-sabotage through productive procrastination.',
+    'Achievement never creates deep, lasting satisfaction. The goalposts move.',
+    'Other people’s success makes something in me tighten.',
+    'There is an underlying sense of emptiness despite the success.'
+  ];
+
+  // ---------- State ----------
+  let data = load();
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (d && Array.isArray(d.notes)) return d;
+    } catch (e) {}
+    return { notes: [], signs: [] };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  // ---------- Helpers ----------
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function rng(seed) { // mulberry32
+    let a = seed >>> 0;
+    return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  const R = rng(20261101);
+  const rand = (a, b) => a + (b - a) * R();
+  const f1 = n => Math.round(n * 10) / 10;
+  // Catmull-Rom spline through points -> smooth cubic path
+  function spline(pts) {
+    if (pts.length < 2) return '';
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+  const poly = pts => pts.map((p, i) => (i ? 'L' : 'M') + f1(p[0]) + ' ' + f1(p[1])).join('');
+  function inPoly(x, y, pts) {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+
+  // ---------- Geometry of the landscape ----------
+  const PEAK = [500, 150];
+  const L_FOOT = [20, 690], R_FOOT = [980, 660];
+  function ridge(a, b, n, amp) {
+    const pts = [a];
+    for (let i = 1; i < n; i++) {
+      const t = i / n;
+      const x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
+      const j = (i % 2 ? -1 : 1) * rand(amp * .3, amp) * (0.4 + 0.6 * Math.sin(Math.PI * t));
+      pts.push([x + rand(-6, 6), y + j]);
+    }
+    pts.push(b);
+    return pts;
+  }
+  const leftRidge = ridge(L_FOOT, PEAK, 26, 18);
+  const rightRidge = ridge(PEAK, R_FOOT, 24, 18);
+  const mountain = leftRidge.concat(rightRidge.slice(1));
+  const mountainPoly = mountain.concat([[980, 780], [20, 800]]);
+
+  const CONF = [500, 800];
+  const STREAMS = [
+    [[315, 430], [350, 540], [420, 690], CONF],
+    [[432, 275], [440, 420], [468, 610], CONF],
+    [[585, 325], [565, 470], [530, 660], CONF],
+    [[722, 470], [655, 590], [565, 730], CONF]
+  ];
+  const RIVER = [CONF, [485, 870], [500, 950], [565, 1040], [640, 1120], [690, 1200], [720, 1270]];
+  const SHORE = [[0, 1300], [140, 1285], [300, 1300], [460, 1280], [600, 1265], [690, 1250], [760, 1225], [850, 1215], [1000, 1190]];
+  const seaPoly = SHORE.concat([[1000, H], [0, H]]);
+
+  // sampled points for distance tests
+  function samplePath(d, n) {
+    const p = el('path', { d });
+    const len = p.getTotalLength(), out = [];
+    for (let i = 0; i <= n; i++) { const q = p.getPointAtLength(len * i / n); out.push([q.x, q.y]); }
+    return out;
+  }
+  function distToPts(x, y, pts) {
+    let m = 1e9;
+    for (const p of pts) { const d = Math.hypot(p[0] - x, p[1] - y); if (d < m) m = d; }
+    return m;
+  }
+  let streamPts = [], riverPts = [];
+
+  function levelAt(x, y) {
+    if (inPoly(x, y, seaPoly)) return 'behavior';
+    const ds = distToPts(x, y, streamPts), dr = distToPts(x, y, riverPts);
+    if (dr < 70 && dr <= ds) return 'state';
+    if (ds < 60) return 'belief';
+    if (inPoly(x, y, mountainPoly)) return 'past';
+    if (y > 1100) return 'behavior';
+    return dr < ds ? 'state' : 'belief';
+  }
+
+  // ---------- Draw the landscape ----------
+  const gWorld = el('g', { id: 'world' }, svg);
+  const gLand = el('g', {}, gWorld);
+  const gNotes = el('g', { id: 'notes' }, gWorld);
+  const gGhost = el('g', { class: 'ghost' }, gWorld);
+
+  function drawLandscape() {
+    const defs = el('defs', {}, gLand);
+    const clip = el('clipPath', { id: 'mclip' }, defs);
+    el('path', { d: poly(mountainPoly) + 'Z' }, clip);
+
+    // Sea
+    el('path', { d: spline(SHORE) + ` L${W} ${H} L0 ${H} Z`, fill: 'var(--sea)', stroke: 'none' }, gLand);
+    el('path', { d: spline(SHORE), class: 'ink', 'stroke-width': 1.6 }, gLand);
+    const gw = el('g', { class: 'ink', 'stroke-width': 1.1, opacity: .6 }, gLand);
+    for (let y = 1330; y < H; y += 44) {
+      for (let x = ((y / 44) | 0) % 2 ? 40 : 10; x < W; x += 60) {
+        if (y < 1320 || inPoly(x + 20, y, seaPoly)) el('path', { d: `M${x} ${y} q10 -6 20 0 t20 0` }, gw);
+      }
+    }
+
+    // Foothill contours
+    const gc = el('g', { class: 'ink', 'stroke-width': 1.3 }, gLand);
+    const contours = [
+      [[20, 760], [160, 740], [300, 790], [420, 870]],
+      [[20, 900], [120, 880], [260, 900], [380, 960], [440, 1020]],
+      [[120, 1060], [240, 1040], [360, 1080], [470, 1150]],
+      [[20, 1180], [150, 1160], [280, 1190]],
+      [[980, 740], [860, 740], [760, 790], [700, 850], [640, 870]],
+      [[980, 860], [900, 850], [820, 900], [720, 940], [660, 960]],
+      [[980, 1010], [900, 1000], [820, 1040], [760, 1060]],
+      [[980, 1120], [920, 1110], [850, 1130]]
+    ];
+    contours.forEach(c => el('path', { d: spline(c) }, gc));
+
+    // Trees, rocks, tufts
+    const gd = el('g', { class: 'ink', 'stroke-width': 1.2 }, gLand);
+    function tree(x, y, s) {
+      el('path', { d: `M${x} ${y} v${-s * 3}` }, gd);
+      for (let i = 0; i < 3; i++) {
+        const yy = y - s * (0.6 + i * 0.8), w = s * (1.2 - i * 0.3);
+        el('path', { d: `M${f1(x - w)} ${f1(yy)} L${x} ${f1(yy - s * 0.9)} L${f1(x + w)} ${f1(yy)}` }, gd);
+      }
+    }
+    function rock(x, y, s) {
+      const pts = [];
+      for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; const r = s * rand(.7, 1.1); pts.push([x + Math.cos(a) * r, y + Math.sin(a) * r * .7]); }
+      el('path', { d: poly(pts) + 'Z', fill: 'var(--paper)' }, gd);
+      el('path', { d: `M${f1(pts[5][0])} ${f1(pts[5][1])} L${f1(x)} ${f1(y + s * .3)} L${f1(pts[2][0])} ${f1(pts[2][1])}` }, gd);
+    }
+    function tuft(x, y, up) {
+      el('path', { d: up ? `M${x} ${y} l-5 -5 M${x} ${y} l5 -5` : `M${x} ${y} l-4 7 M${x} ${y} l4 7` }, gd);
+    }
+    const clusters = [[110, 760, 9], [220, 740, 7], [860, 700, 8], [920, 730, 6], [640, 880, 5], [300, 980, 4], [820, 950, 5]];
+    clusters.forEach(([cx, cy, n]) => { for (let i = 0; i < n; i++) tree(f1(cx + rand(-45, 45)), f1(cy + rand(-24, 24)), rand(7, 11)); });
+    const rockSpots = [[160, 830], [250, 870], [340, 940], [410, 1010], [120, 980], [200, 1120], [330, 1180], [480, 1210], [780, 820], [860, 900], [920, 980], [760, 1090], [880, 1150], [640, 1010]];
+    rockSpots.forEach(([x, y]) => rock(x + rand(-20, 20), y + rand(-10, 10), rand(8, 13)));
+    for (let i = 0; i < 70; i++) {
+      const x = rand(20, 980), y = rand(720, 1240);
+      if (inPoly(x, y, seaPoly) || distToPts(x, y, riverPts) < 40) continue;
+      tuft(f1(x), f1(y), R() > .35);
+    }
+
+    // Mountain body (white fill hides what is behind it)
+    const gm = el('g', { 'clip-path': 'url(#mclip)' }, gLand);
+    el('path', { d: poly(mountainPoly) + 'Z', fill: 'var(--paper)', stroke: 'none' }, gm);
+    // hatching patches on the faces
+    const patches = [
+      { cx: 330, cy: 420, rx: 90, ry: 130, rot: 20 },
+      { cx: 520, cy: 300, rx: 60, ry: 110, rot: -8 },
+      { cx: 640, cy: 440, rx: 70, ry: 90, rot: -25 },
+      { cx: 440, cy: 560, rx: 70, ry: 60, rot: 10 },
+      { cx: 800, cy: 560, rx: 60, ry: 60, rot: -30 }
+    ];
+    patches.forEach((p, i) => {
+      const id = 'hp' + i;
+      const c = el('clipPath', { id }, defs);
+      el('ellipse', { cx: p.cx, cy: p.cy, rx: p.rx, ry: p.ry, transform: `rotate(${p.rot} ${p.cx} ${p.cy})` }, c);
+      const g = el('g', { 'clip-path': `url(#${id})`, class: 'ink', 'stroke-width': .9, opacity: .75 }, gm);
+      const span = Math.max(p.rx, p.ry) * 1.4;
+      for (let x = p.cx - span; x < p.cx + span; x += 7) {
+        const dx = rand(-2, 2);
+        el('line', { x1: f1(x + dx), y1: f1(p.cy - span), x2: f1(x + dx - span * .5), y2: f1(p.cy + span) }, g);
+      }
+    });
+    // rock facet lines
+    const gf = el('g', { class: 'ink', 'stroke-width': 1.1 }, gm);
+    for (let i = 0; i < 46; i++) {
+      const side = R() > .5 ? 1 : -1;
+      const t = rand(.05, .95);
+      const base = side < 0 ? leftRidge : rightRidge;
+      const idx = Math.min(base.length - 1, Math.floor(t * base.length));
+      let x = base[idx][0] + rand(-30, 30), y = base[idx][1] + rand(10, 120);
+      const pts = [[x, y]];
+      const steps = 2 + Math.floor(rand(1, 6));
+      for (let s = 0; s < steps; s++) {
+        const ang = Math.PI / 2 + side * rand(.15, .6) * (R() > .25 ? 1 : -1);
+        const len = rand(18, 48);
+        x += Math.cos(ang) * len; y += Math.sin(ang) * len;
+        pts.push([x, y]);
+      }
+      el('path', { d: poly(pts) }, gf);
+    }
+    // short near-peak strokes
+    for (let i = 0; i < 18; i++) {
+      const x = PEAK[0] + rand(-120, 120), y = PEAK[1] + rand(30, 200);
+      el('path', { d: `M${f1(x)} ${f1(y)} l${f1(rand(-14, 14))} ${f1(rand(10, 26))}` }, gf);
+    }
+    // outline
+    el('path', { d: poly(mountain), class: 'ink', 'stroke-width': 2 }, gLand);
+    // secondary ridge from peak down the front
+    el('path', { d: spline([[PEAK[0] + 4, PEAK[1] + 6], [520, 260], [505, 380], [540, 480], [520, 600]]), class: 'ink', 'stroke-width': 1.2, opacity: .7 }, gLand);
+
+    // Streams and river: pale bed under a red line
+    const gs = el('g', { fill: 'none', 'stroke-linecap': 'round' }, gLand);
+    STREAMS.forEach(s => {
+      const d = spline(s);
+      el('path', { d, stroke: 'var(--sea)', 'stroke-width': 9 }, gs);
+      el('path', { d, stroke: 'var(--red)', 'stroke-width': 2.6 }, gs);
+    });
+    const rd = spline(RIVER);
+    el('path', { d: rd, stroke: 'var(--sea)', 'stroke-width': 26 }, gs);
+    el('path', { d: rd, stroke: 'var(--ink)', 'stroke-width': 1.3, opacity: .55 }, gs);
+    el('path', { d: rd, stroke: 'var(--red)', 'stroke-width': 2.8 }, gs);
+    // bank ticks
+    const gt = el('g', { class: 'ink', 'stroke-width': 1, opacity: .7 }, gLand);
+    const rp = samplePath(rd, 60);
+    for (let i = 4; i < rp.length - 2; i += 3) {
+      const a = rp[i - 1], b = rp[i + 1];
+      const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      const nx = -dy / L, ny = dx / L;
+      const side = i % 2 ? 1 : -1;
+      const x = rp[i][0] + nx * 13 * side, y = rp[i][1] + ny * 13 * side;
+      el('line', { x1: f1(x), y1: f1(y), x2: f1(x + nx * 9 * side), y2: f1(y + ny * 9 * side) }, gt);
+    }
+    // mouth widening into the sea
+    const m = RIVER[RIVER.length - 1];
+    el('path', { d: `M${m[0] - 14} ${m[1] - 40} Q${m[0] - 30} ${m[1] + 10} ${m[0] - 90} ${m[1] + 30}`, class: 'ink', 'stroke-width': 1.2, opacity: .55 }, gLand);
+    el('path', { d: `M${m[0] + 14} ${m[1] - 40} Q${m[0] + 30} ${m[1] - 10} ${m[0] + 70} ${m[1] - 50}`, class: 'ink', 'stroke-width': 1.2, opacity: .55 }, gLand);
+
+    // Labels with leader lines
+    const gl = el('g', {}, gLand);
+    function label(text, x, y, anchor, to, bend) {
+      const t = el('text', { x, y, 'text-anchor': anchor, class: 'label' }, gl);
+      t.textContent = text;
+      const bb = t.getBBox();
+      const fromRight = to[0] > bb.x + bb.width / 2;
+      const sx = fromRight ? bb.x + bb.width + 8 : bb.x - 8;
+      const sy = bb.y + bb.height * .72;
+      const mx = (sx + to[0]) / 2 + bend[0], my = (sy + to[1]) / 2 + bend[1];
+      el('path', { d: `M${f1(sx)} ${f1(sy)} Q${f1(mx)} ${f1(my)} ${to[0]} ${to[1]}`, stroke: 'var(--red)', fill: 'none', 'stroke-width': 1.3, opacity: .85 }, gl);
+    }
+    const sp = i => [Math.round(streamPts[i][0]), Math.round(streamPts[i][1])];
+    label('1. Past experiences', 60, 262, 'start', [372, 340], [20, -10]);
+    label('2. Beliefs', 700, 292, 'start', sp(2 * 41 + 13), [30, -10]);
+    label('3. State', 80, 1000, 'start', [Math.round(riverPts[22][0]) - 14, Math.round(riverPts[22][1])], [30, 30]);
+    label('4. Behavior', 100, 1240, 'start', [370, 1360], [40, 30]);
+    const motto = el('text', { x: 960, y: 128, 'text-anchor': 'end', class: 'motto' }, gl);
+    motto.textContent = 'Water flows downhill.';
+  }
+
+  // sample streams/river first (needed by levelAt and labels)
+  STREAMS.forEach(s => { streamPts = streamPts.concat(samplePath(spline(s), 40)); });
+  riverPts = samplePath(spline(RIVER), 40);
+  drawLandscape();
+
+  // ---------- Notes on the map ----------
+  function wrap(text, max) {
+    const words = text.replace(/\s+/g, ' ').trim().split(' ');
+    const lines = []; let cur = '';
+    for (const w of words) {
+      if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }
+      else cur = (cur + ' ' + w).trim();
+      if (lines.length === 3) break;
+    }
+    if (lines.length < 3 && cur) lines.push(cur);
+    const used = lines.join(' ').length;
+    if (used < text.replace(/\s+/g, ' ').trim().length) lines[lines.length - 1] = lines[lines.length - 1].replace(/\.*$/, '') + '…';
+    return lines;
+  }
+  function renderNotes() {
+    gNotes.innerHTML = '';
+    data.notes.forEach(n => {
+      const g = el('g', { class: 'note' + (n.fuel ? ' ' + n.fuel : ''), 'data-id': n.id }, gNotes);
+      const right = n.x < W * .62;
+      const below = n.y < 110;
+      const tx = n.x + (right ? 46 : -46), ty = n.y + (below ? 44 : -30);
+      const lines = wrap(n.text || '…', 22);
+      const t = el('text', { x: f1(tx), y: f1(ty), 'text-anchor': right ? 'start' : 'end' }, g);
+      lines.forEach((ln, i) => { const s = el('tspan', { x: f1(tx), dy: i ? 24 : 0 }, t); s.textContent = ln; });
+      const ex = right ? tx - 6 : tx + 6, ey = ty - 7;
+      el('path', { class: 'leader', d: `M${f1(n.x)} ${f1(n.y)} Q${f1((n.x + ex) / 2 + (right ? -10 : 10))} ${f1(ey + (below ? -8 : 8))} ${f1(ex)} ${f1(ey)}` }, g);
+      el('circle', { class: 'dot', cx: n.x, cy: n.y, r: 5.5 }, g);
+      // generous invisible hit area
+      const bw = Math.max(...lines.map(l => l.length)) * 11 + 20, bh = lines.length * 24 + 16;
+      el('rect', { class: 'hit', x: right ? tx - 8 : tx - bw + 8, y: ty - 24, width: bw, height: bh }, g);
+      el('circle', { class: 'hit', cx: n.x, cy: n.y, r: 26 }, g);
+    });
+  }
+
+  // ---------- View: zoom and pan ----------
+  const view = { x: 0, y: 0, w: W, h: H };
+  let cw = 1, ch = 1;        // css px
+  let minScale = .1, maxScale = 6;
+  function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); }
+  function scale() { return cw / view.w; }
+  function clampView() {
+    const s = Math.min(maxScale, Math.max(minScale, scale()));
+    view.w = cw / s; view.h = ch / s;
+    const mx = view.w * .6, my = view.h * .6;
+    view.x = Math.min(W + mx - view.w, Math.max(-mx, view.x));
+    view.y = Math.min(H + my - view.h, Math.max(-my, view.y));
+  }
+  function fitView() {
+    const s = Math.min(cw / (W + 40), (ch - 200) / (H + 40));
+    return { w: cw / s, h: ch / s, x: (W - cw / s) / 2, y: (H - ch / s) / 2 + 20 };
+  }
+  function resize() {
+    const r = svg.getBoundingClientRect();
+    const oldScale = scale(), cx = view.x + view.w / 2, cy = view.y + view.h / 2;
+    cw = r.width || 1; ch = r.height || 1;
+    minScale = Math.min(cw / (W + 40), (ch - 200) / (H + 40));
+    const s = Math.max(minScale, oldScale);
+    view.w = cw / s; view.h = ch / s; view.x = cx - view.w / 2; view.y = cy - view.h / 2;
+    clampView(); applyView();
+  }
+  function toScene(px, py) { return [view.x + px / cw * view.w, view.y + py / ch * view.h]; }
+  function toScreen(x, y) { return [(x - view.x) / view.w * cw, (y - view.y) / view.h * ch]; }
+  function zoomAt(px, py, factor) {
+    const [sx, sy] = toScene(px, py);
+    const s = Math.min(maxScale, Math.max(minScale, scale() * factor));
+    view.w = cw / s; view.h = ch / s;
+    view.x = sx - px / cw * view.w; view.y = sy - py / ch * view.h;
+    clampView(); applyView();
+  }
+  let anim = null;
+  function flyTo(target, ms) {
+    if (anim) cancelAnimationFrame(anim);
+    const from = { ...view }, t0 = performance.now();
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const step = now => {
+      const t = Math.min(1, (now - t0) / (ms || 500)), k = ease(t);
+      view.x = from.x + (target.x - from.x) * k; view.y = from.y + (target.y - from.y) * k;
+      view.w = from.w + (target.w - from.w) * k; view.h = from.h + (target.h - from.h) * k;
+      applyView();
+      if (t < 1) anim = requestAnimationFrame(step); else anim = null;
+    };
+    anim = requestAnimationFrame(step);
+  }
+  function viewAround(cx, cy, s) {
+    s = Math.min(maxScale, Math.max(minScale, s));
+    const v = { w: cw / s, h: ch / s }; v.x = cx - v.w / 2; v.y = cy - v.h / 2;
+    const mx = v.w * .6, my = v.h * .6;
+    v.x = Math.min(W + mx - v.w, Math.max(-mx, v.x)); v.y = Math.min(H + my - v.h, Math.max(-my, v.y));
+    return v;
+  }
+  const REGIONS = {
+    past: { cx: 500, cy: 400, z: 1.9 },
+    belief: { cx: 520, cy: 580, z: 2.1 },
+    state: { cx: 580, cy: 1010, z: 2.3 },
+    behavior: { cx: 500, cy: 1380, z: 2.2 }
+  };
+  function goRegion(k) {
+    const r = REGIONS[k];
+    flyTo(viewAround(r.cx, r.cy, minScale * r.z), 600);
+    hideBubble();
+  }
+
+  // ---------- Gestures ----------
+  const pointers = new Map();
+  let gesture = null, lastTap = { t: 0, x: 0, y: 0 }, pressTimer = null, moved = false;
+  let placing = false;
+
+  svg.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    svg.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), target: e.target });
+    if (anim) { cancelAnimationFrame(anim); anim = null; }
+    moved = false;
+    clearTimeout(pressTimer);
+    if (pointers.size === 1) {
+      gesture = { kind: 'pan', x: e.clientX, y: e.clientY, multi: false };
+      pressTimer = setTimeout(() => {
+        if (pointers.size === 1 && !moved) {
+          const p = pointers.values().next().value;
+          if (p.target.closest && p.target.closest('.note')) return;
+          if (navigator.vibrate) navigator.vibrate(10);
+          gesture.consumed = true;
+          const [x, y] = toScene(p.x - svgLeft(), p.y - svgTop());
+          openNoteAt(x, y);
+        }
+      }, 480);
+    } else if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      gesture = { kind: 'pinch', dist: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, multi: true };
+    }
+  });
+  const svgLeft = () => 0, svgTop = () => 0;
+  svg.addEventListener('pointermove', e => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    p.x = e.clientX; p.y = e.clientY;
+    if (Math.hypot(p.x - p.sx, p.y - p.sy) > 8) { moved = true; clearTimeout(pressTimer); }
+    if (!gesture) return;
+    if (gesture.kind === 'pan' && pointers.size === 1) {
+      const dx = (e.clientX - gesture.x) / scale(), dy = (e.clientY - gesture.y) / scale();
+      gesture.x = e.clientX; gesture.y = e.clientY;
+      view.x -= dx; view.y -= dy; clampView(); applyView();
+      if (moved) hideBubble();
+    } else if (gesture.kind === 'pinch' && pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      // pan by midpoint delta, zoom by distance ratio
+      view.x -= (mx - gesture.mx) / scale(); view.y -= (my - gesture.my) / scale();
+      zoomAt(mx, my, dist / (gesture.dist || dist));
+      gesture.dist = dist; gesture.mx = mx; gesture.my = my;
+      hideBubble();
+    }
+  });
+  function endPointer(e) {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    pointers.delete(e.pointerId);
+    clearTimeout(pressTimer);
+    const dt = performance.now() - p.t, dist = Math.hypot(p.x - p.sx, p.y - p.sy);
+    if (pointers.size === 0) {
+      const wasMulti = gesture && gesture.multi, consumed = gesture && gesture.consumed;
+      gesture = null;
+      if (!wasMulti && !consumed && dist < 10 && dt < 350 && e.type === 'pointerup') handleTap(p.x, p.y, p.target);
+    } else if (pointers.size === 1) {
+      const q = pointers.values().next().value;
+      gesture = { kind: 'pan', x: q.x, y: q.y, multi: true };
+    }
+  }
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * .002)); }, { passive: false });
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault()));
+  document.addEventListener('dblclick', e => e.preventDefault());
+
+  function handleTap(px, py, target) {
+    const now = performance.now();
+    const noteG = target.closest ? target.closest('.note') : null;
+    if (noteG) { hideBubble(); openNote(noteG.getAttribute('data-id')); lastTap.t = 0; return; }
+    const [x, y] = toScene(px, py);
+    if (placing) { placing = false; openNoteAt(x, y); return; }
+    if (now - lastTap.t < 320 && Math.hypot(px - lastTap.x, py - lastTap.y) < 40) {
+      lastTap.t = 0; hideBubble();
+      if (scale() > minScale * 4.5) flyTo(fitView(), 500); else flyTo(viewAround(x, y, scale() * 2.2), 380);
+      return;
+    }
+    lastTap = { t: now, x: px, y: py };
+    showBubble(x, y);
+  }
+
+  // Bubble: "+ Write here"
+  const bubble = $('bubble');
+  let bubbleAt = null, bubbleTimer = null;
+  function showBubble(x, y) {
+    bubbleAt = [x, y];
+    const [px, py] = toScreen(x, y);
+    bubble.style.left = px + 'px'; bubble.style.top = py + 'px';
+    bubble.classList.add('show');
+    clearTimeout(bubbleTimer); bubbleTimer = setTimeout(hideBubble, 3500);
+  }
+  function hideBubble() { bubble.classList.remove('show'); bubbleAt = null; }
+  $('bubbleWrite').addEventListener('click', () => { if (bubbleAt) openNoteAt(bubbleAt[0], bubbleAt[1]); hideBubble(); });
+
+  // ---------- Sheets ----------
+  const backdrop = $('backdrop');
+  let openSheet = null;
+  function show(id) { hideBubble(); if (openSheet) $(openSheet).classList.remove('open'); openSheet = id; $(id).classList.add('open'); backdrop.classList.add('open'); }
+  function closeSheets() { if (openSheet) $(openSheet).classList.remove('open'); openSheet = null; backdrop.classList.remove('open'); $('noteText').blur(); placing = false; setHint(); }
+  backdrop.addEventListener('click', closeSheets);
+
+  // keyboard
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const onVV = () => { const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.documentElement.style.setProperty('--kb', kb + 'px'); };
+    vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV);
+  }
+
+  // Hint
+  const hint = $('hint');
+  function setHint(text, red) {
+    hint.textContent = text || (data.notes.length ? 'Pinch to zoom. Hold a spot to write there.' : 'Pinch to zoom. Hold a spot on the landscape to write.');
+    hint.classList.toggle('red', !!red);
+  }
+
+  // ---------- Note editing ----------
+  let editing = null; // { id?, x, y, level, fuel }
+  let promptIdx = 0;
+  const noteText = $('noteText');
+  function setLevel(k) {
+    editing.level = k;
+    [...$('levelSeg').children].forEach(b => b.classList.toggle('on', b.dataset.level === k));
+    $('noteSub').textContent = `${LEVELS[k].place} · ${LEVELS[k].n}. ${LEVELS[k].name}`;
+    promptIdx = Math.floor(Math.random() * PROMPTS[k].length);
+    showPrompt();
+  }
+  function setFuel(f) {
+    editing.fuel = f || '';
+    [...$('fuelSeg').children].forEach(b => b.classList.toggle('on', (b.dataset.fuel || '') === editing.fuel));
+  }
+  function showPrompt() { $('promptText').textContent = PROMPTS[editing.level][promptIdx % PROMPTS[editing.level].length]; }
+  $('promptNext').addEventListener('click', () => { promptIdx++; showPrompt(); });
+  $('levelSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLevel(b.dataset.level); });
+  $('fuelSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setFuel(b.dataset.fuel); });
+
+  function openNoteAt(x, y) {
+    x = Math.round(Math.min(W - 10, Math.max(10, x))); y = Math.round(Math.min(H - 10, Math.max(10, y)));
+    editing = { x, y, level: levelAt(x, y), fuel: '' };
+    ghost(x, y);
+    $('noteTitle').textContent = 'New entry';
+    $('noteDelete').classList.add('hide');
+    noteText.value = '';
+    setLevel(editing.level); setFuel('');
+    show('noteSheet');
+    setTimeout(() => noteText.focus(), 320);
+  }
+  function openNote(id) {
+    const n = data.notes.find(n => n.id === id);
+    if (!n) return;
+    editing = { id, x: n.x, y: n.y, level: n.level, fuel: n.fuel || '' };
+    ghost(n.x, n.y);
+    $('noteTitle').textContent = 'Entry';
+    $('noteDelete').classList.remove('hide');
+    noteText.value = n.text;
+    setLevel(n.level); setFuel(n.fuel);
+    show('noteSheet');
+  }
+  function ghost(x, y) {
+    gGhost.innerHTML = '';
+    el('circle', { cx: x, cy: y, r: 14 }, gGhost);
+    // keep the point visible above the sheet
+    const [, py] = toScreen(x, y);
+    if (py > ch * .3 || py < 90) {
+      const s = Math.max(scale(), minScale * 2.2);
+      const v = viewAround(x, y, s);
+      // put the point just under the title bar, above the sheet
+      v.y = y - v.h * .17;
+      flyTo(v, 420);
+    }
+  }
+  $('noteSave').addEventListener('click', () => {
+    const text = noteText.value.trim();
+    if (!text) { noteText.focus(); return; }
+    const now = Date.now();
+    if (editing.id) {
+      const n = data.notes.find(n => n.id === editing.id);
+      Object.assign(n, { text, level: editing.level, fuel: editing.fuel, updated: now });
+    } else {
+      data.notes.push({ id: uid(), x: editing.x, y: editing.y, text, level: editing.level, fuel: editing.fuel, created: now, updated: now });
+    }
+    save(); renderNotes(); gGhost.innerHTML = ''; closeSheets();
+  });
+  $('noteCancel').addEventListener('click', () => { gGhost.innerHTML = ''; closeSheets(); });
+  $('noteDelete').addEventListener('click', () => {
+    if (!confirm('Delete this entry?')) return;
+    data.notes = data.notes.filter(n => n.id !== editing.id);
+    save(); renderNotes(); gGhost.innerHTML = ''; closeSheets();
+  });
+
+  // ---------- Buttons ----------
+  $('btnFit').addEventListener('click', () => { placing = false; setHint(); flyTo(fitView(), 550); hideBubble(); });
+  $('btnMenu').addEventListener('click', () => show('menuSheet'));
+  document.querySelectorAll('.levels button').forEach(b => b.addEventListener('click', () => goRegion(b.dataset.go)));
+  $('btnAdd').addEventListener('click', () => {
+    placing = !placing;
+    if (placing) setHint('Now tap the spot on the landscape where this belongs.', true); else setHint();
+    hideBubble();
+  });
+  $('btnList').addEventListener('click', () => { renderList(); show('listSheet'); });
+
+  function fmtDate(t) {
+    const d = new Date(t);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+  function renderList() {
+    const ul = $('notesList'); ul.innerHTML = '';
+    const notes = [...data.notes].sort((a, b) => b.created - a.created);
+    if (!notes.length) { ul.innerHTML = '<li class="empty">Nothing written yet. Hold a spot on the landscape to begin.</li>'; return; }
+    notes.forEach(n => {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      const L = LEVELS[n.level] || LEVELS.past;
+      b.innerHTML = `<span class="dot ${n.fuel || ''}"></span><span><div class="t"></div><div class="m">${L.n}. ${L.name}${n.fuel ? ' · ' + n.fuel + ' fuel' : ''} · ${fmtDate(n.created)}</div></span>`;
+      b.querySelector('.t').textContent = n.text;
+      b.addEventListener('click', () => {
+        closeSheets();
+        flyTo(viewAround(n.x, n.y, Math.max(scale(), minScale * 2.4)), 600);
+        const g = gNotes.querySelector(`[data-id="${n.id}"]`);
+        if (g) { g.classList.add('lit'); setTimeout(() => g.classList.remove('lit'), 2200); }
+      });
+      li.appendChild(b); ul.appendChild(li);
+    });
+  }
+
+  // Six signs
+  function renderSigns() {
+    const box = $('signsList'); box.innerHTML = '';
+    SIGNS.forEach((s, i) => {
+      const lab = document.createElement('label');
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!(data.signs && data.signs[i]);
+      cb.addEventListener('change', () => { data.signs = data.signs || []; data.signs[i] = cb.checked; save(); scoreSigns(); });
+      lab.appendChild(cb); lab.appendChild(document.createTextNode(`${i + 1}. ${s}`));
+      box.appendChild(lab);
+    });
+    scoreSigns();
+  }
+  function scoreSigns() {
+    const n = (data.signs || []).filter(Boolean).length;
+    $('signsScore').textContent = n ? `You recognise ${n} of 6.` : 'Tick the ones you recognise in yourself.';
+  }
+  $('menuSigns').addEventListener('click', () => { renderSigns(); show('signsSheet'); });
+  $('menuHow').addEventListener('click', () => show('howSheet'));
+
+  // Backup / restore / reset
+  $('menuBackup').addEventListener('click', async () => {
+    const blob = new Blob([JSON.stringify({ app: 'journey-to-clean-fuel', exported: new Date().toISOString(), ...data }, null, 2)], { type: 'application/json' });
+    const name = 'journey-to-clean-fuel-' + new Date().toISOString().slice(0, 10) + '.json';
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'Journey to Clean Fuel backup' }); return; } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  });
+  $('menuRestore').addEventListener('click', () => $('restoreFile').click());
+  $('restoreFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result);
+        if (!d || !Array.isArray(d.notes)) throw 0;
+        if (!confirm(`Restore ${d.notes.length} entries? This replaces what is here now.`)) return;
+        data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [] };
+        save(); renderNotes(); closeSheets(); setHint();
+      } catch (_) { alert('That file is not a Journey to Clean Fuel backup.'); }
+    };
+    r.readAsText(f); e.target.value = '';
+  });
+  $('menuReset').addEventListener('click', () => {
+    if (!confirm('Clear every entry? Back up first if you want to keep them.')) return;
+    data = { notes: [], signs: [] }; save(); renderNotes(); closeSheets(); setHint();
+  });
+
+  // ---------- Boot ----------
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', () => setTimeout(resize, 120));
+  resize();
+  Object.assign(view, fitView()); applyView();
+  renderNotes(); setHint();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+})();
+</script>
+</body>
+</html>
