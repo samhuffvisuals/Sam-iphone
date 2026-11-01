@@ -269,7 +269,8 @@
   <p><b>3. The river</b> is your state: how it actually feels, day to day, to be you.</p>
   <p><b>4. The sea</b> is your behavior: what the fuel makes you do, and what you can never quite make yourself do.</p>
   <p>Most people stand by the sea with a bucket. Deeper change happens upstream. Start where you feel it (the river), then trace it up to the belief, then to the moment on the mountain where that belief first made sense.</p>
-  <p><b>Using the app:</b> pinch to zoom, drag to look around, hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 at the bottom to fly to each level. Everything stays on your phone.</p>
+  <p><b>Using the app:</b> pinch to zoom, drag to look around, hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 at the bottom to fly to each level.</p>
+  <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all, on a plane or anywhere. Your entries always stay on the phone.</p>
 </div>
 
 <!-- Menu -->
@@ -1004,7 +1005,18 @@
   renderNotes(); setHint();
 
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
+        // Tell the user once that the app is now saved on the phone.
+        let seen = false;
+        try { seen = localStorage.getItem(KEY + ':offline-ready') === '1'; } catch (e) {}
+        if (!seen) {
+          try { localStorage.setItem(KEY + ':offline-ready', '1'); } catch (e) {}
+          setHint('Saved to your phone. Works with no WiFi.');
+          setTimeout(() => setHint(), 5000);
+        }
+      }).catch(() => {});
+    });
   }
 })();
 </script>
