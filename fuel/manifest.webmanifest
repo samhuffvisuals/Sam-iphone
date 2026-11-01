@@ -1,0 +1,16 @@
+{
+  "name": "Fuel",
+  "short_name": "Fuel",
+  "description": "A mountain of streams. Zoom into each one and journal what is really driving you: clean fuel or dirty fuel.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4ecdd",
+  "theme_color": "#f4ecdd",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

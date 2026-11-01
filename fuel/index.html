@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Fuel</title>
+<meta name="description" content="A mountain of streams. Zoom into each one and journal what is really driving you: clean fuel or dirty fuel.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fuel">
+<meta name="theme-color" content="#f4ecdd">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4ecdd;
+    --ink: #2d2a33;
+    --ink-soft: #6b6572;
+    --card: rgba(255, 251, 243, .94);
+    --line: rgba(45, 42, 51, .18);
+    --clean: #4f9fdb;
+    --clean-deep: #2f6fa8;
+    --dirty: #8a7250;
+    --dirty-deep: #5a4631;
+    --accent: #e2694a;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --hand: "Patrick Hand", "Bradley Hand", "Marker Felt", "Comic Sans MS", cursive;
+    --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; overflow: clip; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.35 var(--ui);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    position: fixed; inset: 0;
+    -webkit-user-select: none; user-select: none;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  textarea, input { font: inherit; color: inherit; -webkit-user-select: text; user-select: text; }
+
+  /* ---------- Scene ---------- */
+  #scene {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+    background: #cfe6f3;
+  }
+  #scene text { font-family: var(--hand); }
+  .flow { animation: flow 2.4s linear infinite; }
+  .flow.slow { animation-duration: 4s; }
+  @keyframes flow { to { stroke-dashoffset: -48; } }
+  .hit { stroke: transparent; fill: none; stroke-width: 46; stroke-linecap: round; stroke-linejoin: round; }
+  .stream-g { transition: opacity .35s; }
+  .stream-g.dim { opacity: .3; }
+  .tag { cursor: pointer; }
+  .tag rect { fill: #fffaf0; stroke: var(--ink); stroke-width: 1.4; }
+  .tag.dirty rect { fill: #f3eadb; }
+  .tag text { fill: var(--ink); }
+  .tag .date { fill: var(--ink-soft); }
+  .sign rect { fill: #fff8ea; stroke: var(--ink); stroke-width: 2; }
+  .sign text { fill: var(--ink); }
+  .sign.dirty rect { fill: #e9dcc6; }
+
+  /* ---------- Chrome ---------- */
+  .top {
+    position: absolute; left: 0; right: 0; top: 0; z-index: 5;
+    padding: calc(var(--safe-top) + 8px) 14px 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none;
+  }
+  .top > * { pointer-events: auto; }
+  .logo {
+    font-family: var(--hand); font-size: 34px; line-height: 40px; letter-spacing: .5px;
+    color: var(--ink);
+    text-shadow: 0 1px 0 rgba(255,255,255,.6);
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 38px; padding: 0 14px; border-radius: 19px;
+    background: var(--card); border: 1.5px solid var(--ink);
+    box-shadow: 2px 3px 0 rgba(45,42,51,.18);
+    font-family: var(--hand); font-size: 18px; line-height: 1;
+    color: var(--ink);
+  }
+  .pill:active { transform: translateY(1px); box-shadow: 1px 2px 0 rgba(45,42,51,.18); }
+  .pill.round { width: 38px; padding: 0; justify-content: center; }
+  .pill svg { width: 20px; height: 20px; display: block; }
+  .top .right { display: flex; gap: 8px; }
+  .hide { display: none !important; }
+
+  .bottom {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 10px 14px calc(var(--safe-bottom) + 12px);
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+    pointer-events: none;
+  }
+  .bottom > * { pointer-events: auto; }
+  .hint {
+    font-family: var(--hand); font-size: 17px; color: var(--ink-soft);
+    background: rgba(244,236,221,.85); padding: 4px 12px; border-radius: 12px;
+    pointer-events: none;
+  }
+  .row { display: flex; gap: 8px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .pill.primary { background: var(--ink); color: #fff8ea; border-color: var(--ink); }
+  .pill.wide { flex: 1; justify-content: center; max-width: 220px; }
+
+  /* Focus toolbar */
+  .focusbar {
+    width: 100%; max-width: 440px;
+    background: var(--card); border: 1.5px solid var(--ink); border-radius: 18px;
+    box-shadow: 2px 3px 0 rgba(45,42,51,.18);
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .focusbar .name {
+    display: flex; align-items: baseline; gap: 8px; padding: 0 4px;
+  }
+  .focusbar .name button {
+    font-family: var(--hand); font-size: 24px; line-height: 1.1; text-align: left; flex: 1;
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .focusbar .name button small { font-size: 14px; color: var(--ink-soft); margin-left: 8px; }
+  .focusbar .row { flex-wrap: nowrap; }
+  .seg {
+    display: flex; border: 1.5px solid var(--ink); border-radius: 19px; overflow: hidden; flex: 0 0 auto; height: 38px;
+  }
+  .seg button {
+    font-family: var(--hand); font-size: 18px; padding: 0 14px; line-height: 1;
+    color: var(--ink-soft);
+  }
+  .seg button.on.clean { background: var(--clean); color: #fff; }
+  .seg button.on.dirty { background: var(--dirty); color: #fff; }
+
+  /* ---------- Sheets ---------- */
+  .backdrop {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(45,42,51,.35);
+    display: none;
+  }
+  .backdrop.open { display: block; }
+  .sheet {
+    position: absolute; left: 0; right: 0; z-index: 11;
+    background: #fffaf0; border-top: 2px solid var(--ink);
+    border-radius: 22px 22px 0 0;
+    padding: 14px 16px calc(var(--safe-bottom) + 16px);
+    bottom: var(--kb, 0px);
+    transform: translateY(105%); transition: transform .28s cubic-bezier(.2,.8,.2,1), visibility 0s .3s;
+    visibility: hidden; pointer-events: none;
+    max-height: 85%; overflow: auto;
+  }
+  .sheet.open { transform: none; visibility: visible; pointer-events: auto; transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+  .sheet h2 { font-family: var(--hand); font-size: 26px; margin: 0 0 4px; font-weight: 400; }
+  .sheet .sub { color: var(--ink-soft); margin: 0 0 12px; font-size: 14px; }
+  .prompt {
+    display: flex; gap: 8px; align-items: flex-start;
+    background: #f1e7d3; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+    font-family: var(--hand); font-size: 18px; line-height: 1.2;
+  }
+  .prompt span { flex: 1; }
+  .prompt button { font-size: 20px; line-height: 1; padding: 0 2px; color: var(--ink-soft); }
+  .sheet textarea, .sheet input[type=text] {
+    width: 100%; border: 1.5px solid var(--ink); border-radius: 12px;
+    background: #fff; padding: 10px 12px; font-size: 17px; line-height: 1.35;
+    outline: none; resize: none;
+  }
+  .sheet textarea { min-height: 110px; font-family: var(--hand); font-size: 20px; }
+  .sheet textarea:focus, .sheet input:focus { border-color: var(--clean-deep); }
+  .sheet .actions { display: flex; gap: 8px; margin-top: 12px; }
+  .sheet .actions .pill { flex: 1; justify-content: center; height: 44px; border-radius: 22px; }
+  .sheet .danger { color: #b3432a; }
+  .sheet .typepick { display: flex; gap: 8px; margin: 10px 0 2px; }
+  .sheet .typepick button {
+    flex: 1; border: 1.5px solid var(--ink); border-radius: 12px; padding: 10px;
+    font-family: var(--hand); font-size: 18px; color: var(--ink-soft);
+  }
+  .sheet .typepick button.on.clean { background: var(--clean); color: #fff; }
+  .sheet .typepick button.on.dirty { background: var(--dirty); color: #fff; }
+  .legend { font-size: 13px; color: var(--ink-soft); margin: 6px 0 0; }
+
+  .notes-list { list-style: none; margin: 0; padding: 0; }
+  .notes-list li {
+    display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line);
+    align-items: flex-start;
+  }
+  .notes-list .dot { width: 12px; height: 12px; border-radius: 6px; margin-top: 6px; flex: 0 0 auto; }
+  .notes-list .dot.clean { background: var(--clean); }
+  .notes-list .dot.dirty { background: var(--dirty); }
+  .notes-list .t { font-family: var(--hand); font-size: 18px; line-height: 1.25; }
+  .notes-list .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .notes-list button { text-align: left; flex: 1; }
+  .empty { color: var(--ink-soft); padding: 20px 0; text-align: center; font-family: var(--hand); font-size: 18px; }
+  .menu button.item {
+    display: block; width: 100%; text-align: left; padding: 14px 4px; font-size: 17px;
+    border-bottom: 1px solid var(--line);
+  }
+  .menu button.item:last-child { border-bottom: 0; }
+</style>
+</head>
+<body>
+
+<svg id="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" preserveAspectRatio="xMidYMid slice"></svg>
+
+<div class="top">
+  <div class="logo">Fuel</div>
+  <div class="right">
+    <button class="pill round" id="btnMenu" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg>
+    </button>
+    <button class="pill" id="btnZoomOut">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6"/></svg>
+      Zoom out
+    </button>
+  </div>
+</div>
+
+<div class="bottom">
+  <div id="overviewUI" style="display:contents">
+    <div class="hint">Tap a stream to zoom in</div>
+    <div class="row">
+      <button class="pill wide" id="btnNotes">All notes</button>
+      <button class="pill wide primary" id="btnAddStream">+ Stream</button>
+    </div>
+  </div>
+  <div id="focusUI" class="focusbar hide">
+    <div class="name">
+      <button id="focusName"></button>
+    </div>
+    <div class="row">
+      <div class="seg">
+        <button id="segClean" class="clean">Clean</button>
+        <button id="segDirty" class="dirty">Dirty</button>
+      </div>
+      <button class="pill wide primary" id="btnAddNote">+ Add a note</button>
+    </div>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<!-- Note sheet -->
+<div class="sheet" id="noteSheet">
+  <h2 id="noteTitle">New note</h2>
+  <p class="sub" id="noteSub"></p>
+  <div class="prompt" id="promptBox"><span id="promptText"></span><button id="promptNext" aria-label="Another question">↻</button></div>
+  <textarea id="noteText" placeholder="Write what is really going on…" rows="4"></textarea>
+  <div class="actions">
+    <button class="pill danger hide" id="noteDelete">Delete</button>
+    <button class="pill" id="noteCancel">Cancel</button>
+    <button class="pill primary" id="noteSave">Save</button>
+  </div>
+</div>
+
+<!-- Stream sheet (add / rename) -->
+<div class="sheet" id="streamSheet">
+  <h2 id="streamTitle">New stream</h2>
+  <p class="sub">A stream is one thing that drives you. Name it honestly.</p>
+  <input type="text" id="streamName" placeholder="e.g. Proving them wrong" maxlength="40" autocomplete="off">
+  <div class="typepick">
+    <button id="pickClean" class="clean">Clean fuel</button>
+    <button id="pickDirty" class="dirty">Dirty fuel</button>
+  </div>
+  <p class="legend">Clean: love, curiosity, purpose, service. Dirty: fear, shame, approval, proving a point.</p>
+  <div class="actions">
+    <button class="pill danger hide" id="streamDelete">Delete</button>
+    <button class="pill" id="streamCancel">Cancel</button>
+    <button class="pill primary" id="streamSave">Save</button>
+  </div>
+</div>
+
+<!-- All notes sheet -->
+<div class="sheet" id="listSheet">
+  <h2>All notes</h2>
+  <p class="sub">Newest first. Tap one to zoom to its stream.</p>
+  <ul class="notes-list" id="notesList"></ul>
+</div>
+
+<!-- Menu sheet -->
+<div class="sheet menu" id="menuSheet">
+  <h2>Fuel</h2>
+  <button class="item" id="menuBackup">Back up notes to a file</button>
+  <button class="item" id="menuRestore">Restore from a backup</button>
+  <button class="item" id="menuReset">Reset the mountain</button>
+  <input type="file" id="restoreFile" accept="application/json,.json" class="hide">
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const svg = $('scene');
+  const NS = 'http://www.w3.org/2000/svg';
+  const KEY = 'fuel-v1';
+  const W = 800, H = 1200;            // scene size
+  const PEAK = { x: 400, y: 170 };
+  const BASE_Y = 900, BASE_HALF = 380;
+  const LAKE_Y = 975;
+
+  // ---------- Data ----------
+  const PROMPTS = [
+    'What were you really chasing today?',
+    'Who were you trying to prove something to?',
+    'If nobody ever saw this, would you still do it?',
+    'What did you feel in your body while working?',
+    'Were you running toward something, or away from something?',
+    'What would you do with this hour if you felt enough already?',
+    'Whose approval were you hoping for?',
+    'What part of today felt like play?',
+    'What made you tired that had nothing to do with effort?',
+    'When did you feel most alive this week? What was fueling that?',
+    'What are you afraid will happen if you stop?',
+    'What would love do here?'
+  ];
+  const DEFAULT_STREAMS = [
+    { name: 'Curiosity', type: 'clean' },
+    { name: 'Proving them wrong', type: 'dirty' },
+    { name: 'Love of the craft', type: 'clean' },
+    { name: 'Fear of falling behind', type: 'dirty' },
+    { name: 'Helping people', type: 'clean' },
+    { name: 'Need for approval', type: 'dirty' }
+  ];
+  const MAX_STREAMS = 8;
+  const uid = () => Math.random().toString(36).slice(2, 10);
+
+  let state = load();
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY));
+      if (s && Array.isArray(s.streams)) return s;
+    } catch (e) {}
+    return { streams: DEFAULT_STREAMS.map(d => ({ id: uid(), name: d.name, type: d.type, notes: [] })) };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  // ---------- Geometry helpers ----------
+  const seeded = seed => { let t = seed * 9301 + 49297; return () => { t = (t * 9301 + 49297) % 233280; return t / 233280; }; };
+  const halfWidthAt = y => Math.max(0, (y - PEAK.y) / (BASE_Y - PEAK.y)) * BASE_HALF;
+  function catmull(pts) {
+    if (pts.length < 2) return '';
+    let d = `M${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+      const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+      d += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+    return d;
+  }
+  // Wobbly closed shape for the hand-drawn look
+  function wobblyPath(pts, amp, seed, close = true) {
+    const r = seeded(seed);
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      const segs = Math.max(2, Math.round(Math.hypot(b.x - a.x, b.y - a.y) / 60));
+      for (let s = 0; s < segs; s++) {
+        const t = s / segs;
+        out.push({ x: a.x + (b.x - a.x) * t + (r() - .5) * amp, y: a.y + (b.y - a.y) * t + (r() - .5) * amp });
+      }
+    }
+    out.push(pts[pts.length - 1]);
+    return catmull(out) + (close ? ' Z' : '');
+  }
+  // Each stream gets a slot across the mountain face.
+  function streamPoints(index, count) {
+    const u = count === 1 ? 0 : -1 + 2 * (index + .5) / count;   // -1 .. 1
+    const r = seeded(index * 17 + 3);
+    const ys = 330 + Math.abs(u) * 150 + r() * 30;
+    const xs = PEAK.x + u * halfWidthAt(ys) * .75;
+    const xe = PEAK.x + u * 300;
+    const ye = LAKE_Y - 10;
+    const pts = [{ x: xs, y: ys }];
+    const n = 4;
+    for (let i = 1; i <= n; i++) {
+      const t = i / (n + 1);
+      const y = ys + (ye - ys) * t;
+      const wig = Math.sin(t * Math.PI * 2 + index) * (28 + r() * 22) + (r() - .5) * 24;
+      pts.push({ x: xs + (xe - xs) * t + wig, y });
+    }
+    pts.push({ x: xe, y: ye });
+    return pts;
+  }
+
+  // ---------- Build scene ----------
+  const el = (tag, attrs = {}, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  let streamLayer, tagLayer, signLayer;
+  function buildStatic() {
+    svg.innerHTML = '';
+    const defs = el('defs', {}, svg);
+    const sky = el('linearGradient', { id: 'sky', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': '#bfdcee' }, sky);
+    el('stop', { offset: 1, 'stop-color': '#f1e6d2' }, sky);
+    const water = el('linearGradient', { id: 'water', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': '#8cc3e6' }, water);
+    el('stop', { offset: 1, 'stop-color': '#5a9fd0' }, water);
+
+    // Sky and ground extend far beyond the scene so panning never shows gaps.
+    el('rect', { x: -4000, y: -4000, width: 8800, height: 4000 + 760, fill: '#bfdcee' }, svg);
+    el('rect', { x: -4000, y: 0, width: 8800, height: 900, fill: 'url(#sky)' }, svg);
+    el('rect', { x: -4000, y: 880, width: 8800, height: 6000, fill: '#8fb66d' }, svg);
+
+    // Sun
+    el('circle', { cx: 660, cy: 150, r: 46, fill: '#f7cf6a', stroke: '#2d2a33', 'stroke-width': 3 }, svg);
+    // Clouds
+    [[120, 210, 1], [560, 90, .75], [230, 120, .6]].forEach(([x, y, s]) => {
+      const g = el('g', { transform: `translate(${x} ${y}) scale(${s})` }, svg);
+      el('path', { d: 'M0 0 c-10 -24 24 -40 42 -22 c8 -26 50 -22 54 4 c24 -6 40 24 16 30 l-110 0 c-14 0 -14 -12 -2 -12 Z', fill: '#fffaf0', stroke: '#2d2a33', 'stroke-width': 3, 'stroke-linejoin': 'round' }, g);
+    });
+
+    // Back hills
+    el('path', { d: wobblyPath([{ x: -200, y: 900 }, { x: 60, y: 600 }, { x: 300, y: 900 }], 6, 11), fill: '#a9c8a0', stroke: '#2d2a33', 'stroke-width': 3 }, svg);
+    el('path', { d: wobblyPath([{ x: 480, y: 900 }, { x: 760, y: 560 }, { x: 1050, y: 900 }], 6, 12), fill: '#a9c8a0', stroke: '#2d2a33', 'stroke-width': 3 }, svg);
+
+    // Mountain
+    const mtn = [
+      { x: PEAK.x - BASE_HALF - 60, y: BASE_Y + 10 }, { x: 150, y: 700 }, { x: 250, y: 470 }, { x: 320, y: 330 },
+      PEAK, { x: 470, y: 320 }, { x: 540, y: 460 }, { x: 650, y: 690 }, { x: PEAK.x + BASE_HALF + 60, y: BASE_Y + 10 }
+    ];
+    el('path', { d: wobblyPath(mtn, 8, 5), fill: '#9f8f7a', stroke: '#2d2a33', 'stroke-width': 3.5, 'stroke-linejoin': 'round' }, svg);
+    // Sunlit face
+    el('path', { d: catmull([{ x: 400, y: 175 }, { x: 470, y: 320 }, { x: 540, y: 460 }, { x: 650, y: 690 }, { x: 830, y: 905 }, { x: 400, y: 905 }, { x: 390, y: 500 }]), fill: '#b7a68f', opacity: .9 }, svg);
+    // Snow cap
+    el('path', { d: 'M330 320 C350 300 370 330 390 300 C400 285 410 300 420 310 C440 330 455 300 475 322 C470 350 452 345 445 372 C438 352 420 390 410 365 C398 395 380 352 368 384 C360 360 345 368 338 348 Z', fill: '#fffaf0', stroke: '#2d2a33', 'stroke-width': 3, 'stroke-linejoin': 'round' }, svg);
+    el('path', { d: 'M330 320 L400 178 L475 322', fill: '#fffaf0' }, svg);
+    el('path', { d: 'M322 325 L400 175 L482 325', fill: 'none', stroke: '#2d2a33', 'stroke-width': 3.5, 'stroke-linejoin': 'round' }, svg);
+
+    // Meadow with lake
+    el('path', { d: wobblyPath([{ x: -200, y: 905 }, { x: 1000, y: 905 }], 5, 21, false), fill: 'none', stroke: '#2d2a33', 'stroke-width': 3 }, svg);
+    el('path', { d: wobblyPath([{ x: 70, y: LAKE_Y }, { x: 200, y: 935 }, { x: 420, y: 925 }, { x: 650, y: 945 }, { x: 740, y: LAKE_Y + 20 }, { x: 640, y: 1080 }, { x: 400, y: 1110 }, { x: 160, y: 1075 }, { x: 70, y: LAKE_Y }], 7, 31), fill: 'url(#water)', stroke: '#2d2a33', 'stroke-width': 3.5, 'stroke-linejoin': 'round' }, svg);
+    [[250, 1010, 70], [480, 1050, 90], [380, 985, 50]].forEach(([x, y, l]) => el('path', { d: `M${x} ${y} q${l / 4} -6 ${l / 2} 0 t${l / 2} 0`, fill: 'none', stroke: '#eaf6ff', 'stroke-width': 3, 'stroke-linecap': 'round' }, svg));
+    const lakeLabel = el('text', { x: 400, y: 1160, 'text-anchor': 'middle', 'font-size': 22, fill: '#2d2a33' }, svg);
+    lakeLabel.textContent = 'Your work';
+
+    // Trees
+    const tree = (x, y, s) => {
+      const g = el('g', { transform: `translate(${x} ${y}) scale(${s})` }, svg);
+      el('path', { d: 'M0 -46 L22 -6 L-22 -6 Z M0 -30 L26 14 L-26 14 Z', fill: '#5f9a5a', stroke: '#2d2a33', 'stroke-width': 3, 'stroke-linejoin': 'round' }, g);
+      el('rect', { x: -4, y: 14, width: 8, height: 12, fill: '#7a5a3a', stroke: '#2d2a33', 'stroke-width': 2.5 }, g);
+    };
+    [[60, 880, .9], [110, 870, .7], [720, 875, .85], [760, 892, .65], [30, 950, .8], [770, 1010, .8]].forEach(a => tree(...a));
+
+    streamLayer = el('g', { id: 'streams' }, svg);
+    signLayer = el('g', { id: 'signs' }, svg);
+    tagLayer = el('g', { id: 'tags' }, svg);
+  }
+
+  // Text wrapping measured with canvas (same hand font).
+  const meas = document.createElement('canvas').getContext('2d');
+  function wrap(text, fontSize, maxW, maxLines) {
+    meas.font = `${fontSize}px ${getComputedStyle(document.body).getPropertyValue('--hand')}`;
+    const words = text.replace(/\s+/g, ' ').trim().split(' ');
+    const lines = []; let cur = '';
+    for (const w of words) {
+      const t = cur ? cur + ' ' + w : w;
+      if (meas.measureText(t).width <= maxW || !cur) cur = t; else { lines.push(cur); cur = w; }
+      if (lines.length === maxLines) break;
+    }
+    if (lines.length < maxLines) lines.push(cur);
+    if (lines.length === maxLines && (words.join(' ').length > lines.join(' ').length)) {
+      let last = lines[maxLines - 1];
+      while (last && meas.measureText(last + '…').width > maxW) last = last.slice(0, -1);
+      lines[maxLines - 1] = last + '…';
+    }
+    return lines.filter(Boolean);
+  }
+  const fmtDate = ts => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+  const streamGeo = new Map();  // id -> { path element, bbox }
+  function renderStreams() {
+    streamLayer.innerHTML = ''; signLayer.innerHTML = ''; tagLayer.innerHTML = '';
+    streamGeo.clear();
+    const n = state.streams.length;
+    state.streams.forEach((s, i) => {
+      const pts = streamPoints(i, n);
+      const d = catmull(pts);
+      const dirty = s.type === 'dirty';
+      const g = el('g', { class: 'stream-g' + (focusId && focusId !== s.id ? ' dim' : ''), 'data-stream': s.id }, streamLayer);
+      el('path', { d, fill: 'none', stroke: '#2d2a33', 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      const main = el('path', { d, fill: 'none', stroke: dirty ? '#8a7250' : '#4f9fdb', 'stroke-width': 10, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      el('path', { d, class: 'flow' + (dirty ? ' slow' : ''), fill: 'none', stroke: dirty ? '#4b3a28' : '#e6f4ff', 'stroke-width': dirty ? 3.5 : 2.5, 'stroke-linecap': 'round', 'stroke-dasharray': dirty ? '6 18' : '10 14', opacity: dirty ? .8 : .95 }, g);
+      if (dirty) {
+        // sediment specks
+        const r = seeded(i + 77);
+        const L = main.getTotalLength();
+        for (let k = 0; k < 10; k++) {
+          const p = main.getPointAtLength(L * (0.1 + 0.8 * r()));
+          el('circle', { cx: p.x + (r() - .5) * 6, cy: p.y + (r() - .5) * 6, r: 1.6 + r() * 1.4, fill: '#3a2d1f', opacity: .7 }, g);
+        }
+      }
+      el('path', { d, class: 'hit' }, g);
+
+      // Signpost at the source
+      const src = pts[0];
+      const sign = el('g', { class: 'sign' + (dirty ? ' dirty' : ''), 'data-stream': s.id }, signLayer);
+      const lines = wrap(s.name, 16, 150, 2);
+      const sw = Math.max(70, ...lines.map(l => meas.measureText(l).width)) + 22;
+      const sh = 14 + lines.length * 18;
+      const side = src.x < PEAK.x ? -1 : 1;
+      const sx = src.x + side * 18 - (side < 0 ? sw : 0), sy = src.y - sh - 14;
+      el('line', { x1: src.x, y1: src.y, x2: src.x, y2: sy + sh, stroke: '#2d2a33', 'stroke-width': 3 }, sign);
+      el('rect', { x: sx, y: sy, width: sw, height: sh, rx: 7, transform: `rotate(${side * -2} ${sx + sw / 2} ${sy + sh / 2})` }, sign);
+      const t = el('text', { x: sx + sw / 2, y: sy + 20, 'text-anchor': 'middle', 'font-size': 16, transform: `rotate(${side * -2} ${sx + sw / 2} ${sy + sh / 2})` }, sign);
+      lines.forEach((l, li) => { const ts = el('tspan', { x: sx + sw / 2, dy: li ? 18 : 0 }, t); ts.textContent = l; });
+
+      // Notes along the stream
+      const L = main.getTotalLength();
+      const notes = s.notes;
+      let minX = Math.min(...pts.map(p => p.x)) - 20, maxX = Math.max(...pts.map(p => p.x)) + 20;
+      let minY = sy - 10, maxY = pts[pts.length - 1].y + 20;
+      minX = Math.min(minX, sx); maxX = Math.max(maxX, sx + sw);
+      notes.forEach((note, k) => {
+        const tpos = (k + 1) / (notes.length + 1);
+        const p = main.getPointAtLength(L * (0.12 + 0.76 * tpos));
+        const tw = 168, fs = 13, lh = 16;
+        const nl = wrap(note.text, fs, tw - 20, 5);
+        const th = 12 + nl.length * lh + 14;
+        const tside = (k % 2 === 0) ? -1 : 1;
+        let tx = p.x + tside * 26 - (tside < 0 ? tw : 0);
+        tx = Math.max(6, Math.min(W - tw - 6, tx));
+        const ty = p.y - th / 2;
+        const tg = el('g', { class: 'tag' + (dirty ? ' dirty' : ''), 'data-note': note.id, 'data-stream': s.id }, tagLayer);
+        const ax = tx + (tside < 0 ? tw : 0);
+        el('line', { x1: p.x, y1: p.y, x2: ax, y2: p.y, stroke: '#2d2a33', 'stroke-width': 1.6 }, tg);
+        el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#fffaf0', stroke: '#2d2a33', 'stroke-width': 1.6 }, tg);
+        const rot = ((k * 37) % 5 - 2) * .8;
+        const inner = el('g', { transform: `rotate(${rot} ${tx + tw / 2} ${ty + th / 2})` }, tg);
+        el('rect', { x: tx, y: ty, width: tw, height: th, rx: 6 }, inner);
+        const tt = el('text', { x: tx + 10, y: ty + 10 + fs, 'font-size': fs }, inner);
+        nl.forEach((l, li) => { const ts = el('tspan', { x: tx + 10, dy: li ? lh : 0 }, tt); ts.textContent = l; });
+        const dt = el('text', { x: tx + tw - 10, y: ty + th - 7, 'font-size': 9, 'text-anchor': 'end', class: 'date' }, inner);
+        dt.textContent = fmtDate(note.at);
+        minX = Math.min(minX, tx - 4); maxX = Math.max(maxX, tx + tw + 4);
+        minY = Math.min(minY, ty - 4); maxY = Math.max(maxY, ty + th + 4);
+      });
+      streamGeo.set(s.id, { bbox: { x: minX, y: minY, w: maxX - minX, h: maxY - minY } });
+    });
+  }
+
+  // ---------- Camera ----------
+  const cam = { x: 0, y: 0, w: W };          // viewBox: x, y, w ; h follows screen aspect
+  const aspect = () => svg.clientHeight / Math.max(1, svg.clientWidth);
+  const MIN_W = 150, MAX_W = 1400;
+  function applyCam() {
+    const h = cam.w * aspect();
+    svg.setAttribute('viewBox', `${cam.x} ${cam.y} ${cam.w} ${h}`);
+  }
+  function clampCam() {
+    cam.w = Math.max(MIN_W, Math.min(MAX_W, cam.w));
+    const h = cam.w * aspect();
+    // keep the mountain mostly in frame
+    cam.x = Math.max(-cam.w * .6, Math.min(W - cam.w * .4, cam.x));
+    cam.y = Math.max(-h * .5, Math.min(H - h * .5, cam.y));
+  }
+  // Screen-space insets covered by the top and bottom chrome, in CSS px.
+  function insets() {
+    const top = document.querySelector('.top').getBoundingClientRect().bottom;
+    const bottom = svg.clientHeight - document.querySelector('.bottom').getBoundingClientRect().top;
+    return { top: top + 6, bottom: bottom + 6 };
+  }
+  // Fit a scene box into the part of the screen not covered by chrome.
+  function fitCam(b, padPx = 14) {
+    const sw = svg.clientWidth, sh = svg.clientHeight, ins = insets();
+    const availW = sw - padPx * 2, availH = sh - ins.top - ins.bottom - padPx * 2;
+    let s = Math.min(availW / b.w, availH / b.h);           // px per scene unit
+    s = Math.max(sw / MAX_W, Math.min(sw / MIN_W, s));
+    const w = sw / s;
+    const cy = ins.top + padPx + availH / 2;                  // screen y of the box centre
+    return { x: b.x + b.w / 2 - sw / 2 / s, y: b.y + b.h / 2 - cy / s, w };
+  }
+  const overviewCam = () => fitCam({ x: 0, y: 150, w: W, h: 1040 }, 0);
+  let anim = null;
+  function animateTo(target, ms = 520) {
+    if (anim) cancelAnimationFrame(anim);
+    const from = { ...cam }, t0 = performance.now();
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const step = now => {
+      const t = Math.min(1, (now - t0) / ms), e = ease(t);
+      cam.x = from.x + (target.x - from.x) * e;
+      cam.y = from.y + (target.y - from.y) * e;
+      cam.w = from.w + (target.w - from.w) * e;
+      applyCam();
+      if (t < 1) anim = requestAnimationFrame(step); else anim = null;
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  // ---------- Focus ----------
+  let focusId = null;
+  const streamById = id => state.streams.find(s => s.id === id);
+  function focusStream(id) {
+    focusId = id;
+    renderStreams();
+    const g = streamGeo.get(id);
+    if (g) animateTo(fitCam(g.bbox));
+    updateChrome();
+  }
+  function zoomOut() {
+    focusId = null;
+    renderStreams();
+    animateTo(overviewCam());
+    updateChrome();
+  }
+  function updateChrome() {
+    const s = focusId && streamById(focusId);
+    $('overviewUI').classList.toggle('hide', !!s);
+    $('focusUI').classList.toggle('hide', !s);
+    $('btnZoomOut').classList.toggle('hide', !s);
+    if (s) {
+      $('focusName').innerHTML = '';
+      $('focusName').append(s.name);
+      const small = document.createElement('small'); small.textContent = s.notes.length ? `${s.notes.length} note${s.notes.length === 1 ? '' : 's'}` : 'tap to rename';
+      $('focusName').append(small);
+      $('segClean').classList.toggle('on', s.type === 'clean');
+      $('segDirty').classList.toggle('on', s.type === 'dirty');
+    }
+  }
+
+  // ---------- Gestures ----------
+  const ptrs = new Map();
+  let gesture = null;   // { startCam, startDist, startMid, moved, t0, target }
+  const toScene = (px, py) => {
+    const r = svg.getBoundingClientRect();
+    return { x: cam.x + (px - r.left) / r.width * cam.w, y: cam.y + (py - r.top) / r.height * cam.w * aspect() };
+  };
+  svg.addEventListener('pointerdown', e => {
+    if (anim) { cancelAnimationFrame(anim); anim = null; }
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    svg.setPointerCapture(e.pointerId);
+    beginGesture(e.target);
+  });
+  function beginGesture(target) {
+    const p = [...ptrs.values()];
+    gesture = {
+      startCam: { ...cam }, moved: gesture ? gesture.moved : false, t0: gesture ? gesture.t0 : performance.now(),
+      target: gesture ? gesture.target : target,
+      mid: p.length > 1 ? { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 } : { ...p[0] },
+      dist: p.length > 1 ? Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) : 0,
+      midScene: null
+    };
+    gesture.midScene = toScene(gesture.mid.x, gesture.mid.y);
+  }
+  svg.addEventListener('pointermove', e => {
+    if (!ptrs.has(e.pointerId) || !gesture) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const p = [...ptrs.values()];
+    const r = svg.getBoundingClientRect();
+    const scale = cam.w / r.width;
+    if (p.length === 1) {
+      const dx = p[0].x - gesture.mid.x, dy = p[0].y - gesture.mid.y;
+      if (Math.hypot(dx, dy) > 6) gesture.moved = true;
+      cam.x = gesture.startCam.x - dx * (gesture.startCam.w / r.width);
+      cam.y = gesture.startCam.y - dy * (gesture.startCam.w / r.width);
+      clampCam(); applyCam();
+    } else {
+      gesture.moved = true;
+      const mid = { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 };
+      const dist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1;
+      let w = gesture.startCam.w * (gesture.dist / dist);
+      w = Math.max(MIN_W, Math.min(MAX_W, w));
+      // keep the scene point under the fingers' midpoint fixed
+      cam.w = w;
+      cam.x = gesture.midScene.x - (mid.x - r.left) / r.width * w;
+      cam.y = gesture.midScene.y - (mid.y - r.top) / r.height * w * aspect();
+      clampCam(); applyCam();
+    }
+  });
+  let lastTap = 0;
+  function endPointer(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (ptrs.size > 0) { beginGesture(); return; }
+    const g = gesture; gesture = null;
+    if (!g) return;
+    const quick = performance.now() - g.t0 < 400;
+    if (!g.moved && quick) {
+      const t = g.target && g.target.closest ? g.target : null;
+      const tag = t && t.closest('[data-note]');
+      const st = t && t.closest('[data-stream]');
+      if (tag) { openNoteSheet(tag.getAttribute('data-stream'), tag.getAttribute('data-note')); return; }
+      if (st) { const id = st.getAttribute('data-stream'); if (focusId !== id) focusStream(id); return; }
+      // double tap on empty space: zoom in there; single tap does nothing
+      const now = performance.now();
+      if (now - lastTap < 320) {
+        const sp = toScene(e.clientX, e.clientY);
+        const w = Math.max(MIN_W, cam.w / 2);
+        animateTo({ x: sp.x - w / 2, y: sp.y - w * aspect() / 2, w }, 380);
+        lastTap = 0;
+      } else lastTap = now;
+    }
+  }
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('wheel', e => {   // desktop convenience
+    e.preventDefault();
+    const sp = toScene(e.clientX, e.clientY);
+    const f = Math.exp(e.deltaY * 0.0015);
+    const w = Math.max(MIN_W, Math.min(MAX_W, cam.w * f));
+    const r = svg.getBoundingClientRect();
+    cam.w = w;
+    cam.x = sp.x - (e.clientX - r.left) / r.width * w;
+    cam.y = sp.y - (e.clientY - r.top) / r.height * w * aspect();
+    clampCam(); applyCam();
+  }, { passive: false });
+
+  // ---------- Sheets ----------
+  const backdrop = $('backdrop');
+  let openSheet = null, openedAt = 0;
+  function show(id) { openSheet = $(id); openedAt = performance.now(); openSheet.classList.add('open'); backdrop.classList.add('open'); }
+  function closeSheets() { document.querySelectorAll('.sheet.open').forEach(s => s.classList.remove('open')); backdrop.classList.remove('open'); openSheet = null; document.activeElement && document.activeElement.blur && document.activeElement.blur(); }
+  // Ignore the click a touch synthesises right after a tap on the scene opened a sheet.
+  backdrop.addEventListener('click', () => { if (performance.now() - openedAt > 450) closeSheets(); });
+
+  // Note sheet
+  let noteCtx = null; // { streamId, noteId|null }
+  let promptIdx = Math.floor(Math.random() * PROMPTS.length);
+  function openNoteSheet(streamId, noteId) {
+    const s = streamById(streamId); if (!s) return;
+    const note = noteId ? s.notes.find(n => n.id === noteId) : null;
+    noteCtx = { streamId, noteId: note ? note.id : null };
+    $('noteTitle').textContent = note ? 'Edit note' : 'New note';
+    $('noteSub').textContent = `${s.name} · ${s.type === 'dirty' ? 'dirty fuel' : 'clean fuel'}` + (note ? ` · ${new Date(note.at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}` : '');
+    $('promptBox').classList.toggle('hide', !!note);
+    $('promptText').textContent = PROMPTS[promptIdx];
+    $('noteText').value = note ? note.text : '';
+    $('noteDelete').classList.toggle('hide', !note);
+    show('noteSheet');
+    setTimeout(() => $('noteText').focus(), 60);
+  }
+  $('promptNext').addEventListener('click', () => { promptIdx = (promptIdx + 1) % PROMPTS.length; $('promptText').textContent = PROMPTS[promptIdx]; });
+  $('noteCancel').addEventListener('click', closeSheets);
+  $('noteSave').addEventListener('click', () => {
+    const s = streamById(noteCtx.streamId); const text = $('noteText').value.trim();
+    if (!s) return closeSheets();
+    if (noteCtx.noteId) {
+      const n = s.notes.find(n => n.id === noteCtx.noteId);
+      if (n) { if (text) n.text = text; else s.notes = s.notes.filter(x => x !== n); }
+    } else if (text) {
+      s.notes.push({ id: uid(), text, at: Date.now() });
+    }
+    save(); closeSheets();
+    if (focusId === s.id) focusStream(s.id); else { renderStreams(); updateChrome(); }
+  });
+  $('noteDelete').addEventListener('click', () => {
+    const s = streamById(noteCtx.streamId);
+    if (s && confirm('Delete this note?')) { s.notes = s.notes.filter(n => n.id !== noteCtx.noteId); save(); closeSheets(); focusStream(s.id); }
+  });
+  $('btnAddNote').addEventListener('click', () => focusId && openNoteSheet(focusId, null));
+
+  // Stream sheet
+  let streamCtx = null; // { id|null, type }
+  function openStreamSheet(id) {
+    const s = id ? streamById(id) : null;
+    streamCtx = { id: s ? s.id : null, type: s ? s.type : 'dirty' };
+    $('streamTitle').textContent = s ? 'Rename stream' : 'New stream';
+    $('streamName').value = s ? s.name : '';
+    $('streamDelete').classList.toggle('hide', !s);
+    paintTypePick();
+    show('streamSheet');
+    setTimeout(() => $('streamName').focus(), 60);
+  }
+  function paintTypePick() {
+    $('pickClean').classList.toggle('on', streamCtx.type === 'clean');
+    $('pickDirty').classList.toggle('on', streamCtx.type === 'dirty');
+  }
+  $('pickClean').addEventListener('click', () => { streamCtx.type = 'clean'; paintTypePick(); });
+  $('pickDirty').addEventListener('click', () => { streamCtx.type = 'dirty'; paintTypePick(); });
+  $('streamCancel').addEventListener('click', closeSheets);
+  $('streamSave').addEventListener('click', () => {
+    const name = $('streamName').value.trim();
+    if (!name) { $('streamName').focus(); return; }
+    if (streamCtx.id) {
+      const s = streamById(streamCtx.id); s.name = name; s.type = streamCtx.type;
+      save(); closeSheets(); focusStream(s.id);
+    } else {
+      const s = { id: uid(), name, type: streamCtx.type, notes: [] };
+      state.streams.push(s); save(); closeSheets(); focusStream(s.id);
+    }
+  });
+  $('streamDelete').addEventListener('click', () => {
+    const s = streamById(streamCtx.id); if (!s) return;
+    const msg = s.notes.length ? `Delete "${s.name}" and its ${s.notes.length} note${s.notes.length === 1 ? '' : 's'}?` : `Delete "${s.name}"?`;
+    if (confirm(msg)) { state.streams = state.streams.filter(x => x.id !== s.id); save(); closeSheets(); zoomOut(); }
+  });
+  $('btnAddStream').addEventListener('click', () => {
+    if (state.streams.length >= MAX_STREAMS) { alert(`The mountain holds ${MAX_STREAMS} streams. Delete one to add another.`); return; }
+    openStreamSheet(null);
+  });
+  $('focusName').addEventListener('click', () => focusId && openStreamSheet(focusId));
+  $('segClean').addEventListener('click', () => setType('clean'));
+  $('segDirty').addEventListener('click', () => setType('dirty'));
+  function setType(t) { const s = streamById(focusId); if (!s || s.type === t) return; s.type = t; save(); renderStreams(); updateChrome(); }
+
+  // All notes
+  $('btnNotes').addEventListener('click', () => {
+    const list = $('notesList'); list.innerHTML = '';
+    const all = [];
+    state.streams.forEach(s => s.notes.forEach(n => all.push({ s, n })));
+    all.sort((a, b) => b.n.at - a.n.at);
+    if (!all.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'No notes yet. Zoom into a stream and add one.'; list.appendChild(li); }
+    all.forEach(({ s, n }) => {
+      const li = document.createElement('li');
+      const dot = document.createElement('span'); dot.className = 'dot ' + s.type;
+      const b = document.createElement('button');
+      const t = document.createElement('div'); t.className = 't'; t.textContent = n.text;
+      const m = document.createElement('div'); m.className = 'm'; m.textContent = `${s.name} · ${new Date(n.at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`;
+      b.append(t, m); li.append(dot, b); list.appendChild(li);
+      b.addEventListener('click', () => { closeSheets(); focusStream(s.id); });
+    });
+    show('listSheet');
+  });
+
+  // Menu
+  $('btnMenu').addEventListener('click', () => show('menuSheet'));
+  $('menuBackup').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ app: 'fuel', exported: new Date().toISOString(), ...state }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `fuel-backup-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); closeSheets();
+  });
+  $('menuRestore').addEventListener('click', () => $('restoreFile').click());
+  $('restoreFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(txt => {
+      const data = JSON.parse(txt);
+      if (!data || !Array.isArray(data.streams)) throw new Error('bad');
+      if (confirm('Replace everything on the mountain with this backup?')) { state = { streams: data.streams }; save(); zoomOut(); }
+    }).catch(() => alert('That file is not a Fuel backup.')).finally(() => { e.target.value = ''; closeSheets(); });
+  });
+  $('menuReset').addEventListener('click', () => {
+    if (confirm('Reset the mountain to the starting streams? All notes will be deleted.')) {
+      localStorage.removeItem(KEY); state = load(); save(); closeSheets(); zoomOut();
+    }
+  });
+  $('btnZoomOut').addEventListener('click', zoomOut);
+
+  // Keep sheets above the iPhone keyboard.
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const onVV = () => {
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty('--kb', kb + 'px');
+      document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
+    };
+    vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV);
+  }
+  document.addEventListener('focusin', () => setTimeout(() => { document.body.scrollTop = 0; }, 0));
+
+  // ---------- Boot ----------
+  save();
+  buildStatic();
+  renderStreams();
+  Object.assign(cam, overviewCam()); applyCam();
+  updateChrome();
+  const ready = (document.fonts && document.fonts.ready) || Promise.resolve();
+  ready.then(() => renderStreams());
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (focusId) focusStream(focusId); else { Object.assign(cam, overviewCam()); applyCam(); } }, 80); });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script>
+</body>
+</html>
