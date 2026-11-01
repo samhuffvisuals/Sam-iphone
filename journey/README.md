@@ -1,13 +1,13 @@
 # Journey to Clean Fuel
 
-A very simple iPhone web app for uncovering your **dirty fuel**, drawn in the fine-line style of the training video: one landscape, and water flows downhill.
+A very simple iPhone web app for uncovering your **dirty fuel**, drawn in the fine-line style of the training video: one 3D landscape in ink on white paper, and water flows downhill.
 
 1. **The mountain** is your past experiences.
 2. **The streams** are your beliefs.
 3. **The river** is your state.
 4. **The sea** is your behavior.
 
-Zoom in anywhere on the landscape, write what is really going on, zoom back out and see the whole picture.
+Turn the landscape with one finger, pinch to zoom, write anywhere on it, and read everything back as an organized journal.
 
 ## Put it on your iPhone Home Screen
 
@@ -19,12 +19,26 @@ Open it from the Home Screen icon. The Home Screen app keeps its own storage, se
 
 ## Using it
 
-- **Pinch** to zoom, **drag** to look around, **double-tap** to zoom in (double-tap again when close to zoom back out). The ⛶ button at the top zooms out to the whole landscape.
-- **Hold a spot** on the landscape to write there. Or tap a spot and choose **+ Write here**. Or tap **+ Write** and then tap the spot.
+Two tabs at the bottom: **Map** and **Journal**.
+
+**Map**
+
+- **Drag** with one finger to turn the landscape, **pinch** to zoom, drag with **two fingers** to slide it. **Double-tap** to zoom in on a spot. The ⛶ button at the top returns to the whole landscape.
+- **Hold a spot** on the landscape to write there. Or tap a spot and choose **+ Write here**. Or tap **+ Write on the map** and then tap the spot.
 - The app guesses the level from where you tapped (mountain, stream, river or sea) and shows a question for that level. Tap ↻ for a different question. You can change the level in the sheet.
 - Mark each entry **Dirty**, **Clean** or **Not sure yet**. Dirty entries get a red dot, clean ones a teal dot.
-- Entries sit on the landscape like the labels in the illustration. Tap one to edit or delete it.
-- **1. Mountain · 2. Streams · 3. River · 4. Sea** at the bottom fly to each level.
-- **All entries** lists everything, newest first. Tap one to zoom to it.
-- **⋯ → Six signs check-in** is the quick test from the video. **How this works** explains the landscape and the trace → surrender → replace idea.
-- **⋯ → Back up** saves everything to a file. **Restore** loads it back. Entries live only on your phone, so back up now and then.
+- Entries sit on the landscape like the labels in the illustration and stay attached as you turn it. Tap one to edit or delete it.
+- **1. Mountain · 2. Streams · 3. River · 4. Sea** fly to each level.
+
+**Journal**
+
+- Everything written on the map, as one organized list grouped by level: 1. Mountain (past experiences), 2. Streams (beliefs), 3. River (state), 4. Sea (behavior). Newest first within each group.
+- Tap an entry to edit it. **Find on map** switches to the map and flies to it.
+- **+ Write** in the journal adds an entry without picking a spot; it is placed on the map at the level you choose.
+
+**Menu (⋯)**
+
+- **Six signs check-in** is the quick test from the video. **How this works** explains the landscape.
+- **Back up** saves everything to a file. **Restore** loads it back. Entries live only on your phone, so back up now and then.
+
+**Offline**: open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all.

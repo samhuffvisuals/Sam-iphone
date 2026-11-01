@@ -1,7 +1,7 @@
 // Offline support for Journey to Clean Fuel.
 // The app shell is served from the phone first (works with no WiFi at all),
 // then quietly refreshed from the network when one is available.
-const CACHE = 'journey-v2';
+const CACHE = 'journey-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'sw.js', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 const MARK = '<title>Journey to Clean Fuel</title>';
 

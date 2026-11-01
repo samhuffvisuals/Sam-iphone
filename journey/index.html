@@ -43,26 +43,35 @@
   textarea, input { font: inherit; color: inherit; -webkit-user-select: text; user-select: text; }
   .hide { display: none !important; }
 
-  /* ---------- Scene ---------- */
-  #scene {
-    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
-    touch-action: none; background: var(--paper);
+  /* ---------- Map ---------- */
+  #map { position: absolute; inset: 0; }
+  #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; background: var(--paper); }
+  #overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  #leaders { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #leaders path { fill: none; stroke: var(--red); stroke-width: 1.2; opacity: .85; }
+  #leaders path.lead-note { stroke-width: 1.3; }
+  #leaders circle.dot { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+  #leaders circle.dot.dirty { fill: var(--red); stroke: var(--red); }
+  #leaders circle.dot.clean { fill: var(--teal); stroke: var(--teal); }
+  #leaders circle.ghost { fill: none; stroke: var(--red); stroke-width: 2; stroke-dasharray: 4 4; }
+  .lbl {
+    position: absolute; left: 0; top: 0; transform: translate(-50%, -50%);
+    font-family: var(--serif); font-style: italic; color: var(--ink); white-space: nowrap;
+    font-size: 17px; line-height: 1.1; pointer-events: none;
+    text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 6px var(--paper);
   }
-  #scene text { font-family: var(--serif); font-style: italic; fill: var(--ink); }
-  #scene .ink { stroke: var(--ink); fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  #scene .label { font-size: 30px; }
-  #scene .motto { font-size: 30px; }
-  #scene .note { cursor: pointer; }
-  #scene .note text { font-size: 22px; paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
-  #scene .note .leader { stroke: var(--red); fill: none; stroke-width: 1.4; opacity: .8; }
-  #scene .note .dot { stroke: var(--ink); stroke-width: 1.6; fill: var(--paper); }
-  #scene .note.dirty .dot { fill: var(--red); stroke: var(--red); }
-  #scene .note.clean .dot { fill: var(--teal); stroke: var(--teal); }
-  #scene .note.lit text { fill: var(--red); }
-  #scene .note.lit .dot { r: 9; }
-  #scene .note .hit { fill: transparent; stroke: none; }
-  #scene .ghost { pointer-events: none; }
-  #scene .ghost circle { fill: none; stroke: var(--red); stroke-width: 2; stroke-dasharray: 4 4; }
+  .lbl.motto { font-size: 16px; }
+  .note-lbl {
+    position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer;
+    font-family: var(--serif); font-style: italic; color: var(--ink);
+    font-size: 13.5px; line-height: 1.2; max-width: 150px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 5px var(--paper), 0 0 8px var(--paper);
+    padding: 2px 3px;
+  }
+  .note-lbl.right { transform: translate(0, -100%); }
+  .note-lbl.left { transform: translate(-100%, -100%); text-align: right; }
+  .note-lbl.lit { color: var(--red); }
 
   /* ---------- Chrome ---------- */
   .top {
@@ -94,7 +103,6 @@
 
   .bottom {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
-    padding: 8px 12px calc(var(--safe-bottom) + 12px);
     display: flex; flex-direction: column; gap: 10px; align-items: center;
     pointer-events: none;
   }
@@ -102,7 +110,7 @@
   .hint {
     font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink-soft);
     background: rgba(251,250,246,.85); padding: 4px 12px; border-radius: 12px; pointer-events: none;
-    text-align: center; transition: opacity .3s;
+    text-align: center; margin: 0 12px;
   }
   .hint.red { color: var(--red); }
   .levels { display: flex; gap: 6px; }
@@ -111,16 +119,56 @@
     background: var(--card); font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink);
   }
   .levels button:active { background: var(--sea); }
-  .row { display: flex; gap: 8px; width: 100%; justify-content: center; }
-  .pill.wide { flex: 1; max-width: 200px; height: 44px; border-radius: 22px; font-size: 18px; }
+  .row { display: flex; gap: 8px; width: 100%; justify-content: center; padding: 0 12px; }
+  .pill.wide { flex: 1; max-width: 260px; height: 44px; border-radius: 22px; font-size: 18px; }
+
+  /* Tab bar */
+  .tabs {
+    width: 100%; display: flex; justify-content: space-around; align-items: stretch;
+    background: var(--card); border-top: 1px solid var(--line);
+    padding: 6px 0 calc(var(--safe-bottom) + 6px);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .tabs button {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); padding: 4px 0 2px;
+  }
+  .tabs button svg { width: 26px; height: 26px; display: block; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .tabs button.on { color: var(--ink); }
+  .tabs button.on svg { stroke-width: 1.9; }
 
   /* Floating "write here" bubble */
-  .bubble {
-    position: absolute; z-index: 4; transform: translate(-50%, -100%);
-    margin-top: -12px; display: none;
-  }
+  .bubble { position: absolute; z-index: 4; transform: translate(-50%, -100%); margin-top: -12px; display: none; }
   .bubble.show { display: block; }
   .bubble .pill { height: 36px; }
+
+  /* ---------- Journal ---------- */
+  #journal {
+    position: absolute; inset: 0; z-index: 3; background: var(--paper);
+    display: none; flex-direction: column;
+  }
+  #journal.on { display: flex; }
+  #journal .scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: calc(var(--safe-top) + 84px) 16px 170px; }
+  .jhead { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 14px; }
+  .jhead h1 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 30px; margin: 0; }
+  .jhead .count { color: var(--ink-soft); font-size: 13px; }
+  .jsec { margin: 0 0 22px; }
+  .jsec h2 {
+    font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 20px; margin: 0 0 2px;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .jsec h2 small { font: 11px/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+  .jsec .rule { height: 1px; background: var(--ink); opacity: .5; margin: 4px 0 2px; }
+  .jsec .none { color: var(--ink-soft); font-family: var(--serif); font-style: italic; padding: 10px 0 2px; }
+  .entry { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
+  .entry .dot { width: 10px; height: 10px; border-radius: 5px; margin-top: 8px; flex: 0 0 auto; border: 1.5px solid var(--ink); background: var(--paper); }
+  .entry .dot.dirty { background: var(--red); border-color: var(--red); }
+  .entry .dot.clean { background: var(--teal); border-color: var(--teal); }
+  .entry .body { flex: 1; min-width: 0; text-align: left; }
+  .entry .t { font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.3; white-space: pre-wrap; word-wrap: break-word; }
+  .entry .m { font-size: 12px; color: var(--ink-soft); margin-top: 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .entry .m .find { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--red); padding: 2px 0; }
+  .jempty { text-align: center; color: var(--ink-soft); font-family: var(--serif); font-style: italic; font-size: 19px; padding: 60px 20px; line-height: 1.4; }
 
   /* ---------- Sheets ---------- */
   .backdrop { position: absolute; inset: 0; z-index: 10; background: rgba(47,70,68,.28); display: none; }
@@ -164,19 +212,8 @@
   .sheet .actions { display: flex; gap: 8px; margin-top: 14px; }
   .sheet .actions .pill { flex: 1; height: 44px; border-radius: 22px; }
   .sheet .danger { color: var(--red); border-color: var(--red); flex: 0 0 auto !important; padding: 0 16px; }
-
-  .notes-list { list-style: none; margin: 0; padding: 0; }
-  .notes-list li { border-bottom: 1px solid var(--line); }
-  .notes-list button { display: flex; gap: 10px; width: 100%; text-align: left; padding: 10px 0; align-items: flex-start; }
-  .notes-list .dot { width: 10px; height: 10px; border-radius: 5px; margin-top: 7px; flex: 0 0 auto; border: 1.5px solid var(--ink); }
-  .notes-list .dot.dirty { background: var(--red); border-color: var(--red); }
-  .notes-list .dot.clean { background: var(--teal); border-color: var(--teal); }
-  .notes-list .t { font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.25; white-space: pre-wrap; }
-  .notes-list .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
-  .empty { color: var(--ink-soft); padding: 20px 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 18px; }
   .menu button.item { display: block; width: 100%; text-align: left; padding: 14px 4px; font-size: 17px; border-bottom: 1px solid var(--line); }
   .menu button.item:last-of-type { border-bottom: 0; }
-
   .signs label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.35; }
   .signs input { width: 22px; height: 22px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--red); }
   .signs .score { font-family: var(--serif); font-style: italic; font-size: 22px; margin: 12px 0 2px; }
@@ -186,7 +223,18 @@
 </head>
 <body>
 
-<svg id="scene" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+<div id="map">
+  <canvas id="gl"></canvas>
+  <div id="overlay">
+    <svg id="leaders" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="labels"></div>
+  </div>
+  <div class="bubble" id="bubble"><button class="pill red" id="bubbleWrite">+ Write here</button></div>
+</div>
+
+<div id="journal">
+  <div class="scroll" id="journalScroll"></div>
+</div>
 
 <div class="top">
   <div class="title">Journey to Clean Fuel<small>Water flows downhill</small></div>
@@ -200,19 +248,29 @@
   </div>
 </div>
 
-<div class="bubble" id="bubble"><button class="pill red" id="bubbleWrite">+ Write here</button></div>
-
 <div class="bottom">
-  <div class="hint" id="hint">Pinch to zoom. Hold a spot to write there.</div>
-  <div class="levels">
-    <button data-go="past">1. Mountain</button>
-    <button data-go="belief">2. Streams</button>
-    <button data-go="state">3. River</button>
-    <button data-go="behavior">4. Sea</button>
+  <div id="mapUI" style="display:contents">
+    <div class="hint" id="hint">Drag to turn · pinch to zoom · hold a spot to write</div>
+    <div class="levels">
+      <button data-go="past">1. Mountain</button>
+      <button data-go="belief">2. Streams</button>
+      <button data-go="state">3. River</button>
+      <button data-go="behavior">4. Sea</button>
+    </div>
+    <div class="row"><button class="pill wide primary" id="btnAdd">+ Write on the map</button></div>
   </div>
-  <div class="row">
-    <button class="pill wide" id="btnList">All entries</button>
-    <button class="pill wide primary" id="btnAdd">+ Write</button>
+  <div id="journalUI" class="hide" style="display:contents">
+    <div class="row"><button class="pill wide primary" id="btnAddJournal">+ Write</button></div>
+  </div>
+  <div class="tabs">
+    <button id="tabMap" class="on">
+      <svg viewBox="0 0 24 24"><path d="M3 18 L9 5 L13 12 L15.5 9 L21 18 Z"/><path d="M3 21h18"/></svg>
+      Map
+    </button>
+    <button id="tabJournal">
+      <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+      Journal
+    </button>
   </div>
 </div>
 
@@ -244,13 +302,6 @@
   </div>
 </div>
 
-<!-- All entries -->
-<div class="sheet" id="listSheet">
-  <h2>All entries</h2>
-  <p class="sub">Newest first. Tap one to zoom to it on the landscape.</p>
-  <ul class="notes-list" id="notesList"></ul>
-</div>
-
 <!-- Six signs -->
 <div class="sheet signs" id="signsSheet">
   <h2>Six signs of dirty fuel</h2>
@@ -269,8 +320,9 @@
   <p><b>3. The river</b> is your state: how it actually feels, day to day, to be you.</p>
   <p><b>4. The sea</b> is your behavior: what the fuel makes you do, and what you can never quite make yourself do.</p>
   <p>Most people stand by the sea with a bucket. Deeper change happens upstream. Start where you feel it (the river), then trace it up to the belief, then to the moment on the mountain where that belief first made sense.</p>
-  <p><b>Using the app:</b> pinch to zoom, drag to look around, hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 at the bottom to fly to each level.</p>
-  <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all, on a plane or anywhere. Your entries always stay on the phone.</p>
+  <p><b>Map:</b> drag with one finger to turn the landscape, pinch to zoom, drag with two fingers to slide it. Hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 to fly to each level.</p>
+  <p><b>Journal:</b> everything you write on the map, as one organized list by level. Tap an entry to edit it, or <i>Find on map</i> to fly to it.</p>
+  <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all. Your entries always stay on the phone.</p>
 </div>
 
 <!-- Menu -->
@@ -288,17 +340,15 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = $('scene');
   const KEY = 'journey-clean-fuel-v1';
-  const W = 1000, H = 1600;   // scene units
+  const W = 1000, D = 1600;          // world size: x across, z downhill (toward the viewer)
 
   // ---------- Content ----------
   const LEVELS = {
-    past:     { n: 1, name: 'Past experiences', place: 'On the mountain' },
-    belief:   { n: 2, name: 'Beliefs',          place: 'In a stream' },
-    state:    { n: 3, name: 'State',            place: 'In the river' },
-    behavior: { n: 4, name: 'Behavior',         place: 'In the sea' }
+    past:     { n: 1, name: 'Past experiences', place: 'On the mountain', where: 'Mountain' },
+    belief:   { n: 2, name: 'Beliefs',          place: 'In a stream',     where: 'Streams' },
+    state:    { n: 3, name: 'State',            place: 'In the river',    where: 'River' },
+    behavior: { n: 4, name: 'Behavior',         place: 'In the sea',      where: 'Sea' }
   };
   const PROMPTS = {
     past: [
@@ -350,395 +400,423 @@
   // ---------- State ----------
   let data = load();
   function load() {
-    try {
-      const d = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (d && Array.isArray(d.notes)) return d;
-    } catch (e) {}
+    try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && Array.isArray(d.notes)) return d; } catch (e) {}
     return { notes: [], signs: [] };
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-  // ---------- Helpers ----------
-  function el(name, attrs, parent) {
-    const e = document.createElementNS(NS, name);
-    for (const k in attrs) e.setAttribute(k, attrs[k]);
-    if (parent) parent.appendChild(e);
-    return e;
-  }
-  function rng(seed) { // mulberry32
-    let a = seed >>> 0;
-    return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  }
+  // ---------- Small math ----------
+  function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   const R = rng(20261101);
   const rand = (a, b) => a + (b - a) * R();
-  const f1 = n => Math.round(n * 10) / 10;
-  // Catmull-Rom spline through points -> smooth cubic path
-  function spline(pts) {
-    if (pts.length < 2) return '';
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  function hash2(i, j) { let h = (i * 374761393 + j * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
+  function vnoise(x, z) {
+    const i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j;
+    const u = fx * fx * (3 - 2 * fx), v = fz * fz * (3 - 2 * fz);
+    const a = hash2(i, j), b = hash2(i + 1, j), c = hash2(i, j + 1), d = hash2(i + 1, j + 1);
+    return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v;
+  }
+  function spline(pts, per) { // Catmull-Rom, resampled to roughly `per` units
+    const out = [];
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
-      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
-      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += ` C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      const segLen = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+      const n = Math.max(2, Math.ceil(segLen / per));
+      for (let k = 0; k < n; k++) {
+        const t = k / n, t2 = t * t, t3 = t2 * t;
+        out.push([
+          .5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+          .5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)
+        ]);
+      }
     }
-    return d;
-  }
-  const poly = pts => pts.map((p, i) => (i ? 'L' : 'M') + f1(p[0]) + ' ' + f1(p[1])).join('');
-  function inPoly(x, y, pts) {
-    let inside = false;
-    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-      const xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
-      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
-    }
-    return inside;
-  }
-
-  // ---------- Geometry of the landscape ----------
-  const PEAK = [500, 150];
-  const L_FOOT = [20, 690], R_FOOT = [980, 660];
-  function ridge(a, b, n, amp) {
-    const pts = [a];
-    for (let i = 1; i < n; i++) {
-      const t = i / n;
-      const x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
-      const j = (i % 2 ? -1 : 1) * rand(amp * .3, amp) * (0.4 + 0.6 * Math.sin(Math.PI * t));
-      pts.push([x + rand(-6, 6), y + j]);
-    }
-    pts.push(b);
-    return pts;
-  }
-  const leftRidge = ridge(L_FOOT, PEAK, 26, 18);
-  const rightRidge = ridge(PEAK, R_FOOT, 24, 18);
-  const mountain = leftRidge.concat(rightRidge.slice(1));
-  const mountainPoly = mountain.concat([[980, 780], [20, 800]]);
-
-  const CONF = [500, 800];
-  const STREAMS = [
-    [[315, 430], [350, 540], [420, 690], CONF],
-    [[432, 275], [440, 420], [468, 610], CONF],
-    [[585, 325], [565, 470], [530, 660], CONF],
-    [[722, 470], [655, 590], [565, 730], CONF]
-  ];
-  const RIVER = [CONF, [485, 870], [500, 950], [565, 1040], [640, 1120], [690, 1200], [720, 1270]];
-  const SHORE = [[0, 1300], [140, 1285], [300, 1300], [460, 1280], [600, 1265], [690, 1250], [760, 1225], [850, 1215], [1000, 1190]];
-  const seaPoly = SHORE.concat([[1000, H], [0, H]]);
-
-  // sampled points for distance tests
-  function samplePath(d, n) {
-    const p = el('path', { d });
-    const len = p.getTotalLength(), out = [];
-    for (let i = 0; i <= n; i++) { const q = p.getPointAtLength(len * i / n); out.push([q.x, q.y]); }
+    out.push(pts[pts.length - 1].slice());
     return out;
   }
-  function distToPts(x, y, pts) {
-    let m = 1e9;
-    for (const p of pts) { const d = Math.hypot(p[0] - x, p[1] - y); if (d < m) m = d; }
-    return m;
-  }
-  let streamPts = [], riverPts = [];
+  function distToPath(x, z, pts) { let m = 1e9; for (let i = 0; i < pts.length; i++) { const dx = pts[i][0] - x, dz = pts[i][1] - z; const d = dx * dx + dz * dz; if (d < m) m = d; } return Math.sqrt(m); }
 
-  function levelAt(x, y) {
-    if (inPoly(x, y, seaPoly)) return 'behavior';
-    const ds = distToPts(x, y, streamPts), dr = distToPts(x, y, riverPts);
-    if (dr < 70 && dr <= ds) return 'state';
-    if (ds < 60) return 'belief';
-    if (inPoly(x, y, mountainPoly)) return 'past';
-    if (y > 1100) return 'behavior';
+  // ---------- The landscape ----------
+  const CONF = [500, 800];
+  const STREAMS2D = [
+    [[315, 440], [350, 560], [420, 700], CONF],
+    [[432, 330], [440, 470], [468, 640], CONF],
+    [[585, 360], [565, 500], [530, 680], CONF],
+    [[722, 480], [655, 610], [565, 740], CONF]
+  ];
+  const RIVER2D = [CONF, [485, 870], [500, 950], [565, 1040], [640, 1120], [690, 1200], [720, 1290]];
+  const streams = STREAMS2D.map(s => spline(s, 8));
+  const river = spline(RIVER2D, 8);
+  const allStreamPts = [].concat(...streams);
+  const shoreZ = x => 1290 + 28 * Math.sin(x / 120) + 18 * Math.sin(x / 47 + 1) - 70 * Math.exp(-(((x - 720) / 90) ** 2));
+
+  function landHeight(x, z) {
+    // main massif
+    const dx = (x - 500) / 470, dz = (z - 230) / 300;
+    let h = 400 * Math.pow(Math.max(0, 1 - Math.sqrt(dx * dx + dz * dz)), 1.35);
+    // shoulders
+    const sh = (cx, cz, r, H) => H * Math.pow(Math.max(0, 1 - Math.hypot(x - cx, z - cz) / r), 1.2);
+    h = Math.max(h, sh(300, 340, 190, 230), sh(725, 330, 210, 255), sh(170, 520, 150, 110), sh(860, 520, 160, 120));
+    // rock roughness grows with height
+    const n1 = vnoise(x / 70, z / 70) - .5, n2 = vnoise(x / 28 + 9, z / 28 + 3) - .5;
+    h += (0.14 * h + 4) * (n1 * 1.4 + n2 * .8);
+    // foothills
+    const f = 26 * vnoise(x / 190 + 4, z / 190) + 11 * vnoise(x / 60 + 7, z / 60 + 2) - 8;
+    h += f * smooth(900, 300, h);
+    // carve the river and the streams
+    const dr = distToPath(x, z, river);
+    h -= 16 * Math.exp(-((dr / 30) ** 2));
+    const ds = distToPath(x, z, allStreamPts);
+    h -= 5 * Math.exp(-((ds / 11) ** 2));
+    // the sea
+    const s = smooth(shoreZ(x) - 60, shoreZ(x) + 30, z);
+    h = h * (1 - s) + (-9) * s;
+    return h;
+  }
+
+  // Height grid
+  const STEP = 8, NX = W / STEP + 1, NZ = D / STEP + 1;
+  const HG = new Float32Array(NX * NZ);
+  for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) HG[j * NX + i] = landHeight(i * STEP, j * STEP);
+  function height(x, z) {
+    const fx = clamp(x / STEP, 0, NX - 1.001), fz = clamp(z / STEP, 0, NZ - 1.001);
+    const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j;
+    const a = HG[j * NX + i], b = HG[j * NX + i + 1], c = HG[(j + 1) * NX + i], d = HG[(j + 1) * NX + i + 1];
+    return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v;
+  }
+  function slope(x, z) { const e = 4; return [(height(x + e, z) - height(x - e, z)) / (2 * e), (height(x, z + e) - height(x, z - e)) / (2 * e)]; }
+  const inSea = (x, z) => z > shoreZ(x) + 10;
+
+  function levelAt(x, z) {
+    if (inSea(x, z) || height(x, z) < 0.5) return 'behavior';
+    const ds = distToPath(x, z, allStreamPts), dr = distToPath(x, z, river);
+    if (dr < 60 && dr <= ds) return 'state';
+    if (ds < 50) return 'belief';
+    if (height(x, z) > 60 && z < 760) return 'past';
+    if (z > 1150) return 'behavior';
     return dr < ds ? 'state' : 'belief';
   }
 
-  // ---------- Draw the landscape ----------
-  const gWorld = el('g', { id: 'world' }, svg);
-  const gLand = el('g', {}, gWorld);
-  const gNotes = el('g', { id: 'notes' }, gWorld);
-  const gGhost = el('g', { class: 'ghost' }, gWorld);
+  // ---------- Geometry buffers ----------
+  const LIFT = 1.0;
+  // terrain triangles
+  const terr = new Float32Array((NX - 1) * (NZ - 1) * 6 * 3);
+  { let k = 0;
+    for (let j = 0; j < NZ - 1; j++) for (let i = 0; i < NX - 1; i++) {
+      const x0 = i * STEP, x1 = x0 + STEP, z0 = j * STEP, z1 = z0 + STEP;
+      const a = HG[j * NX + i], b = HG[j * NX + i + 1], c = HG[(j + 1) * NX + i], d = HG[(j + 1) * NX + i + 1];
+      terr.set([x0, a, z0, x0, c, z1, x1, b, z0, x1, b, z0, x0, c, z1, x1, d, z1], k); k += 18;
+    } }
+  const seaQuad = new Float32Array([-400, 0, 1050, -400, 0, 2100, 1400, 0, 1050, 1400, 0, 1050, -400, 0, 2100, 1400, 0, 2100]);
 
-  function drawLandscape() {
-    const defs = el('defs', {}, gLand);
-    const clip = el('clipPath', { id: 'mclip' }, defs);
-    el('path', { d: poly(mountainPoly) + 'Z' }, clip);
+  const lines = { contour: [], hatch: [], wave: [], tree: [], tuft: [] };
+  const seg = (arr, x1, y1, z1, x2, y2, z2) => arr.push(x1, y1, z1, x2, y2, z2);
 
-    // Sea
-    el('path', { d: spline(SHORE) + ` L${W} ${H} L0 ${H} Z`, fill: 'var(--sea)', stroke: 'none' }, gLand);
-    el('path', { d: spline(SHORE), class: 'ink', 'stroke-width': 1.6 }, gLand);
-    const gw = el('g', { class: 'ink', 'stroke-width': 1.1, opacity: .6 }, gLand);
-    for (let y = 1330; y < H; y += 44) {
-      for (let x = ((y / 44) | 0) % 2 ? 40 : 10; x < W; x += 60) {
-        if (y < 1320 || inPoly(x + 20, y, seaPoly)) el('path', { d: `M${x} ${y} q10 -6 20 0 t20 0` }, gw);
+  // contour lines by marching squares
+  for (let lvl = 7; lvl < 420; lvl += 14) {
+    for (let j = 0; j < NZ - 1; j++) for (let i = 0; i < NX - 1; i++) {
+      const a = HG[j * NX + i], b = HG[j * NX + i + 1], c = HG[(j + 1) * NX + i + 1], d = HG[(j + 1) * NX + i];
+      const idx = (a > lvl ? 8 : 0) | (b > lvl ? 4 : 0) | (c > lvl ? 2 : 0) | (d > lvl ? 1 : 0);
+      if (idx === 0 || idx === 15) continue;
+      const x0 = i * STEP, z0 = j * STEP;
+      const top = [x0 + STEP * (lvl - a) / (b - a), z0], right = [x0 + STEP, z0 + STEP * (lvl - b) / (c - b)];
+      const bot = [x0 + STEP * (lvl - d) / (c - d), z0 + STEP], left = [x0, z0 + STEP * (lvl - a) / (d - a)];
+      const add = (p, q) => seg(lines.contour, p[0], lvl + LIFT, p[1], q[0], lvl + LIFT, q[1]);
+      switch (idx) {
+        case 1: case 14: add(left, bot); break;
+        case 2: case 13: add(bot, right); break;
+        case 3: case 12: add(left, right); break;
+        case 4: case 11: add(top, right); break;
+        case 5: add(top, left); add(bot, right); break;
+        case 6: case 9: add(top, bot); break;
+        case 7: case 8: add(top, left); break;
+        case 10: add(top, right); add(left, bot); break;
       }
     }
-
-    // Foothill contours
-    const gc = el('g', { class: 'ink', 'stroke-width': 1.3 }, gLand);
-    const contours = [
-      [[20, 760], [160, 740], [300, 790], [420, 870]],
-      [[20, 900], [120, 880], [260, 900], [380, 960], [440, 1020]],
-      [[120, 1060], [240, 1040], [360, 1080], [470, 1150]],
-      [[20, 1180], [150, 1160], [280, 1190]],
-      [[980, 740], [860, 740], [760, 790], [700, 850], [640, 870]],
-      [[980, 860], [900, 850], [820, 900], [720, 940], [660, 960]],
-      [[980, 1010], [900, 1000], [820, 1040], [760, 1060]],
-      [[980, 1120], [920, 1110], [850, 1130]]
-    ];
-    contours.forEach(c => el('path', { d: spline(c) }, gc));
-
-    // Trees, rocks, tufts
-    const gd = el('g', { class: 'ink', 'stroke-width': 1.2 }, gLand);
-    function tree(x, y, s) {
-      el('path', { d: `M${x} ${y} v${-s * 3}` }, gd);
-      for (let i = 0; i < 3; i++) {
-        const yy = y - s * (0.6 + i * 0.8), w = s * (1.2 - i * 0.3);
-        el('path', { d: `M${f1(x - w)} ${f1(yy)} L${x} ${f1(yy - s * 0.9)} L${f1(x + w)} ${f1(yy)}` }, gd);
-      }
-    }
-    function rock(x, y, s) {
-      const pts = [];
-      for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; const r = s * rand(.7, 1.1); pts.push([x + Math.cos(a) * r, y + Math.sin(a) * r * .7]); }
-      el('path', { d: poly(pts) + 'Z', fill: 'var(--paper)' }, gd);
-      el('path', { d: `M${f1(pts[5][0])} ${f1(pts[5][1])} L${f1(x)} ${f1(y + s * .3)} L${f1(pts[2][0])} ${f1(pts[2][1])}` }, gd);
-    }
-    function tuft(x, y, up) {
-      el('path', { d: up ? `M${x} ${y} l-5 -5 M${x} ${y} l5 -5` : `M${x} ${y} l-4 7 M${x} ${y} l4 7` }, gd);
-    }
-    const clusters = [[110, 760, 9], [220, 740, 7], [860, 700, 8], [920, 730, 6], [640, 880, 5], [300, 980, 4], [820, 950, 5]];
-    clusters.forEach(([cx, cy, n]) => { for (let i = 0; i < n; i++) tree(f1(cx + rand(-45, 45)), f1(cy + rand(-24, 24)), rand(7, 11)); });
-    const rockSpots = [[160, 830], [250, 870], [340, 940], [410, 1010], [120, 980], [200, 1120], [330, 1180], [480, 1210], [780, 820], [860, 900], [920, 980], [760, 1090], [880, 1150], [640, 1010]];
-    rockSpots.forEach(([x, y]) => rock(x + rand(-20, 20), y + rand(-10, 10), rand(8, 13)));
-    for (let i = 0; i < 70; i++) {
-      const x = rand(20, 980), y = rand(720, 1240);
-      if (inPoly(x, y, seaPoly) || distToPts(x, y, riverPts) < 40) continue;
-      tuft(f1(x), f1(y), R() > .35);
-    }
-
-    // Mountain body (white fill hides what is behind it)
-    const gm = el('g', { 'clip-path': 'url(#mclip)' }, gLand);
-    el('path', { d: poly(mountainPoly) + 'Z', fill: 'var(--paper)', stroke: 'none' }, gm);
-    // hatching patches on the faces
-    const patches = [
-      { cx: 330, cy: 420, rx: 90, ry: 130, rot: 20 },
-      { cx: 520, cy: 300, rx: 60, ry: 110, rot: -8 },
-      { cx: 640, cy: 440, rx: 70, ry: 90, rot: -25 },
-      { cx: 440, cy: 560, rx: 70, ry: 60, rot: 10 },
-      { cx: 800, cy: 560, rx: 60, ry: 60, rot: -30 }
-    ];
-    patches.forEach((p, i) => {
-      const id = 'hp' + i;
-      const c = el('clipPath', { id }, defs);
-      el('ellipse', { cx: p.cx, cy: p.cy, rx: p.rx, ry: p.ry, transform: `rotate(${p.rot} ${p.cx} ${p.cy})` }, c);
-      const g = el('g', { 'clip-path': `url(#${id})`, class: 'ink', 'stroke-width': .9, opacity: .75 }, gm);
-      const span = Math.max(p.rx, p.ry) * 1.4;
-      for (let x = p.cx - span; x < p.cx + span; x += 7) {
-        const dx = rand(-2, 2);
-        el('line', { x1: f1(x + dx), y1: f1(p.cy - span), x2: f1(x + dx - span * .5), y2: f1(p.cy + span) }, g);
-      }
-    });
-    // rock facet lines
-    const gf = el('g', { class: 'ink', 'stroke-width': 1.1 }, gm);
-    for (let i = 0; i < 46; i++) {
-      const side = R() > .5 ? 1 : -1;
-      const t = rand(.05, .95);
-      const base = side < 0 ? leftRidge : rightRidge;
-      const idx = Math.min(base.length - 1, Math.floor(t * base.length));
-      let x = base[idx][0] + rand(-30, 30), y = base[idx][1] + rand(10, 120);
-      const pts = [[x, y]];
-      const steps = 2 + Math.floor(rand(1, 6));
-      for (let s = 0; s < steps; s++) {
-        const ang = Math.PI / 2 + side * rand(.15, .6) * (R() > .25 ? 1 : -1);
-        const len = rand(18, 48);
-        x += Math.cos(ang) * len; y += Math.sin(ang) * len;
-        pts.push([x, y]);
-      }
-      el('path', { d: poly(pts) }, gf);
-    }
-    // short near-peak strokes
-    for (let i = 0; i < 18; i++) {
-      const x = PEAK[0] + rand(-120, 120), y = PEAK[1] + rand(30, 200);
-      el('path', { d: `M${f1(x)} ${f1(y)} l${f1(rand(-14, 14))} ${f1(rand(10, 26))}` }, gf);
-    }
-    // outline
-    el('path', { d: poly(mountain), class: 'ink', 'stroke-width': 2 }, gLand);
-    // secondary ridge from peak down the front
-    el('path', { d: spline([[PEAK[0] + 4, PEAK[1] + 6], [520, 260], [505, 380], [540, 480], [520, 600]]), class: 'ink', 'stroke-width': 1.2, opacity: .7 }, gLand);
-
-    // Streams and river: pale bed under a red line
-    const gs = el('g', { fill: 'none', 'stroke-linecap': 'round' }, gLand);
-    STREAMS.forEach(s => {
-      const d = spline(s);
-      el('path', { d, stroke: 'var(--sea)', 'stroke-width': 9 }, gs);
-      el('path', { d, stroke: 'var(--red)', 'stroke-width': 2.6 }, gs);
-    });
-    const rd = spline(RIVER);
-    el('path', { d: rd, stroke: 'var(--sea)', 'stroke-width': 26 }, gs);
-    el('path', { d: rd, stroke: 'var(--ink)', 'stroke-width': 1.3, opacity: .55 }, gs);
-    el('path', { d: rd, stroke: 'var(--red)', 'stroke-width': 2.8 }, gs);
-    // bank ticks
-    const gt = el('g', { class: 'ink', 'stroke-width': 1, opacity: .7 }, gLand);
-    const rp = samplePath(rd, 60);
-    for (let i = 4; i < rp.length - 2; i += 3) {
-      const a = rp[i - 1], b = rp[i + 1];
-      const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
-      const nx = -dy / L, ny = dx / L;
-      const side = i % 2 ? 1 : -1;
-      const x = rp[i][0] + nx * 13 * side, y = rp[i][1] + ny * 13 * side;
-      el('line', { x1: f1(x), y1: f1(y), x2: f1(x + nx * 9 * side), y2: f1(y + ny * 9 * side) }, gt);
-    }
-    // mouth widening into the sea
-    const m = RIVER[RIVER.length - 1];
-    el('path', { d: `M${m[0] - 14} ${m[1] - 40} Q${m[0] - 30} ${m[1] + 10} ${m[0] - 90} ${m[1] + 30}`, class: 'ink', 'stroke-width': 1.2, opacity: .55 }, gLand);
-    el('path', { d: `M${m[0] + 14} ${m[1] - 40} Q${m[0] + 30} ${m[1] - 10} ${m[0] + 70} ${m[1] - 50}`, class: 'ink', 'stroke-width': 1.2, opacity: .55 }, gLand);
-
-    // Labels with leader lines
-    const gl = el('g', {}, gLand);
-    function label(text, x, y, anchor, to, bend) {
-      const t = el('text', { x, y, 'text-anchor': anchor, class: 'label' }, gl);
-      t.textContent = text;
-      const bb = t.getBBox();
-      const fromRight = to[0] > bb.x + bb.width / 2;
-      const sx = fromRight ? bb.x + bb.width + 8 : bb.x - 8;
-      const sy = bb.y + bb.height * .72;
-      const mx = (sx + to[0]) / 2 + bend[0], my = (sy + to[1]) / 2 + bend[1];
-      el('path', { d: `M${f1(sx)} ${f1(sy)} Q${f1(mx)} ${f1(my)} ${to[0]} ${to[1]}`, stroke: 'var(--red)', fill: 'none', 'stroke-width': 1.3, opacity: .85 }, gl);
-    }
-    const sp = i => [Math.round(streamPts[i][0]), Math.round(streamPts[i][1])];
-    label('1. Past experiences', 60, 262, 'start', [372, 340], [20, -10]);
-    label('2. Beliefs', 700, 292, 'start', sp(2 * 41 + 13), [30, -10]);
-    label('3. State', 80, 1000, 'start', [Math.round(riverPts[22][0]) - 14, Math.round(riverPts[22][1])], [30, 30]);
-    label('4. Behavior', 100, 1240, 'start', [370, 1360], [40, 30]);
-    const motto = el('text', { x: 960, y: 128, 'text-anchor': 'end', class: 'motto' }, gl);
-    motto.textContent = 'Water flows downhill.';
   }
-
-  // sample streams/river first (needed by levelAt and labels)
-  STREAMS.forEach(s => { streamPts = streamPts.concat(samplePath(spline(s), 40)); });
-  riverPts = samplePath(spline(RIVER), 40);
-  drawLandscape();
-
-  // ---------- Notes on the map ----------
-  function wrap(text, max) {
-    const words = text.replace(/\s+/g, ' ').trim().split(' ');
-    const lines = []; let cur = '';
-    for (const w of words) {
-      if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }
-      else cur = (cur + ' ' + w).trim();
-      if (lines.length === 3) break;
+  // hatching on steep faces
+  for (let j = 1; j < NZ - 1; j += 2) for (let i = 1; i < NX - 1; i += 2) {
+    const x = i * STEP + rand(-3, 3), z = j * STEP + rand(-3, 3);
+    const [gx, gz] = slope(x, z); const g = Math.hypot(gx, gz);
+    if (g < .72 || R() > (g - .72) * 1.6) continue;
+    const L = rand(7, 13) / g;
+    const x2 = x - gx * L * .5, z2 = z - gz * L * .5, x1 = x + gx * L * .5, z1 = z + gz * L * .5;
+    seg(lines.hatch, x1, height(x1, z1) + LIFT, z1, x2, height(x2, z2) + LIFT, z2);
+  }
+  // waves on the sea
+  for (let z = 1340; z < 1660; z += 34) for (let x = ((z / 34) | 0) % 2 ? -60 : -30; x < 1120; x += 58) {
+    if (!inSea(clamp(x, 0, W), z) && z < 1500) continue;
+    let px = x, py = .8, pz = z;
+    for (let k = 1; k <= 6; k++) { const nx = x + k * 4, nz = z - Math.sin(k / 6 * Math.PI * 2) * 2.2; seg(lines.wave, px, py, pz, nx, py, nz); px = nx; pz = nz; }
+  }
+  // trees and tufts on the slopes
+  function tree(x, z) {
+    const y = height(x, z) + .5, s = rand(7, 11);
+    seg(lines.tree, x, y, z, x, y + s * 3, z);
+    for (let k = 0; k < 3; k++) {
+      const yy = y + s * (.6 + k * .8), w = s * (1.1 - k * .28), tip = yy + s * .9;
+      seg(lines.tree, x - w, yy, z, x, tip, z); seg(lines.tree, x, tip, z, x + w, yy, z);
+      seg(lines.tree, x, yy, z - w, x, tip, z); seg(lines.tree, x, tip, z, x, yy, z + w);
     }
-    if (lines.length < 3 && cur) lines.push(cur);
-    const used = lines.join(' ').length;
-    if (used < text.replace(/\s+/g, ' ').trim().length) lines[lines.length - 1] = lines[lines.length - 1].replace(/\.*$/, '') + '…';
-    return lines;
   }
-  function renderNotes() {
-    gNotes.innerHTML = '';
-    data.notes.forEach(n => {
-      const g = el('g', { class: 'note' + (n.fuel ? ' ' + n.fuel : ''), 'data-id': n.id }, gNotes);
-      const right = n.x < W * .62;
-      const below = n.y < 110;
-      const tx = n.x + (right ? 46 : -46), ty = n.y + (below ? 44 : -30);
-      const lines = wrap(n.text || '…', 22);
-      const t = el('text', { x: f1(tx), y: f1(ty), 'text-anchor': right ? 'start' : 'end' }, g);
-      lines.forEach((ln, i) => { const s = el('tspan', { x: f1(tx), dy: i ? 24 : 0 }, t); s.textContent = ln; });
-      const ex = right ? tx - 6 : tx + 6, ey = ty - 7;
-      el('path', { class: 'leader', d: `M${f1(n.x)} ${f1(n.y)} Q${f1((n.x + ex) / 2 + (right ? -10 : 10))} ${f1(ey + (below ? -8 : 8))} ${f1(ex)} ${f1(ey)}` }, g);
-      el('circle', { class: 'dot', cx: n.x, cy: n.y, r: 5.5 }, g);
-      // generous invisible hit area
-      const bw = Math.max(...lines.map(l => l.length)) * 11 + 20, bh = lines.length * 24 + 16;
-      el('rect', { class: 'hit', x: right ? tx - 8 : tx - bw + 8, y: ty - 24, width: bw, height: bh }, g);
-      el('circle', { class: 'hit', cx: n.x, cy: n.y, r: 26 }, g);
-    });
+  let placed = 0;
+  for (let t = 0; t < 4000 && placed < 150; t++) {
+    const x = rand(15, W - 15), z = rand(600, 1300);
+    const h = height(x, z), [gx, gz] = slope(x, z);
+    if (h < 6 || h > 120 || Math.hypot(gx, gz) > .4 || inSea(x, z) || distToPath(x, z, river) < 40 || distToPath(x, z, allStreamPts) < 25) continue;
+    if (vnoise(x / 90 + 2, z / 90 + 5) < .55) continue;   // clumps
+    tree(x, z); placed++;
   }
+  for (let t = 0; t < 260; t++) {
+    const x = rand(10, W - 10), z = rand(560, 1320);
+    const h = height(x, z), [gx, gz] = slope(x, z);
+    if (h < 3 || h > 140 || Math.hypot(gx, gz) > .5 || inSea(x, z) || distToPath(x, z, river) < 30) continue;
+    const y = h + .6, up = R() > .4;
+    if (up) { seg(lines.tuft, x - 4, y, z, x, y + 4, z); seg(lines.tuft, x, y + 4, z, x + 4, y, z); }
+    else { seg(lines.tuft, x - 3, y + 4, z, x, y, z); seg(lines.tuft, x, y, z, x + 3, y + 4, z); }
+  }
+  // ribbons for streams and the river
+  function ribbon(pts, width, lift) {
+    const out = [];
+    const P = pts.map(p => [p[0], height(p[0], p[1]) + lift, p[1]]);
+    for (let i = 0; i < P.length - 1; i++) {
+      const a = P[i], b = P[i + 1];
+      const dx = b[0] - a[0], dz = b[2] - a[2], L = Math.hypot(dx, dz) || 1;
+      const nx = -dz / L * width / 2, nz = dx / L * width / 2;
+      const w0 = i === 0 ? 1 : 1, w1 = 1;
+      out.push(a[0] + nx * w0, a[1], a[2] + nz * w0, a[0] - nx * w0, a[1], a[2] - nz * w0, b[0] + nx * w1, b[1], b[2] + nz * w1,
+               b[0] - nx * w0, b[1], b[2] - nz * w0, b[0] + nx * w1, b[1], b[2] + nz * w1, a[0] - nx * w0, a[1], a[2] - nz * w0);
+    }
+    return new Float32Array(out);
+  }
+  const streamRibbons = streams.map(s => ribbon(s, 3.2, LIFT + .2));
+  const streamBeds = streams.map(s => ribbon(s, 9, LIFT));
+  const riverRibbon = ribbon(river, 4.2, LIFT + .3);
+  const riverBed = ribbon(river, 24, LIFT + .1);
+  const riverEdge = [];
+  { const P = river; for (let i = 0; i < P.length - 1; i++) { const a = P[i], b = P[i + 1]; const dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz) || 1; const nx = -dz / L * 12, nz = dx / L * 12;
+      seg(riverEdge, a[0] + nx, height(a[0] + nx, a[1] + nz) + LIFT + .2, a[1] + nz, b[0] + nx, height(b[0] + nx, b[1] + nz) + LIFT + .2, b[1] + nz);
+      seg(riverEdge, a[0] - nx, height(a[0] - nx, a[1] - nz) + LIFT + .2, a[1] - nz, b[0] - nx, height(b[0] - nx, b[1] - nz) + LIFT + .2, b[1] - nz);
+      if (i % 4 === 2) { const s = (i >> 2) % 2 ? 1 : -1; const px = a[0] + nx * s * 1.15, pz = a[1] + nz * s * 1.15, qx = a[0] + nx * s * 1.8, qz = a[1] + nz * s * 1.8; seg(riverEdge, px, height(px, pz) + LIFT + .3, pz, qx, height(qx, qz) + LIFT + .3, qz); }
+  } }
 
-  // ---------- View: zoom and pan ----------
-  const view = { x: 0, y: 0, w: W, h: H };
-  let cw = 1, ch = 1;        // css px
-  let minScale = .1, maxScale = 6;
-  function applyView() { svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`); }
-  function scale() { return cw / view.w; }
-  function clampView() {
-    const s = Math.min(maxScale, Math.max(minScale, scale()));
-    view.w = cw / s; view.h = ch / s;
-    const mx = view.w * .6, my = view.h * .6;
-    view.x = Math.min(W + mx - view.w, Math.max(-mx, view.x));
-    view.y = Math.min(H + my - view.h, Math.max(-my, view.y));
+  // ---------- WebGL ----------
+  const canvas = $('gl');
+  const gl = canvas.getContext('webgl', { antialias: true, alpha: false, depth: true, powerPreference: 'low-power' });
+  if (!gl) { document.body.innerHTML = '<p style="padding:40px;font-family:serif">This phone cannot draw the 3D landscape. Please update iOS and try again.</p>'; return; }
+  const vs = 'attribute vec3 p;uniform mat4 m;void main(){gl_Position=m*vec4(p,1.0);}';
+  const fs = 'precision mediump float;uniform vec4 c;void main(){gl_FragColor=c;}';
+  function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+  const prog = gl.createProgram(); gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(prog); gl.useProgram(prog);
+  const aP = gl.getAttribLocation(prog, 'p'), uM = gl.getUniformLocation(prog, 'm'), uC = gl.getUniformLocation(prog, 'c');
+  gl.enableVertexAttribArray(aP);
+  function buf(arr) { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, arr instanceof Float32Array ? arr : new Float32Array(arr), gl.STATIC_DRAW); return { b, n: (arr.length / 3) | 0 }; }
+  const B = {
+    terr: buf(terr), sea: buf(seaQuad),
+    contour: buf(lines.contour), hatch: buf(lines.hatch), wave: buf(lines.wave), tree: buf(lines.tree), tuft: buf(lines.tuft), redge: buf(riverEdge),
+    sribbons: streamRibbons.map(buf), sbeds: streamBeds.map(buf), river: buf(riverRibbon), rbed: buf(riverBed)
+  };
+  const css = getComputedStyle(document.documentElement);
+  function rgba(name, a) { const m = css.getPropertyValue(name).trim().match(/#(..)(..)(..)/); return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255, a]; }
+  const C = { paper: rgba('--paper', 1), ink: rgba('--ink', 1), sea: rgba('--sea', 1), red: rgba('--red', 1) };
+  const col = (c, a) => [c[0], c[1], c[2], a];
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(C.paper[0], C.paper[1], C.paper[2], 1);
+  function draw(bo, mode, c) { gl.bindBuffer(gl.ARRAY_BUFFER, bo.b); gl.vertexAttribPointer(aP, 3, gl.FLOAT, false, 0, 0); gl.uniform4fv(uC, c); gl.drawArrays(mode, 0, bo.n); }
+
+  // matrices
+  function perspective(fov, aspect, n, f) { const t = 1 / Math.tan(fov / 2); return [t / aspect, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0]; }
+  function lookAt(e, t) {
+    let zx = e[0] - t[0], zy = e[1] - t[1], zz = e[2] - t[2]; let L = Math.hypot(zx, zy, zz); zx /= L; zy /= L; zz /= L;
+    let xx = zz, xy = 0, xz = -zx; L = Math.hypot(xx, xy, xz) || 1; xx /= L; xz /= L;          // right = up(0,1,0) x z
+    const yx = zy * xz - zz * xy, yy = zz * xx - zx * xz, yz = zx * xy - zy * xx;
+    return [xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, -(xx * e[0] + xy * e[1] + xz * e[2]), -(yx * e[0] + yy * e[1] + yz * e[2]), -(zx * e[0] + zy * e[1] + zz * e[2]), 1];
   }
-  function fitView() {
-    const s = Math.min(cw / (W + 40), (ch - 200) / (H + 40));
-    return { w: cw / s, h: ch / s, x: (W - cw / s) / 2, y: (H - ch / s) / 2 + 20 };
+  function mul(a, b) { const o = new Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k]; o[i * 4 + j] = s; } return o; }
+
+  // ---------- Camera ----------
+  const FOV = 40 * Math.PI / 180;
+  const cam = { tx: 500, tz: 850, dist: 2000, az: 0, pol: .95 };
+  const LIM = { dist: [260, 3400], pol: [.28, 1.25] };
+  let cw = 1, ch = 1, dpr = 1, MVP = null, eye = [0, 0, 0];
+  function camPos() {
+    const ty = height(cam.tx, cam.tz);
+    return [cam.tx + cam.dist * Math.sin(cam.pol) * Math.sin(cam.az), ty + cam.dist * Math.cos(cam.pol), cam.tz + cam.dist * Math.sin(cam.pol) * Math.cos(cam.az)];
+  }
+  function clampCam() {
+    cam.dist = clamp(cam.dist, LIM.dist[0], LIM.dist[1]); cam.pol = clamp(cam.pol, LIM.pol[0], LIM.pol[1]);
+    cam.tx = clamp(cam.tx, -100, W + 100); cam.tz = clamp(cam.tz, -50, D + 80);
   }
   function resize() {
-    const r = svg.getBoundingClientRect();
-    const oldScale = scale(), cx = view.x + view.w / 2, cy = view.y + view.h / 2;
-    cw = r.width || 1; ch = r.height || 1;
-    minScale = Math.min(cw / (W + 40), (ch - 200) / (H + 40));
-    const s = Math.max(minScale, oldScale);
-    view.w = cw / s; view.h = ch / s; view.x = cx - view.w / 2; view.y = cy - view.h / 2;
-    clampView(); applyView();
+    const r = canvas.getBoundingClientRect(); cw = r.width || 1; ch = r.height || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+    canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    $('leaders').setAttribute('viewBox', `0 0 ${cw} ${ch}`);
+    requestRender();
   }
-  function toScene(px, py) { return [view.x + px / cw * view.w, view.y + py / ch * view.h]; }
-  function toScreen(x, y) { return [(x - view.x) / view.w * cw, (y - view.y) / view.h * ch]; }
-  function zoomAt(px, py, factor) {
-    const [sx, sy] = toScene(px, py);
-    const s = Math.min(maxScale, Math.max(minScale, scale() * factor));
-    view.w = cw / s; view.h = ch / s;
-    view.x = sx - px / cw * view.w; view.y = sy - py / ch * view.h;
-    clampView(); applyView();
+  function project(x, y, z) { // -> [sx, sy, visible-in-front]
+    const m = MVP; const cx = m[0] * x + m[4] * y + m[8] * z + m[12], cy = m[1] * x + m[5] * y + m[9] * z + m[13], cwv = m[3] * x + m[7] * y + m[11] * z + m[15];
+    return [(cx / cwv + 1) / 2 * cw, (1 - cy / cwv) / 2 * ch, cwv > 0];
   }
+  function rayFromScreen(px, py) {
+    const t = camPos(), ty = height(cam.tx, cam.tz);
+    let fx = cam.tx - t[0], fy = ty - t[1], fz = cam.tz - t[2]; const L = Math.hypot(fx, fy, fz); fx /= L; fy /= L; fz /= L;
+    let rx = -fz, ry = 0, rz = fx; const RL = Math.hypot(rx, rz) || 1; rx /= RL; rz /= RL;         // right = forward x up
+    const ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;                 // up = right x forward
+    const th = Math.tan(FOV / 2), nx = (px / cw * 2 - 1) * th * (cw / ch), ny = (1 - py / ch * 2) * th;
+    let dx = fx + rx * nx + ux * ny, dy = fy + ry * nx + uy * ny, dz = fz + rz * nx + uz * ny; const DL = Math.hypot(dx, dy, dz);
+    return { o: t, d: [dx / DL, dy / DL, dz / DL] };
+  }
+  function hitGround(px, py) {
+    const { o, d } = rayFromScreen(px, py);
+    let prev = 0;
+    for (let t = 0; t < 7000; t += 5) {
+      const x = o[0] + d[0] * t, y = o[1] + d[1] * t, z = o[2] + d[2] * t;
+      if (x < -300 || x > W + 300 || z < -300 || z > D + 500) { if (t > 0 && y < -20) return null; prev = t; continue; }
+      const h = (x >= 0 && x <= W && z >= 0 && z <= D) ? height(x, z) : 0;
+      if (y <= h) { // refine
+        let lo = prev, hi = t;
+        for (let k = 0; k < 10; k++) { const mid = (lo + hi) / 2; const mx = o[0] + d[0] * mid, mz = o[2] + d[2] * mid; const mh = (mx >= 0 && mx <= W && mz >= 0 && mz <= D) ? height(mx, mz) : 0; if (o[1] + d[1] * mid <= mh) hi = mid; else lo = mid; }
+        return [clamp(o[0] + d[0] * hi, 0, W), clamp(o[2] + d[2] * hi, 0, D)];
+      }
+      prev = t;
+    }
+    return null;
+  }
+  function occluded(x, y, z) {
+    const o = eye; const dx = x - o[0], dy = y - o[1], dz = z - o[2];
+    for (let k = 1; k < 48; k++) { const t = k / 50; const px = o[0] + dx * t, py = o[1] + dy * t, pz = o[2] + dz * t; if (px < 0 || px > W || pz < 0 || pz > D) continue; if (py < height(px, pz) - 2.5) return true; }
+    return false;
+  }
+
+  // ---------- Render ----------
+  let dirty = true;
+  function requestRender() { dirty = true; }
+  function render() {
+    clampCam();
+    eye = camPos(); const ty = height(cam.tx, cam.tz);
+    MVP = mul(perspective(FOV, cw / ch, 20, 9000), lookAt(eye, [cam.tx, ty, cam.tz]));
+    gl.uniformMatrix4fv(uM, false, new Float32Array(MVP));
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(2, 4);
+    draw(B.terr, gl.TRIANGLES, C.paper);
+    draw(B.sea, gl.TRIANGLES, C.sea);
+    gl.disable(gl.POLYGON_OFFSET_FILL);
+    B.sbeds.forEach(b => draw(b, gl.TRIANGLES, C.sea));
+    draw(B.rbed, gl.TRIANGLES, C.sea);
+    draw(B.contour, gl.LINES, col(C.ink, .8));
+    draw(B.hatch, gl.LINES, col(C.ink, .55));
+    draw(B.wave, gl.LINES, col(C.ink, .42));
+    draw(B.tree, gl.LINES, col(C.ink, .85));
+    draw(B.tuft, gl.LINES, col(C.ink, .7));
+    draw(B.redge, gl.LINES, col(C.ink, .55));
+    B.sribbons.forEach(b => draw(b, gl.TRIANGLES, C.red));
+    draw(B.river, gl.TRIANGLES, C.red);
+    layoutOverlay();
+  }
+  requestAnimationFrame(function loop() { if (dirty) { dirty = false; render(); } requestAnimationFrame(loop); });
+
+  // ---------- Overlay: labels, notes, leaders ----------
+  const labelsEl = $('labels'), leadersEl = $('leaders');
+  const sp = (pts, f) => { const p = pts[Math.floor(pts.length * f)]; return [p[0], height(p[0], p[1]) + 1, p[1]]; };
+  const LABELS = [
+    { text: '1. Past experiences', at: () => [300, height(300, 400) + 1, 400], off: [-70, 60] },
+    { text: '2. Beliefs', at: () => sp(streams[3], .45), off: [100, 30] },
+    { text: '3. State', at: () => sp(river, .55), off: [-115, 25] },
+    { text: '4. Behavior', at: () => [380, 0.5, 1440], off: [-80, -45] }
+  ];
+  const labelEls = LABELS.map(l => { const d = document.createElement('div'); d.className = 'lbl' + (l.motto ? ' motto' : ''); d.textContent = l.text; labelsEl.appendChild(d); return d; });
+  const noteEls = new Map();
+  let ghostPt = null;
+  function noteEl(n) {
+    let d = noteEls.get(n.id);
+    if (!d) { d = document.createElement('div'); d.className = 'note-lbl'; d.dataset.id = n.id; d.addEventListener('click', () => { hideBubble(); openNote(n.id); }); labelsEl.appendChild(d); noteEls.set(n.id, d); }
+    d.textContent = n.text;
+    return d;
+  }
+  function syncNoteEls() {
+    const ids = new Set(data.notes.map(n => n.id));
+    for (const [id, el] of noteEls) if (!ids.has(id)) { el.remove(); noteEls.delete(id); }
+    data.notes.forEach(noteEl);
+    requestRender();
+  }
+  function layoutOverlay() {
+    let svg = '';
+    LABELS.forEach((l, i) => {
+      const p = l.at(); const [sx, sy, ok] = project(p[0], p[1], p[2]);
+      const el = labelEls[i];
+      if (!ok || sx < -200 || sx > cw + 200 || sy < -100 || sy > ch + 100) { el.style.display = 'none'; return; }
+      el.style.display = '';
+      const lx = clamp(sx + l.off[0], 70, cw - 70), ly = clamp(sy + l.off[1], 90, ch - 180);
+      el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
+      if (!l.motto) {
+        const r = el.getBoundingClientRect(); const fromX = sx > lx ? lx + r.width / 2 + 4 : lx - r.width / 2 - 4, fromY = ly + 4;
+        const mx = (fromX + sx) / 2 + (sy > ly ? 8 : -8), my = (fromY + sy) / 2 + 10;
+        svg += `<path d="M${fromX.toFixed(1)} ${fromY.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${sx.toFixed(1)} ${sy.toFixed(1)}"/>`;
+      }
+    });
+    data.notes.forEach(n => {
+      const el = noteEls.get(n.id); if (!el) return;
+      const y = height(n.x, n.y) + 1;
+      const [sx, sy, ok] = project(n.x, y, n.y);
+      if (!ok || sx < -60 || sx > cw + 60 || sy < -40 || sy > ch + 40 || occluded(n.x, y + 1.5, n.y)) { el.style.display = 'none'; return; }
+      el.style.display = '';
+      const right = sx < cw * .62;
+      el.className = 'note-lbl ' + (right ? 'right' : 'left') + (el.classList.contains('lit') ? ' lit' : '');
+      const lx = sx + (right ? 34 : -34), ly = sy - 22;
+      el.style.transform = `translate(${lx}px, ${ly}px) translate(${right ? 0 : -100}%, -100%)`;
+      const ex = right ? lx - 4 : lx + 4, ey = ly - 6;
+      svg += `<path class="lead-note" d="M${sx.toFixed(1)} ${sy.toFixed(1)} Q${((sx + ex) / 2 + (right ? -8 : 8)).toFixed(1)} ${(ey + 6).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}"/><circle class="dot ${n.fuel || ''}" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="4.5"/>`;
+    });
+    if (ghostPt) { const [gx, gy, ok] = project(ghostPt[0], height(ghostPt[0], ghostPt[1]) + 1, ghostPt[1]); if (ok) svg += `<circle class="ghost" cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="13"/>`; }
+    leadersEl.innerHTML = svg;
+    if (bubbleAt) { const [bx, by] = project(bubbleAt[0], height(bubbleAt[0], bubbleAt[1]) + 1, bubbleAt[1]); bubble.style.left = bx + 'px'; bubble.style.top = by + 'px'; }
+  }
+
+  // ---------- Camera animation ----------
   let anim = null;
   function flyTo(target, ms) {
     if (anim) cancelAnimationFrame(anim);
-    const from = { ...view }, t0 = performance.now();
+    const from = { ...cam }, t0 = performance.now();
     const ease = t => 1 - Math.pow(1 - t, 3);
     const step = now => {
-      const t = Math.min(1, (now - t0) / (ms || 500)), k = ease(t);
-      view.x = from.x + (target.x - from.x) * k; view.y = from.y + (target.y - from.y) * k;
-      view.w = from.w + (target.w - from.w) * k; view.h = from.h + (target.h - from.h) * k;
-      applyView();
+      const t = Math.min(1, (now - t0) / (ms || 600)), k = ease(t);
+      for (const key of ['tx', 'tz', 'dist', 'az', 'pol']) if (target[key] !== undefined) cam[key] = from[key] + (target[key] - from[key]) * k;
+      requestRender();
       if (t < 1) anim = requestAnimationFrame(step); else anim = null;
     };
     anim = requestAnimationFrame(step);
   }
-  function viewAround(cx, cy, s) {
-    s = Math.min(maxScale, Math.max(minScale, s));
-    const v = { w: cw / s, h: ch / s }; v.x = cx - v.w / 2; v.y = cy - v.h / 2;
-    const mx = v.w * .6, my = v.h * .6;
-    v.x = Math.min(W + mx - v.w, Math.max(-mx, v.x)); v.y = Math.min(H + my - v.h, Math.max(-my, v.y));
-    return v;
-  }
+  const HOME = { tx: 500, tz: 960, dist: 2250, az: 0, pol: 1.0 };
   const REGIONS = {
-    past: { cx: 500, cy: 400, z: 1.9 },
-    belief: { cx: 520, cy: 580, z: 2.1 },
-    state: { cx: 580, cy: 1010, z: 2.3 },
-    behavior: { cx: 500, cy: 1380, z: 2.2 }
+    past: { tx: 500, tz: 380, dist: 950, az: 0, pol: 1.0 },
+    belief: { tx: 510, tz: 600, dist: 720, az: 0.15, pol: .9 },
+    state: { tx: 560, tz: 1010, dist: 640, az: 0.35, pol: .85 },
+    behavior: { tx: 560, tz: 1400, dist: 760, az: -0.2, pol: .9 }
   };
-  function goRegion(k) {
-    const r = REGIONS[k];
-    flyTo(viewAround(r.cx, r.cy, minScale * r.z), 600);
-    hideBubble();
-  }
+  function fitHome() { const f = { ...HOME }; if (cw / ch > .8) f.dist = 1800; flyTo(f, 650); }
 
   // ---------- Gestures ----------
   const pointers = new Map();
-  let gesture = null, lastTap = { t: 0, x: 0, y: 0 }, pressTimer = null, moved = false;
-  let placing = false;
-
-  svg.addEventListener('pointerdown', e => {
-    if (e.button !== 0 && e.pointerType === 'mouse') return;
-    svg.setPointerCapture(e.pointerId);
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), target: e.target });
+  let gesture = null, lastTap = { t: 0, x: 0, y: 0 }, pressTimer = null, moved = false, placing = false;
+  canvas.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now() });
     if (anim) { cancelAnimationFrame(anim); anim = null; }
-    moved = false;
-    clearTimeout(pressTimer);
+    moved = false; clearTimeout(pressTimer);
     if (pointers.size === 1) {
-      gesture = { kind: 'pan', x: e.clientX, y: e.clientY, multi: false };
+      gesture = { kind: 'orbit', x: e.clientX, y: e.clientY, multi: false };
       pressTimer = setTimeout(() => {
         if (pointers.size === 1 && !moved) {
-          const p = pointers.values().next().value;
-          if (p.target.closest && p.target.closest('.note')) return;
+          const p = pointers.values().next().value; const hit = hitGround(p.x, p.y);
+          if (!hit) return;
           if (navigator.vibrate) navigator.vibrate(10);
-          gesture.consumed = true;
-          const [x, y] = toScene(p.x - svgLeft(), p.y - svgTop());
-          openNoteAt(x, y);
+          gesture.consumed = true; openNoteAt(hit[0], hit[1]);
         }
       }, 480);
     } else if (pointers.size === 2) {
@@ -746,205 +824,214 @@
       gesture = { kind: 'pinch', dist: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, multi: true };
     }
   });
-  const svgLeft = () => 0, svgTop = () => 0;
-  svg.addEventListener('pointermove', e => {
-    const p = pointers.get(e.pointerId);
-    if (!p) return;
+  function panBy(dx, dy) {
+    const perPx = 2 * cam.dist * Math.tan(FOV / 2) / ch;
+    const fx = -Math.sin(cam.az), fz = -Math.cos(cam.az);       // ground-forward (away from the camera)
+    const rx = Math.cos(cam.az), rz = -Math.sin(cam.az);        // ground-right
+    cam.tx -= (rx * dx) * perPx; cam.tz -= (rz * dx) * perPx;
+    const k = perPx / Math.max(.35, Math.cos(cam.pol));
+    cam.tx -= fx * (-dy) * k; cam.tz -= fz * (-dy) * k;
+  }
+  canvas.addEventListener('pointermove', e => {
+    const p = pointers.get(e.pointerId); if (!p) return;
     p.x = e.clientX; p.y = e.clientY;
     if (Math.hypot(p.x - p.sx, p.y - p.sy) > 8) { moved = true; clearTimeout(pressTimer); }
     if (!gesture) return;
-    if (gesture.kind === 'pan' && pointers.size === 1) {
-      const dx = (e.clientX - gesture.x) / scale(), dy = (e.clientY - gesture.y) / scale();
-      gesture.x = e.clientX; gesture.y = e.clientY;
-      view.x -= dx; view.y -= dy; clampView(); applyView();
+    if (gesture.kind === 'orbit' && pointers.size === 1) {
+      const dx = e.clientX - gesture.x, dy = e.clientY - gesture.y; gesture.x = e.clientX; gesture.y = e.clientY;
+      cam.az -= dx * .005; cam.pol -= dy * .004; clampCam(); requestRender();
       if (moved) hideBubble();
     } else if (gesture.kind === 'pinch' && pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       const dist = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-      // pan by midpoint delta, zoom by distance ratio
-      view.x -= (mx - gesture.mx) / scale(); view.y -= (my - gesture.my) / scale();
-      zoomAt(mx, my, dist / (gesture.dist || dist));
+      panBy(mx - gesture.mx, my - gesture.my);
+      cam.dist *= (gesture.dist || dist) / dist; clampCam();
       gesture.dist = dist; gesture.mx = mx; gesture.my = my;
-      hideBubble();
+      hideBubble(); requestRender();
     }
   });
   function endPointer(e) {
-    const p = pointers.get(e.pointerId);
-    if (!p) return;
-    pointers.delete(e.pointerId);
-    clearTimeout(pressTimer);
+    const p = pointers.get(e.pointerId); if (!p) return;
+    pointers.delete(e.pointerId); clearTimeout(pressTimer);
     const dt = performance.now() - p.t, dist = Math.hypot(p.x - p.sx, p.y - p.sy);
     if (pointers.size === 0) {
-      const wasMulti = gesture && gesture.multi, consumed = gesture && gesture.consumed;
-      gesture = null;
-      if (!wasMulti && !consumed && dist < 10 && dt < 350 && e.type === 'pointerup') handleTap(p.x, p.y, p.target);
+      const wasMulti = gesture && gesture.multi, consumed = gesture && gesture.consumed; gesture = null;
+      if (!wasMulti && !consumed && dist < 10 && dt < 350 && e.type === 'pointerup') handleTap(p.x, p.y);
     } else if (pointers.size === 1) {
-      const q = pointers.values().next().value;
-      gesture = { kind: 'pan', x: q.x, y: q.y, multi: true };
+      const q = pointers.values().next().value; gesture = { kind: 'orbit', x: q.x, y: q.y, multi: true };
     }
   }
-  svg.addEventListener('pointerup', endPointer);
-  svg.addEventListener('pointercancel', endPointer);
-  svg.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * .002)); }, { passive: false });
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+  canvas.addEventListener('wheel', e => { e.preventDefault(); cam.dist *= Math.exp(e.deltaY * .002); clampCam(); requestRender(); }, { passive: false });
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault()));
   document.addEventListener('dblclick', e => e.preventDefault());
 
-  function handleTap(px, py, target) {
+  function handleTap(px, py) {
     const now = performance.now();
-    const noteG = target.closest ? target.closest('.note') : null;
-    if (noteG) { hideBubble(); openNote(noteG.getAttribute('data-id')); lastTap.t = 0; return; }
-    const [x, y] = toScene(px, py);
-    if (placing) { placing = false; openNoteAt(x, y); return; }
+    const hit = hitGround(px, py);
+    if (!hit) { hideBubble(); return; }
+    if (placing) { placing = false; setHint(); openNoteAt(hit[0], hit[1]); return; }
     if (now - lastTap.t < 320 && Math.hypot(px - lastTap.x, py - lastTap.y) < 40) {
       lastTap.t = 0; hideBubble();
-      if (scale() > minScale * 4.5) flyTo(fitView(), 500); else flyTo(viewAround(x, y, scale() * 2.2), 380);
+      if (cam.dist < 420) fitHome(); else flyTo({ tx: hit[0], tz: hit[1], dist: cam.dist * .5 }, 450);
       return;
     }
     lastTap = { t: now, x: px, y: py };
-    showBubble(x, y);
+    showBubble(hit[0], hit[1]);
   }
 
-  // Bubble: "+ Write here"
+  // Bubble
   const bubble = $('bubble');
   let bubbleAt = null, bubbleTimer = null;
-  function showBubble(x, y) {
-    bubbleAt = [x, y];
-    const [px, py] = toScreen(x, y);
-    bubble.style.left = px + 'px'; bubble.style.top = py + 'px';
-    bubble.classList.add('show');
-    clearTimeout(bubbleTimer); bubbleTimer = setTimeout(hideBubble, 3500);
-  }
+  function showBubble(x, z) { bubbleAt = [x, z]; bubble.classList.add('show'); requestRender(); clearTimeout(bubbleTimer); bubbleTimer = setTimeout(hideBubble, 3500); }
   function hideBubble() { bubble.classList.remove('show'); bubbleAt = null; }
   $('bubbleWrite').addEventListener('click', () => { if (bubbleAt) openNoteAt(bubbleAt[0], bubbleAt[1]); hideBubble(); });
+
+  // ---------- Tabs ----------
+  let tab = 'map';
+  function setTab(t) {
+    tab = t;
+    $('journal').classList.toggle('on', t === 'journal');
+    $('tabMap').classList.toggle('on', t === 'map'); $('tabJournal').classList.toggle('on', t === 'journal');
+    $('mapUI').classList.toggle('hide', t !== 'map'); $('journalUI').classList.toggle('hide', t !== 'journal');
+    $('btnFit').classList.toggle('hide', t !== 'map');
+    if (t === 'journal') renderJournal(); else requestRender();
+    hideBubble();
+  }
+  $('tabMap').addEventListener('click', () => setTab('map'));
+  $('tabJournal').addEventListener('click', () => setTab('journal'));
 
   // ---------- Sheets ----------
   const backdrop = $('backdrop');
   let openSheet = null;
   function show(id) { hideBubble(); if (openSheet) $(openSheet).classList.remove('open'); openSheet = id; $(id).classList.add('open'); backdrop.classList.add('open'); }
-  function closeSheets() { if (openSheet) $(openSheet).classList.remove('open'); openSheet = null; backdrop.classList.remove('open'); $('noteText').blur(); placing = false; setHint(); }
+  function closeSheets() { if (openSheet) $(openSheet).classList.remove('open'); openSheet = null; backdrop.classList.remove('open'); $('noteText').blur(); placing = false; setHint(); ghostPt = null; requestRender(); }
   backdrop.addEventListener('click', closeSheets);
-
-  // keyboard
   if (window.visualViewport) {
     const vv = window.visualViewport;
     const onVV = () => { const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.documentElement.style.setProperty('--kb', kb + 'px'); };
     vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV);
   }
-
-  // Hint
   const hint = $('hint');
-  function setHint(text, red) {
-    hint.textContent = text || (data.notes.length ? 'Pinch to zoom. Hold a spot to write there.' : 'Pinch to zoom. Hold a spot on the landscape to write.');
-    hint.classList.toggle('red', !!red);
-  }
+  function setHint(text, red) { hint.textContent = text || 'Drag to turn · pinch to zoom · hold a spot to write'; hint.classList.toggle('red', !!red); }
 
   // ---------- Note editing ----------
-  let editing = null; // { id?, x, y, level, fuel }
-  let promptIdx = 0;
+  let editing = null, promptIdx = 0;
   const noteText = $('noteText');
   function setLevel(k) {
     editing.level = k;
     [...$('levelSeg').children].forEach(b => b.classList.toggle('on', b.dataset.level === k));
-    $('noteSub').textContent = `${LEVELS[k].place} · ${LEVELS[k].n}. ${LEVELS[k].name}`;
-    promptIdx = Math.floor(Math.random() * PROMPTS[k].length);
-    showPrompt();
+    $('noteSub').textContent = (editing.x == null ? 'Will be placed ' + LEVELS[k].place.toLowerCase() : LEVELS[k].place) + ` · ${LEVELS[k].n}. ${LEVELS[k].name}`;
+    promptIdx = Math.floor(Math.random() * PROMPTS[k].length); showPrompt();
   }
-  function setFuel(f) {
-    editing.fuel = f || '';
-    [...$('fuelSeg').children].forEach(b => b.classList.toggle('on', (b.dataset.fuel || '') === editing.fuel));
-  }
+  function setFuel(f) { editing.fuel = f || ''; [...$('fuelSeg').children].forEach(b => b.classList.toggle('on', (b.dataset.fuel || '') === editing.fuel)); }
   function showPrompt() { $('promptText').textContent = PROMPTS[editing.level][promptIdx % PROMPTS[editing.level].length]; }
   $('promptNext').addEventListener('click', () => { promptIdx++; showPrompt(); });
   $('levelSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLevel(b.dataset.level); });
   $('fuelSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setFuel(b.dataset.fuel); });
 
-  function openNoteAt(x, y) {
-    x = Math.round(Math.min(W - 10, Math.max(10, x))); y = Math.round(Math.min(H - 10, Math.max(10, y)));
-    editing = { x, y, level: levelAt(x, y), fuel: '' };
-    ghost(x, y);
-    $('noteTitle').textContent = 'New entry';
-    $('noteDelete').classList.add('hide');
-    noteText.value = '';
+  function frameOnPoint(x, z) {
+    // bring the point to the upper part of the screen, above the sheet
+    const [, sy, ok] = project(x, height(x, z) + 1, z);
+    if (ok && sy > 70 && sy < ch * .22) return;
+    const dist = Math.min(cam.dist, 700);
+    const perPx = 2 * dist * Math.tan(FOV / 2) / ch, k = perPx / Math.max(.35, Math.cos(cam.pol));
+    const shift = ch * .38 * k;   // target sits well below the point, so the point shows above the sheet
+    flyTo({ tx: x + Math.sin(cam.az) * shift, tz: z + Math.cos(cam.az) * shift, dist }, 450);
+  }
+  function openNoteAt(x, z) {
+    x = Math.round(clamp(x, 5, W - 5)); z = Math.round(clamp(z, 5, D - 5));
+    editing = { x, y: z, level: levelAt(x, z), fuel: '' };
+    ghostPt = [x, z]; frameOnPoint(x, z);
+    $('noteTitle').textContent = 'New entry'; $('noteDelete').classList.add('hide'); noteText.value = '';
     setLevel(editing.level); setFuel('');
-    show('noteSheet');
-    setTimeout(() => noteText.focus(), 320);
+    show('noteSheet'); setTimeout(() => noteText.focus(), 320);
+  }
+  function openNoteBlank() {
+    editing = { x: null, y: null, level: 'state', fuel: '' };
+    ghostPt = null;
+    $('noteTitle').textContent = 'New entry'; $('noteDelete').classList.add('hide'); noteText.value = '';
+    setLevel('state'); setFuel('');
+    show('noteSheet'); setTimeout(() => noteText.focus(), 320);
   }
   function openNote(id) {
-    const n = data.notes.find(n => n.id === id);
-    if (!n) return;
+    const n = data.notes.find(n => n.id === id); if (!n) return;
     editing = { id, x: n.x, y: n.y, level: n.level, fuel: n.fuel || '' };
-    ghost(n.x, n.y);
-    $('noteTitle').textContent = 'Entry';
-    $('noteDelete').classList.remove('hide');
-    noteText.value = n.text;
+    if (tab === 'map') { ghostPt = [n.x, n.y]; frameOnPoint(n.x, n.y); }
+    $('noteTitle').textContent = 'Entry'; $('noteDelete').classList.remove('hide'); noteText.value = n.text;
     setLevel(n.level); setFuel(n.fuel);
     show('noteSheet');
   }
-  function ghost(x, y) {
-    gGhost.innerHTML = '';
-    el('circle', { cx: x, cy: y, r: 14 }, gGhost);
-    // keep the point visible above the sheet
-    const [, py] = toScreen(x, y);
-    if (py > ch * .3 || py < 90) {
-      const s = Math.max(scale(), minScale * 2.2);
-      const v = viewAround(x, y, s);
-      // put the point just under the title bar, above the sheet
-      v.y = y - v.h * .17;
-      flyTo(v, 420);
-    }
+  function autoPlace(level) {
+    const pick = (pts, a, b) => { const p = pts[Math.floor(pts.length * rand(a, b))]; return [p[0] + rand(-6, 6), p[1] + rand(-6, 6)]; };
+    const rr = Math.random;
+    if (level === 'belief') return pick(streams[Math.floor(rr() * streams.length)], .25, .75);
+    if (level === 'state') return pick(river, .15, .85);
+    if (level === 'behavior') return [200 + rr() * 650, 1400 + rr() * 150];
+    for (let i = 0; i < 40; i++) { const x = 300 + rr() * 400, z = 260 + rr() * 220; if (height(x, z) > 80 && distToPath(x, z, allStreamPts) > 25) return [x, z]; }
+    return [500, 330];
   }
   $('noteSave').addEventListener('click', () => {
-    const text = noteText.value.trim();
-    if (!text) { noteText.focus(); return; }
+    const text = noteText.value.trim(); if (!text) { noteText.focus(); return; }
     const now = Date.now();
     if (editing.id) {
-      const n = data.notes.find(n => n.id === editing.id);
-      Object.assign(n, { text, level: editing.level, fuel: editing.fuel, updated: now });
+      const n = data.notes.find(n => n.id === editing.id); Object.assign(n, { text, level: editing.level, fuel: editing.fuel, updated: now });
     } else {
-      data.notes.push({ id: uid(), x: editing.x, y: editing.y, text, level: editing.level, fuel: editing.fuel, created: now, updated: now });
+      let x = editing.x, z = editing.y;
+      if (x == null) { [x, z] = autoPlace(editing.level); x = Math.round(x); z = Math.round(z); }
+      data.notes.push({ id: uid(), x, y: z, text, level: editing.level, fuel: editing.fuel, created: now, updated: now });
     }
-    save(); renderNotes(); gGhost.innerHTML = ''; closeSheets();
+    save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
   });
-  $('noteCancel').addEventListener('click', () => { gGhost.innerHTML = ''; closeSheets(); });
+  $('noteCancel').addEventListener('click', closeSheets);
   $('noteDelete').addEventListener('click', () => {
     if (!confirm('Delete this entry?')) return;
     data.notes = data.notes.filter(n => n.id !== editing.id);
-    save(); renderNotes(); gGhost.innerHTML = ''; closeSheets();
+    save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
   });
 
   // ---------- Buttons ----------
-  $('btnFit').addEventListener('click', () => { placing = false; setHint(); flyTo(fitView(), 550); hideBubble(); });
+  $('btnFit').addEventListener('click', () => { placing = false; setHint(); fitHome(); hideBubble(); });
   $('btnMenu').addEventListener('click', () => show('menuSheet'));
-  document.querySelectorAll('.levels button').forEach(b => b.addEventListener('click', () => goRegion(b.dataset.go)));
-  $('btnAdd').addEventListener('click', () => {
-    placing = !placing;
-    if (placing) setHint('Now tap the spot on the landscape where this belongs.', true); else setHint();
-    hideBubble();
-  });
-  $('btnList').addEventListener('click', () => { renderList(); show('listSheet'); });
+  document.querySelectorAll('.levels button').forEach(b => b.addEventListener('click', () => { flyTo(REGIONS[b.dataset.go], 700); hideBubble(); }));
+  $('btnAdd').addEventListener('click', () => { placing = !placing; if (placing) setHint('Now tap the spot on the landscape where this belongs.', true); else setHint(); hideBubble(); });
+  $('btnAddJournal').addEventListener('click', openNoteBlank);
 
-  function fmtDate(t) {
-    const d = new Date(t);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-  }
-  function renderList() {
-    const ul = $('notesList'); ul.innerHTML = '';
-    const notes = [...data.notes].sort((a, b) => b.created - a.created);
-    if (!notes.length) { ul.innerHTML = '<li class="empty">Nothing written yet. Hold a spot on the landscape to begin.</li>'; return; }
-    notes.forEach(n => {
-      const li = document.createElement('li');
-      const b = document.createElement('button');
-      const L = LEVELS[n.level] || LEVELS.past;
-      b.innerHTML = `<span class="dot ${n.fuel || ''}"></span><span><div class="t"></div><div class="m">${L.n}. ${L.name}${n.fuel ? ' · ' + n.fuel + ' fuel' : ''} · ${fmtDate(n.created)}</div></span>`;
-      b.querySelector('.t').textContent = n.text;
-      b.addEventListener('click', () => {
-        closeSheets();
-        flyTo(viewAround(n.x, n.y, Math.max(scale(), minScale * 2.4)), 600);
-        const g = gNotes.querySelector(`[data-id="${n.id}"]`);
-        if (g) { g.classList.add('lit'); setTimeout(() => g.classList.remove('lit'), 2200); }
+  // ---------- Journal ----------
+  function fmtDate(t) { const d = new Date(t); return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
+  function renderJournal() {
+    const box = $('journalScroll'); box.innerHTML = '';
+    const head = document.createElement('div'); head.className = 'jhead';
+    head.innerHTML = `<h1>Journal</h1><span class="count">${data.notes.length ? data.notes.length + (data.notes.length === 1 ? ' entry' : ' entries') : ''}</span>`;
+    box.appendChild(head);
+    if (!data.notes.length) {
+      const e = document.createElement('div'); e.className = 'jempty';
+      e.textContent = 'Nothing here yet. Everything you write on the map appears here, organized by level. Hold a spot on the map, or tap + Write.';
+      box.appendChild(e); return;
+    }
+    for (const k of ['past', 'belief', 'state', 'behavior']) {
+      const L = LEVELS[k];
+      const notes = data.notes.filter(n => n.level === k).sort((a, b) => b.created - a.created);
+      const sec = document.createElement('section'); sec.className = 'jsec';
+      sec.innerHTML = `<h2>${L.n}. ${L.where} <small>${L.name}${notes.length ? ' · ' + notes.length : ''}</small></h2><div class="rule"></div>`;
+      if (!notes.length) { const d = document.createElement('div'); d.className = 'none'; d.textContent = 'Nothing written here yet.'; sec.appendChild(d); }
+      notes.forEach(n => {
+        const row = document.createElement('div'); row.className = 'entry';
+        const dot = document.createElement('span'); dot.className = 'dot ' + (n.fuel || '');
+        const body = document.createElement('button'); body.className = 'body';
+        const t = document.createElement('div'); t.className = 't'; t.textContent = n.text;
+        const m = document.createElement('div'); m.className = 'm';
+        m.innerHTML = `<span>${n.fuel ? n.fuel[0].toUpperCase() + n.fuel.slice(1) + ' fuel · ' : ''}${fmtDate(n.created)}</span>`;
+        const find = document.createElement('button'); find.className = 'find'; find.textContent = 'Find on map';
+        find.addEventListener('click', ev => { ev.stopPropagation(); setTab('map'); flyTo({ tx: n.x, tz: n.y, dist: Math.min(cam.dist, 650) }, 700); const el = noteEls.get(n.id); if (el) { el.classList.add('lit'); setTimeout(() => { el.classList.remove('lit'); requestRender(); }, 2400); } });
+        m.appendChild(find);
+        body.appendChild(t); body.appendChild(m);
+        body.addEventListener('click', () => openNote(n.id));
+        row.appendChild(dot); row.appendChild(body); sec.appendChild(row);
       });
-      li.appendChild(b); ul.appendChild(li);
-    });
+      box.appendChild(sec);
+    }
   }
 
   // Six signs
@@ -954,15 +1041,11 @@
       const lab = document.createElement('label');
       const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!(data.signs && data.signs[i]);
       cb.addEventListener('change', () => { data.signs = data.signs || []; data.signs[i] = cb.checked; save(); scoreSigns(); });
-      lab.appendChild(cb); lab.appendChild(document.createTextNode(`${i + 1}. ${s}`));
-      box.appendChild(lab);
+      lab.appendChild(cb); lab.appendChild(document.createTextNode(`${i + 1}. ${s}`)); box.appendChild(lab);
     });
     scoreSigns();
   }
-  function scoreSigns() {
-    const n = (data.signs || []).filter(Boolean).length;
-    $('signsScore').textContent = n ? `You recognise ${n} of 6.` : 'Tick the ones you recognise in yourself.';
-  }
+  function scoreSigns() { const n = (data.signs || []).filter(Boolean).length; $('signsScore').textContent = n ? `You recognise ${n} of 6.` : 'Tick the ones you recognise in yourself.'; }
   $('menuSigns').addEventListener('click', () => { renderSigns(); show('signsSheet'); });
   $('menuHow').addEventListener('click', () => show('howSheet'));
 
@@ -983,37 +1066,34 @@
     const r = new FileReader();
     r.onload = () => {
       try {
-        const d = JSON.parse(r.result);
-        if (!d || !Array.isArray(d.notes)) throw 0;
+        const d = JSON.parse(r.result); if (!d || !Array.isArray(d.notes)) throw 0;
         if (!confirm(`Restore ${d.notes.length} entries? This replaces what is here now.`)) return;
         data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [] };
-        save(); renderNotes(); closeSheets(); setHint();
+        save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
       } catch (_) { alert('That file is not a Journey to Clean Fuel backup.'); }
     };
     r.readAsText(f); e.target.value = '';
   });
   $('menuReset').addEventListener('click', () => {
     if (!confirm('Clear every entry? Back up first if you want to keep them.')) return;
-    data = { notes: [], signs: [] }; save(); renderNotes(); closeSheets(); setHint();
+    data = { notes: [], signs: [] }; save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
   });
 
   // ---------- Boot ----------
   window.addEventListener('resize', resize);
   window.addEventListener('orientationchange', () => setTimeout(resize, 120));
   resize();
-  Object.assign(view, fitView()); applyView();
-  renderNotes(); setHint();
+  Object.assign(cam, HOME); if (cw / ch > .8) cam.dist = 1800;
+  syncNoteEls(); setHint();
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
-        // Tell the user once that the app is now saved on the phone.
         let seen = false;
         try { seen = localStorage.getItem(KEY + ':offline-ready') === '1'; } catch (e) {}
         if (!seen) {
           try { localStorage.setItem(KEY + ':offline-ready', '1'); } catch (e) {}
-          setHint('Saved to your phone. Works with no WiFi.');
-          setTimeout(() => setHint(), 5000);
+          setHint('Saved to your phone. Works with no WiFi.'); setTimeout(() => setHint(), 5000);
         }
       }).catch(() => {});
     });
