@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Second Star</title>
+<meta name="description" content="A 1960s dreamy fall playlist for Apple Music: 75 songs that sound like The Second Star to the Right.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Second Star">
+<meta name="theme-color" content="#0b1230">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #0b1230;
+    --sky-mid: #2c1e46;
+    --horizon: #c46e34;
+    --ink: #f6ecd8;
+    --ink-soft: rgba(246, 236, 216, .68);
+    --ink-faint: rgba(246, 236, 216, .4);
+    --gold: #ffd66e;
+    --gold-deep: #e0a93c;
+    --leaf: #de6c34;
+    --card: rgba(255, 244, 222, .07);
+    --card-line: rgba(255, 244, 222, .14);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --display: "Cormorant Garamond", "Didot", "Georgia", serif;
+    --body: "Lora", "Georgia", "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { background: var(--sky-top); }
+  body {
+    margin: 0;
+    min-height: 100%;
+    color: var(--ink);
+    font: 16px/1.5 var(--body);
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse 120% 60% at 62% 18%, rgba(255, 196, 90, .22), transparent 60%),
+      linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, #5a2d3a 80%, var(--horizon) 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  a { color: inherit; }
+
+  /* ---------- Sky ---------- */
+  #sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  #sky .star {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: #fff4d6; opacity: .7;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: .95; transform: scale(1.15); } }
+  #sky .leaf {
+    position: absolute; top: -40px; width: 22px; height: 12px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: var(--leaf); opacity: .75;
+    animation: fall linear infinite;
+  }
+  #sky .leaf.b { background: #d9962c; }
+  #sky .leaf.c { background: #a7442a; }
+  @keyframes fall {
+    0%   { transform: translate3d(0, -40px, 0) rotate(0deg); }
+    100% { transform: translate3d(var(--drift), 110vh, 0) rotate(720deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { #sky .star, #sky .leaf { animation: none; } }
+
+  /* ---------- Layout ---------- */
+  .wrap { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; padding: calc(var(--safe-top) + 28px) 18px calc(var(--safe-bottom) + 120px); }
+
+  header { text-align: center; padding: 10px 0 26px; }
+  .eyebrow {
+    font-family: var(--body); font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--gold); opacity: .9; margin-bottom: 10px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 500; font-size: 54px; line-height: .98; letter-spacing: -.01em;
+    margin: 0;
+    color: var(--ink);
+    text-shadow: 0 0 40px rgba(255, 214, 110, .25);
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .tagline {
+    font-family: var(--display); font-style: italic; font-size: 20px; line-height: 1.3;
+    color: var(--ink-soft); margin: 14px auto 0; max-width: 420px;
+  }
+  .meta { margin-top: 16px; font-size: 13px; color: var(--ink-faint); letter-spacing: .04em; }
+
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px; padding: 0 18px; border-radius: 22px;
+    border: 1px solid var(--card-line); background: var(--card);
+    font-family: var(--body); font-size: 15px; color: var(--ink);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    text-decoration: none;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn.gold { background: var(--gold); color: #2a1a08; border-color: var(--gold); font-weight: 500; }
+  .btn svg { width: 18px; height: 18px; display: block; flex: 0 0 auto; }
+
+  /* ---------- Sections ---------- */
+  section { margin-top: 34px; }
+  .sec {
+    display: flex; align-items: baseline; gap: 12px; margin: 0 0 8px; padding: 0 4px;
+  }
+  .sec h2 { font-family: var(--display); font-weight: 600; font-size: 30px; line-height: 1.1; margin: 0; }
+  .sec h2 .n { font-size: 14px; font-family: var(--body); color: var(--gold); letter-spacing: .2em; margin-right: 10px; vertical-align: middle; }
+  .sec p { margin: 0; font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  .sec-note { font-style: italic; color: var(--ink-soft); font-size: 15px; margin: 0 4px 12px; line-height: 1.45; }
+
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .track {
+    display: grid; grid-template-columns: 30px 1fr auto; gap: 10px 10px; align-items: center;
+    padding: 12px 12px 12px 14px; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--card-line);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: background .2s;
+  }
+  .track.done { background: rgba(255, 214, 110, .10); border-color: rgba(255, 214, 110, .35); }
+  .track .num {
+    font-family: var(--display); font-size: 18px; color: var(--ink-faint); text-align: right; padding-right: 2px;
+    align-self: start; padding-top: 3px;
+  }
+  .track.done .num { color: var(--gold); }
+  .track .t { min-width: 0; }
+  .track .title { font-family: var(--display); font-weight: 600; font-size: 21px; line-height: 1.15; }
+  .track .artist { font-size: 14px; color: var(--ink-soft); margin-top: 2px; }
+  .track .artist .yr { color: var(--ink-faint); }
+  .track .why { font-size: 13.5px; line-height: 1.4; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
+  .track .ctl { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .track .play {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--gold); color: #2a1a08;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(255, 214, 110, .25);
+  }
+  .track .play svg { width: 18px; height: 18px; display: block; margin-left: 2px; }
+  .track .check {
+    width: 40px; height: 28px; border-radius: 14px;
+    border: 1px solid var(--card-line); color: var(--ink-faint);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .track.done .check { background: var(--gold); color: #2a1a08; border-color: var(--gold); }
+  .track .check svg { width: 14px; height: 14px; }
+
+  /* ---------- Footer ---------- */
+  footer { margin-top: 48px; text-align: center; color: var(--ink-faint); font-size: 13px; font-style: italic; line-height: 1.6; }
+
+  /* ---------- Bottom bar ---------- */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
+    padding: 10px 16px calc(var(--safe-bottom) + 12px);
+    display: flex; justify-content: center;
+    pointer-events: none;
+  }
+  .bar .inner {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 10px 8px 16px; border-radius: 30px;
+    background: rgba(18, 16, 36, .82); border: 1px solid var(--card-line);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+    max-width: 560px; width: 100%;
+  }
+  .bar .prog { flex: 1; min-width: 0; font-size: 13px; color: var(--ink-soft); }
+  .bar .prog b { color: var(--gold); font-weight: 500; }
+  .bar .prog .line { height: 3px; border-radius: 2px; background: rgba(255,255,255,.12); margin-top: 6px; overflow: hidden; }
+  .bar .prog .line i { display: block; height: 100%; background: var(--gold); width: 0; transition: width .3s; }
+
+  /* ---------- Sheet ---------- */
+  .sheet-bg { position: fixed; inset: 0; z-index: 9; background: rgba(5, 6, 18, .6); display: none; }
+  .sheet-bg.open { display: block; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    max-height: 86vh; overflow: auto; -webkit-overflow-scrolling: touch;
+    background: #171433; color: var(--ink);
+    border-radius: 24px 24px 0 0; padding: 14px 22px calc(var(--safe-bottom) + 24px);
+    transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,.4);
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet .grip { width: 40px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.2); margin: 0 auto 16px; }
+  .sheet h3 { font-family: var(--display); font-size: 28px; font-weight: 600; margin: 0 0 6px; }
+  .sheet h4 { font-family: var(--display); font-size: 21px; font-weight: 600; margin: 22px 0 6px; color: var(--gold); }
+  .sheet p, .sheet li { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+  .sheet ol { padding-left: 20px; margin: 6px 0; }
+  .sheet li { margin: 6px 0; }
+  .sheet .btn { margin-top: 14px; }
+  .sheet code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 6px; color: var(--ink); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(var(--safe-bottom) + 84px); transform: translateX(-50%) translateY(10px);
+    z-index: 20; background: var(--gold); color: #2a1a08; padding: 10px 16px; border-radius: 20px;
+    font-size: 14px; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 380px) {
+    h1 { font-size: 46px; }
+    .track .title { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+<div id="sky" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">An Apple Music playlist · the dreamy sixties</div>
+    <h1>Second Star<br><em>to the right</em></h1>
+    <p class="tagline">A dreamy fall. Seventy-five old records that sound like a Disney night sky: strings, hushed harmonies, leaves coming down.</p>
+    <div class="meta" id="meta"></div>
+    <div class="actions">
+      <a class="btn gold" id="openMusic" href="https://music.apple.com/us/search?term=second%20star%20to%20the%20right%20doris%20day" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3v12.1a3.5 3.5 0 1 0 2 3.2V8h8V3H9zm10 3.5h-6V5h6v1.5z"/></svg>
+        Open in Apple Music
+      </a>
+      <button class="btn" id="howBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+        Make it a playlist
+      </button>
+    </div>
+  </header>
+
+  <main id="sections"></main>
+
+  <footer>
+    Steer by the second star, then straight on till morning.<br>
+    Tap ▶ on any song to find it in Apple Music. Tap the circle to mark it added.
+  </footer>
+</div>
+
+<div class="bar">
+  <div class="inner">
+    <div class="prog">
+      <span><b id="doneCount">0</b> of <span id="totalCount">0</span> added to your playlist</span>
+      <div class="line"><i id="progLine"></i></div>
+    </div>
+    <button class="btn" id="copyBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      Copy list
+    </button>
+  </div>
+</div>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="How to make this an Apple Music playlist">
+  <div class="grip"></div>
+  <h3>Make it an Apple Music playlist</h3>
+  <p>Apple doesn't let a web page drop a playlist into your library, so there are two ways to get these 75 songs in. The first takes about two minutes.</p>
+
+  <h4>1. Import the whole list at once</h4>
+  <ol>
+    <li>Tap <b>Copy list</b> below. It copies every song as <code>Artist - Title</code>, one per line.</li>
+    <li>Open <a href="https://www.tunemymusic.com/transfer" target="_blank" rel="noopener">TuneMyMusic</a> (or Soundiiz) in Safari, choose <b>Text</b> / <b>Upload from text</b> as the source, and paste.</li>
+    <li>Pick <b>Apple Music</b> as the destination, sign in, and name the playlist <b>Second Star</b>.</li>
+    <li>It matches each line to a track. Skim the matches once: for the older records it sometimes picks a re-recording, so swap in the original where it matters.</li>
+  </ol>
+  <button class="btn gold" id="copyBtn2">Copy the song list</button>
+
+  <h4>2. Add them one at a time</h4>
+  <ol>
+    <li>In Apple Music, go to <b>Library → Playlists → New Playlist</b> and call it <b>Second Star</b>.</li>
+    <li>Back here, tap <b>▶</b> on a song. Apple Music opens on a search for it.</li>
+    <li>Touch and hold the track → <b>Add to a Playlist</b> → <b>Second Star</b>.</li>
+    <li>Come back and tap the circle on the right to mark it added. Your progress is saved on this phone.</li>
+  </ol>
+
+  <h4>Good to know</h4>
+  <p>Tracks 1 and 2 are the two Peter Pan records the whole list is tuned to, from 1953 and 1954. Everything else is 1958–1969. A few from France and Italy are in the <i>Across the water</i> section; skip that section if you want English only.</p>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ---------- The playlist ---------- */
+const SECTIONS = [
+  { id: 'star', n: 'I', title: 'Second star', note: 'The records the whole list is tuned to: choirs, celesta, strings, and stars in the lyrics.' },
+  { id: 'gold', n: 'II', title: 'Golden hour', note: 'Lush early-sixties ballads for the late afternoon, when the light goes amber.' },
+  { id: 'leaves', n: 'III', title: 'Leaves', note: 'The fall songs proper: September, turning leaves, geese going south, time slipping.' },
+  { id: 'rain', n: 'IV', title: 'Rain on the roof', note: 'For the grey days.' },
+  { id: 'water', n: 'V', title: 'Across the water', note: 'A few from Paris and Milan that drift the same way. Skip this section if you want English only.' },
+  { id: 'night', n: 'VI', title: 'Starlight', note: 'After dark: late-sixties dreamers and the jazz that sounds like snow globes.' },
+  { id: 'sleep', n: 'VII', title: 'Goodnight', note: 'Lullabies to close the record, straight on till morning.' },
+];
+
+const TRACKS = [
+  // I. Second star
+  { s: 'star', t: 'The Second Star to the Right', a: 'Doris Day with Paul Weston & His Orchestra', y: 1953, w: 'The star itself. Doris cut the Peter Pan theme the year the film came out, with a choir behind her.' },
+  { s: 'star', t: 'Never Never Land', a: 'Mary Martin', y: 1954, w: 'From the Broadway Peter Pan. "A place where dreams are born, and time is never planned."' },
+  { s: 'star', t: 'When You Wish Upon a Star', a: 'Dion & The Belmonts', y: 1960, w: 'Disney\'s wish sung as Bronx doo-wop. Hit the Top 40 in the spring of 1960.' },
+  { s: 'star', t: 'A Thousand Stars', a: 'Kathy Young with The Innocents', y: 1960, w: 'A teenager counting stars over a slow, swaying beat.' },
+  { s: 'star', t: 'I Only Have Eyes for You', a: 'The Flamingos', y: 1959, w: '"Are the stars out tonight?" The dreamiest record of its decade.' },
+  { s: 'star', t: 'Deep Purple', a: 'Nino Tempo & April Stevens', y: 1963, w: 'Sleepy garden walls, stars beginning to twinkle. A number one in the fall of 1963.' },
+  { s: 'star', t: 'Sleep Walk', a: 'Santo & Johnny', y: 1959, w: 'Steel guitar drifting off to sleep.' },
+
+  // II. Golden hour
+  { s: 'gold', t: 'Theme from "A Summer Place"', a: 'Percy Faith & His Orchestra', y: 1960, w: 'The sound of strings swelling in an old movie. Summer\'s last glow.' },
+  { s: 'gold', t: 'Moon River', a: 'Andy Williams', y: 1962, w: 'Huckleberry friend, waiting round the bend.' },
+  { s: 'gold', t: 'Stranger on the Shore', a: 'Acker Bilk', y: 1961, w: 'A clarinet over strings, as foggy as a harbour morning.' },
+  { s: 'gold', t: 'Blue Velvet', a: 'Bobby Vinton', y: 1963, w: 'Softer than satin was the light from the stars.' },
+  { s: 'gold', t: 'Up on the Roof', a: 'The Drifters', y: 1962, w: '"At night the stars put on a show for free."' },
+  { s: 'gold', t: 'In Dreams', a: 'Roy Orbison', y: 1963, w: 'A candy-colored clown they call the sandman. Builds like an aria.' },
+  { s: 'gold', t: 'Unchained Melody', a: 'The Righteous Brothers', y: 1965, w: 'Lonely rivers flow to the sea.' },
+  { s: 'gold', t: 'Surfer Girl', a: 'The Beach Boys', y: 1963, w: 'Brian Wilson\'s first song, written to sound like "When You Wish Upon a Star."' },
+  { s: 'gold', t: 'God Only Knows', a: 'The Beach Boys', y: 1966, w: 'French horn, sleigh bells and harmonies that round like a carousel.' },
+  { s: 'gold', t: 'Here, There and Everywhere', a: 'The Beatles', y: 1966, w: 'McCartney\'s answer to the song above. Barely above a whisper.' },
+  { s: 'gold', t: 'Never My Love', a: 'The Association', y: 1967, w: 'Five-part harmony, soft as a pillow.' },
+  { s: 'gold', t: 'Dream a Little Dream of Me', a: 'The Mamas & The Papas', y: 1968, w: 'Mama Cass, stars shining bright above you, night breezes whispering.' },
+  { s: 'gold', t: 'What a Wonderful World', a: 'Louis Armstrong', y: 1967, w: 'The bright blessed day, the dark sacred night.' },
+  { s: 'gold', t: 'Quiet Nights of Quiet Stars (Corcovado)', a: 'Doris Day', y: 1965, w: 'The same voice as track 1, twelve years on, singing about quiet stars.' },
+
+  // III. Leaves
+  { s: 'leaves', t: 'Summer Has Gone', a: 'Doris Day', y: 1965, w: 'From Latin for Lovers. The door closing on summer.' },
+  { s: 'leaves', t: 'Autumn Leaves', a: 'Bill Evans Trio', y: 1960, w: 'From Portrait in Jazz. The standard, played like falling light.' },
+  { s: 'leaves', t: 'Autumn Serenade', a: 'John Coltrane & Johnny Hartman', y: 1963, w: 'A baritone and a tenor sax in the same warm room.' },
+  { s: 'leaves', t: 'September in the Rain', a: 'Dinah Washington', y: 1961, w: '"The leaves of brown came tumbling down."' },
+  { s: 'leaves', t: 'Try to Remember', a: 'The Brothers Four', y: 1965, w: '"The kind of September when life was slow and oh so mellow."' },
+  { s: 'leaves', t: 'It Was a Very Good Year', a: 'Frank Sinatra', y: 1965, w: 'Sinatra in the autumn of the year, with Gordon Jenkins\' oboe.' },
+  { s: 'leaves', t: 'California Dreamin\'', a: 'The Mamas & The Papas', y: 1965, w: '"All the leaves are brown and the sky is grey." Flute solo and all.' },
+  { s: 'leaves', t: 'April Come She Will', a: 'Simon & Garfunkel', y: 1966, w: '"August, die she must. The autumn winds blow chilly and cold."' },
+  { s: 'leaves', t: 'Leaves That Are Green', a: 'Simon & Garfunkel', y: 1966, w: 'Harpsichord, and the leaves that are green turning to brown.' },
+  { s: 'leaves', t: 'Scarborough Fair / Canticle', a: 'Simon & Garfunkel', y: 1966, w: 'Parsley, sage, rosemary and thyme, sung in a cathedral of echo.' },
+  { s: 'leaves', t: 'Urge for Going', a: 'Tom Rush', y: 1966, w: 'Joni Mitchell\'s frost-on-the-town song, first recorded by Tom Rush. The definitive fall song.' },
+  { s: 'leaves', t: 'Four Strong Winds', a: 'Ian & Sylvia', y: 1963, w: '"Think I\'ll go out to Alberta, weather\'s good there in the fall."' },
+  { s: 'leaves', t: 'Turn! Turn! Turn!', a: 'The Byrds', y: 1965, w: 'To everything there is a season. Twelve-string Rickenbacker like church bells.' },
+  { s: 'leaves', t: 'Who Knows Where the Time Goes', a: 'Judy Collins', y: 1968, w: '"Across the evening sky, all the birds are leaving."' },
+  { s: 'leaves', t: 'These Days', a: 'Nico', y: 1967, w: 'Jackson Browne\'s song at sixteen, with harpsichord and a long autumn walk in it.' },
+  { s: 'leaves', t: 'Days', a: 'The Kinks', y: 1968, w: 'Thank you for the days. A hymn for the end of something.' },
+  { s: 'leaves', t: 'Wichita Lineman', a: 'Glen Campbell', y: 1968, w: 'Wires humming across an empty plain. The loneliest beautiful record.' },
+  { s: 'leaves', t: 'Those Were the Days', a: 'Mary Hopkin', y: 1968, w: 'A Russian waltz about a tavern, produced by Paul McCartney.' },
+  { s: 'leaves', t: 'The Windmills of Your Mind', a: 'Noel Harrison', y: 1968, w: '"The autumn leaves were turning to the colour of her hair."' },
+  { s: 'leaves', t: 'As Tears Go By', a: 'Marianne Faithfull', y: 1964, w: '"It is the evening of the day, I sit and watch the children play."' },
+  { s: 'leaves', t: 'Walk Away Renée', a: 'The Left Banke', y: 1966, w: 'Baroque pop: strings, harpsichord, flute, and rain on the sidewalk.' },
+  { s: 'leaves', t: 'The Great Pumpkin Waltz', a: 'Vince Guaraldi', y: 1966, w: 'Charlie Brown in the pumpkin patch. Piano jazz with leaves in it.' },
+  { s: 'leaves', t: 'In My Life', a: 'The Beatles', y: 1965, w: 'Places I remember, and the sped-up piano that sounds like a harpsichord.' },
+
+  // IV. Rain on the roof
+  { s: 'rain', t: 'Rhythm of the Rain', a: 'The Cascades', y: 1962, w: 'Celesta, thunder, and rain telling you just what a fool you\'ve been.' },
+  { s: 'rain', t: 'Walking in the Rain', a: 'The Ronettes', y: 1964, w: 'Phil Spector\'s wall of sound with a real thunderstorm in it.' },
+  { s: 'rain', t: 'Rain on the Roof', a: 'The Lovin\' Spoonful', y: 1966, w: 'You and me and the rain on the roof.' },
+  { s: 'rain', t: 'The Rain, the Park & Other Things', a: 'The Cowsills', y: 1967, w: 'The flower girl in the rain. Harmonies like a Disney chorus.' },
+  { s: 'rain', t: 'I Will Wait for You', a: 'Michel Legrand', y: 1964, w: 'From The Umbrellas of Cherbourg. Rain, umbrellas, and the whole town singing.' },
+  { s: 'rain', t: 'I Think It\'s Going to Rain Today', a: 'Randy Newman', y: 1968, w: 'Just piano and strings. "Scarecrows dressed in the latest styles."' },
+
+  // V. Across the water
+  { s: 'water', t: 'Le temps de l\'amour', a: 'Françoise Hardy', y: 1962, w: 'The time of love, sung with a shrug and a twangy guitar.' },
+  { s: 'water', t: 'La Javanaise', a: 'Serge Gainsbourg', y: 1963, w: 'An old-fashioned waltz, written for Juliette Gréco.' },
+  { s: 'water', t: 'Au cœur de septembre', a: 'Nana Mouskouri', y: 1967, w: '"In the heart of September." The French version of Try to Remember.' },
+  { s: 'water', t: 'A Man and a Woman (Un homme et une femme)', a: 'Francis Lai', y: 1966, w: 'Ba-da-ba-da. A beach in Deauville in the off-season.' },
+  { s: 'water', t: 'Il cielo in una stanza', a: 'Mina', y: 1960, w: 'The sky inside a room: the walls turn into infinite trees.' },
+  { s: 'water', t: 'La canzone di Marinella', a: 'Fabrizio De André', y: 1964, w: 'The wind sees how beautiful she is and carries her up onto a star.' },
+  { s: 'water', t: '29 settembre', a: 'Equipe 84', y: 1967, w: 'The twenty-ninth of September, written by Lucio Battisti. Soft psychedelia.' },
+  { s: 'water', t: 'La pioggia', a: 'Gigliola Cinquetti', y: 1969, w: '"The rain." Clouds black in the sky, and the sparrows not flying anymore.' },
+
+  // VI. Starlight
+  { s: 'night', t: 'Both Sides, Now', a: 'Judy Collins', y: 1967, w: 'Ice cream castles in the air, with a harpsichord.' },
+  { s: 'night', t: 'Sunday Morning', a: 'The Velvet Underground & Nico', y: 1967, w: 'Celesta and a sleepy Lou Reed. The gentlest thing they ever did.' },
+  { s: 'night', t: 'Nights in White Satin', a: 'The Moody Blues', y: 1967, w: 'Mellotron strings and a flute solo like a long sigh.' },
+  { s: 'night', t: 'Everybody\'s Talkin\'', a: 'Harry Nilsson', y: 1968, w: 'Going where the sun keeps shining through the pouring rain.' },
+  { s: 'night', t: 'The Puppy Song', a: 'Harry Nilsson', y: 1969, w: '"Dreams are nothing more than wishes." Music-hall whimsy, straight out of Disney.' },
+  { s: 'night', t: 'Fly Me to the Moon', a: 'Frank Sinatra', y: 1964, w: 'With Count Basie. Let me play among the stars.' },
+  { s: 'night', t: 'Waltz for Debby', a: 'Bill Evans Trio', y: 1961, w: 'A waltz for a niece, recorded live at the Village Vanguard with glasses clinking.' },
+  { s: 'night', t: 'My One and Only Love', a: 'John Coltrane & Johnny Hartman', y: 1963, w: 'The warmest ballad in jazz.' },
+  { s: 'night', t: 'Lujon', a: 'Henry Mancini', y: 1961, w: 'Vibraphone and strings. Mancini\'s most dreamlike two minutes.' },
+
+  // VII. Goodnight
+  { s: 'sleep', t: 'Dedicated to the One I Love', a: 'The Mamas & The Papas', y: 1967, w: 'Opens like a lullaby, then the whole choir comes in.' },
+  { s: 'sleep', t: 'Goodnight My Love', a: 'The Fleetwoods', y: 1963, w: 'Pleasant dreams and sleep tight, sung in a whisper.' },
+  { s: 'sleep', t: 'All I Have to Do Is Dream', a: 'The Everly Brothers', y: 1958, w: 'Dream, dream, dream.' },
+  { s: 'sleep', t: 'Guinnevere', a: 'Crosby, Stills & Nash', y: 1969, w: 'Green eyes, peacocks, and the harbour at night. Hushed and strange.' },
+  { s: 'sleep', t: 'River Man', a: 'Nick Drake', y: 1969, w: 'From Five Leaves Left. Strings that move like water under a bridge.' },
+  { s: 'sleep', t: 'Because', a: 'The Beatles', y: 1969, w: 'Nine-part harmony and a harpsichord. "Because the sky is blue, it makes me cry."' },
+  { s: 'sleep', t: 'Good Night', a: 'The Beatles', y: 1968, w: 'Ringo singing a lullaby over a full orchestra. The closest thing to track 1 the sixties made.' },
+  { s: 'sleep', t: 'Song for a Winter\'s Night', a: 'Gordon Lightfoot', y: 1967, w: 'The first frost. Where fall hands over to winter.' },
+];
+
+/* ---------- Render ---------- */
+const KEY = 'secondstar-added-v1';
+let added = new Set();
+try { added = new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) {}
+function saveAdded() { try { localStorage.setItem(KEY, JSON.stringify([...added])); } catch (e) {} }
+
+const shortArtist = a => a.replace(/ with .*$/, '').replace(/ & His Orchestra$/, '');
+const musicUrl = tr => 'https://music.apple.com/us/search?term=' + encodeURIComponent(tr.t + ' ' + shortArtist(tr.a));
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function render() {
+  const main = document.getElementById('sections');
+  let i = 0;
+  main.innerHTML = SECTIONS.map(sec => {
+    const rows = TRACKS.filter(t => t.s === sec.id).map(tr => {
+      const idx = TRACKS.indexOf(tr); i++;
+      const key = tr.t + '|' + tr.a;
+      return `<div class="track${added.has(key) ? ' done' : ''}" data-key="${esc(key)}">
+        <div class="num">${i}</div>
+        <div class="t">
+          <div class="title">${esc(tr.t)}</div>
+          <div class="artist">${esc(tr.a)} <span class="yr">· ${tr.y}</span></div>
+          <div class="why">${esc(tr.w)}</div>
+        </div>
+        <div class="ctl">
+          <a class="play" href="${musicUrl(tr)}" target="_blank" rel="noopener" aria-label="Find ${esc(tr.t)} in Apple Music">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>
+          </a>
+          <button class="check" data-idx="${idx}" aria-label="Mark as added">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<section id="${sec.id}">
+      <div class="sec"><h2><span class="n">${sec.n}</span>${esc(sec.title)}</h2></div>
+      <p class="sec-note">${esc(sec.note)}</p>
+      <div class="list">${rows}</div>
+    </section>`;
+  }).join('');
+
+  main.querySelectorAll('.check').forEach(b => b.addEventListener('click', () => {
+    const row = b.closest('.track'); const key = row.dataset.key;
+    if (added.has(key)) added.delete(key); else added.add(key);
+    row.classList.toggle('done', added.has(key));
+    saveAdded(); updateProgress();
+  }));
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = TRACKS.length;
+  const done = TRACKS.filter(t => added.has(t.t + '|' + t.a)).length;
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('progLine').style.width = (100 * done / total) + '%';
+}
+
+/* ---------- Copy list ---------- */
+function listText() {
+  return TRACKS.map(t => `${shortArtist(t.a)} - ${t.t}`).join('\n');
+}
+async function copyList() {
+  const text = listText();
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Copied ' + TRACKS.length + ' songs');
+  } catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+    ta.select(); try { document.execCommand('copy'); toast('Copied ' + TRACKS.length + ' songs'); } catch (e2) { toast('Could not copy'); }
+    ta.remove();
+  }
+}
+let toastT;
+function toast(msg) {
+  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800);
+}
+document.getElementById('copyBtn').addEventListener('click', copyList);
+document.getElementById('copyBtn2').addEventListener('click', copyList);
+
+/* ---------- Sheet ---------- */
+const sheet = document.getElementById('sheet'), sheetBg = document.getElementById('sheetBg');
+function openSheet() { sheet.classList.add('open'); sheetBg.classList.add('open'); }
+function closeSheet() { sheet.classList.remove('open'); sheetBg.classList.remove('open'); }
+document.getElementById('howBtn').addEventListener('click', openSheet);
+sheetBg.addEventListener('click', closeSheet);
+
+/* ---------- Sky ---------- */
+(function sky() {
+  const sky = document.getElementById('sky');
+  const w = innerWidth, h = innerHeight; let html = '';
+  for (let i = 0; i < 70; i++) {
+    const size = 1 + Math.random() * 2.2;
+    html += `<i class="star" style="left:${Math.random() * 100}%;top:${Math.random() * 55}%;width:${size}px;height:${size}px;animation-duration:${3 + Math.random() * 5}s;animation-delay:${-Math.random() * 8}s"></i>`;
+  }
+  for (let i = 0; i < 9; i++) {
+    const cls = ['', 'b', 'c'][i % 3];
+    html += `<i class="leaf ${cls}" style="left:${Math.random() * 100}%;--drift:${(Math.random() * 160 - 80)}px;animation-duration:${14 + Math.random() * 14}s;animation-delay:${-Math.random() * 28}s;transform:scale(${.7 + Math.random() * .7})"></i>`;
+  }
+  sky.innerHTML = html;
+})();
+
+/* ---------- Meta ---------- */
+(function meta() {
+  const years = TRACKS.map(t => t.y);
+  const mins = Math.round(TRACKS.length * 3.1);
+  document.getElementById('meta').textContent = `${TRACKS.length} songs · about ${Math.floor(mins / 60)} h ${mins % 60} min · ${Math.min(...years)}–${Math.max(...years)}`;
+})();
+
+render();
+
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

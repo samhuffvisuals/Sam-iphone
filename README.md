@@ -1,6 +1,6 @@
 # Leads
 
-> Also in this repo: **[Journey to Clean Fuel](journey/)**, a zoomable mountain-streams-river-sea journal for uncovering your dirty fuel, **[Backyard](backyard/)**, a backyard ultra race tracker, and **[Fuel](fuel/)**, an earlier fuel journal. Open `/journey/`, `/backyard/` or `/fuel/` on the same Pages site. See [journey/README.md](journey/README.md), [backyard/README.md](backyard/README.md) and [fuel/README.md](fuel/README.md).
+> Also in this repo: **[Second Star](playlist/)**, a 1960s dreamy fall playlist for Apple Music, **[Journey to Clean Fuel](journey/)**, a zoomable mountain-streams-river-sea journal for uncovering your dirty fuel, **[Backyard](backyard/)**, a backyard ultra race tracker, and **[Fuel](fuel/)**, an earlier fuel journal. Open `/playlist/`, `/journey/`, `/backyard/` or `/fuel/` on the same Pages site. See [playlist/README.md](playlist/README.md), [journey/README.md](journey/README.md), [backyard/README.md](backyard/README.md) and [fuel/README.md](fuel/README.md).
 
 An Instagram-style iPhone web app with one job: keep track of video-project leads and tag each one 🔥 Hot, ☀️ Warm or ❄️ Cold.
 
