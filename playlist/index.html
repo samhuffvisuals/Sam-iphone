@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Second Star</title>
-<meta name="description" content="A 1960s dreamy fall playlist for Apple Music: 76 songs that sound like The Second Star to the Right.">
+<meta name="description" content="A dreamy fall playlist for Apple Music in old close harmony: 100 songs that sound like The Second Star to the Right and When You Wish Upon a Star.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -214,9 +214,9 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">An Apple Music playlist · the dreamy sixties</div>
+    <div class="eyebrow">An Apple Music playlist · close harmony, 1939–1969</div>
     <h1>Second Star<br><em>to the right</em></h1>
-    <p class="tagline">A dreamy fall. Seventy-six old records that sound like a Disney night sky: strings, hushed harmonies, leaves coming down.</p>
+    <p class="tagline">A dreamy fall in close harmony. A hundred old records with the stacked, hushed voices of the Disney studio choirs, from the Pied Pipers to the Beach Boys.</p>
     <div class="meta" id="meta"></div>
     <div class="actions">
       <a class="btn gold" id="openMusic" href="https://music.apple.com/us/search?term=second%20star%20to%20the%20right%20doris%20day" target="_blank" rel="noopener">
@@ -233,7 +233,7 @@
   <main id="sections"></main>
 
   <footer>
-    Steer by the second star, then straight on till morning.<br>
+    Close harmony, 1939 to 1969. Steer by the second star, then straight on till morning.<br>
     Tap ▶ on any song to find it in Apple Music. Tap the circle to mark it added.
   </footer>
 </div>
@@ -275,7 +275,7 @@
   </ol>
 
   <h4>Good to know</h4>
-  <p>Tracks 1 to 3 are the Peter Pan records the whole list is tuned to, from 1953 and 1954. Everything else is 1958–1969. A few from France and Italy are in the <i>Across the water</i> section; skip that section if you want English only.</p>
+  <p>The sound you are after is called <b>close harmony</b>: three or four voices stacked a few notes apart and sung soft, the way barbershop quartets and the 1930s sister acts did it, which Disney\'s studio choirs (the Ken Darby Singers, Jud Conlon\'s Rhythmaires, the Mellomen) turned into the Peter Pan sound. The list runs 1939 to 1969 because the sound is older than the sixties; the sixties groups that kept it are in section V.</p>
 </div>
 
 <div class="toast" id="toast">Copied</div>
@@ -283,105 +283,121 @@
 <script>
 /* ---------- The playlist ---------- */
 const SECTIONS = [
-  { id: 'star', n: 'I', title: 'Second star', note: 'The records the whole list is tuned to: choirs, celesta, strings, and stars in the lyrics.' },
-  { id: 'gold', n: 'II', title: 'Golden hour', note: 'Lush early-sixties ballads for the late afternoon, when the light goes amber.' },
-  { id: 'leaves', n: 'III', title: 'Leaves', note: 'The fall songs proper: September, turning leaves, geese going south, time slipping.' },
-  { id: 'rain', n: 'IV', title: 'Rain on the roof', note: 'For the grey days.' },
-  { id: 'water', n: 'V', title: 'Across the water', note: 'A few from Paris and Milan that drift the same way. Skip this section if you want English only.' },
-  { id: 'night', n: 'VI', title: 'Starlight', note: 'After dark: late-sixties dreamers and the jazz that sounds like snow globes.' },
-  { id: 'sleep', n: 'VII', title: 'Goodnight', note: 'Lullabies to close the record, straight on till morning.' },
+  { id: "wish", n: "I", title: "Wish upon a star", note: "The Disney and Hollywood originals, sung by the studio choirs that made the sound: the Ken Darby Singers, Jud Conlon's Rhythmaires, the Mellomen." },
+  { id: "pipers", n: "II", title: "The Pied Pipers years", note: "1940s big-band vocal groups and crooners with a choir behind them. This is where close harmony on record begins." },
+  { id: "golden", n: "III", title: "Golden-age harmony", note: "The 1950s quartets and sister acts, and the singers who always had a soft chorus behind them." },
+  { id: "leaves", n: "IV", title: "Leaves", note: "The fall songs in that same style: turning leaves, green fields gone brown, lamplighters, a blustery day in the Hundred Acre Wood." },
+  { id: "sixties", n: "V", title: "Sixties harmony", note: "The groups that carried the sound into the sixties: the Lettermen, the Beach Boys, the Vogues, Nashville's Jordanaires, and sunshine pop." },
+  { id: "sleep", n: "VI", title: "Goodnight", note: "Lullabies in close harmony to close the record." },
 ];
 
 const TRACKS = [
-  // I. Second star
-  { s: 'star', t: 'The Second Star to the Right', a: 'The Jud Conlon Chorus & The Mellomen (Peter Pan soundtrack)', y: 1953, w: 'The star itself: the choir over the opening credits of Disney\'s Peter Pan. Everything below is tuned to this.' },
-  { s: 'star', t: 'The Second Star to the Right', a: 'Doris Day with Paul Weston & His Orchestra', y: 1953, w: 'Doris cut the same song the year the film came out, with The Four Lads behind her.' },
-  { s: 'star', t: 'Never Never Land', a: 'Mary Martin', y: 1954, w: 'From the Broadway Peter Pan. "A place where dreams are born, and time is never planned."' },
-  { s: 'star', t: 'When You Wish Upon a Star', a: 'Dion & The Belmonts', y: 1960, w: 'Disney\'s wish sung as Bronx doo-wop. Hit the Top 40 in the spring of 1960.' },
-  { s: 'star', t: 'A Thousand Stars', a: 'Kathy Young with The Innocents', y: 1960, w: 'A teenager counting stars over a slow, swaying beat.' },
-  { s: 'star', t: 'I Only Have Eyes for You', a: 'The Flamingos', y: 1959, w: '"Are the stars out tonight?" The dreamiest record of its decade.' },
-  { s: 'star', t: 'Deep Purple', a: 'Nino Tempo & April Stevens', y: 1963, w: 'Sleepy garden walls, stars beginning to twinkle. A number one in the fall of 1963.' },
-  { s: 'star', t: 'Sleep Walk', a: 'Santo & Johnny', y: 1959, w: 'Steel guitar drifting off to sleep.' },
-
-  // II. Golden hour
-  { s: 'gold', t: 'Theme from "A Summer Place"', a: 'Percy Faith & His Orchestra', y: 1960, w: 'The sound of strings swelling in an old movie. Summer\'s last glow.' },
-  { s: 'gold', t: 'Moon River', a: 'Andy Williams', y: 1962, w: 'Huckleberry friend, waiting round the bend.' },
-  { s: 'gold', t: 'Stranger on the Shore', a: 'Acker Bilk', y: 1961, w: 'A clarinet over strings, as foggy as a harbour morning.' },
-  { s: 'gold', t: 'Blue Velvet', a: 'Bobby Vinton', y: 1963, w: 'Softer than satin was the light from the stars.' },
-  { s: 'gold', t: 'Up on the Roof', a: 'The Drifters', y: 1962, w: '"At night the stars put on a show for free."' },
-  { s: 'gold', t: 'In Dreams', a: 'Roy Orbison', y: 1963, w: 'A candy-colored clown they call the sandman. Builds like an aria.' },
-  { s: 'gold', t: 'Unchained Melody', a: 'The Righteous Brothers', y: 1965, w: 'Lonely rivers flow to the sea.' },
-  { s: 'gold', t: 'Surfer Girl', a: 'The Beach Boys', y: 1963, w: 'Brian Wilson\'s first song, written to sound like "When You Wish Upon a Star."' },
-  { s: 'gold', t: 'God Only Knows', a: 'The Beach Boys', y: 1966, w: 'French horn, sleigh bells and harmonies that round like a carousel.' },
-  { s: 'gold', t: 'Here, There and Everywhere', a: 'The Beatles', y: 1966, w: 'McCartney\'s answer to the song above. Barely above a whisper.' },
-  { s: 'gold', t: 'Never My Love', a: 'The Association', y: 1967, w: 'Five-part harmony, soft as a pillow.' },
-  { s: 'gold', t: 'Dream a Little Dream of Me', a: 'The Mamas & The Papas', y: 1968, w: 'Mama Cass, stars shining bright above you, night breezes whispering.' },
-  { s: 'gold', t: 'What a Wonderful World', a: 'Louis Armstrong', y: 1967, w: 'The bright blessed day, the dark sacred night.' },
-  { s: 'gold', t: 'Quiet Nights of Quiet Stars (Corcovado)', a: 'Doris Day', y: 1965, w: 'The same voice as track 1, twelve years on, singing about quiet stars.' },
-
-  // III. Leaves
-  { s: 'leaves', t: 'Summer Has Gone', a: 'Doris Day', y: 1965, w: 'From Latin for Lovers. The door closing on summer.' },
-  { s: 'leaves', t: 'Autumn Leaves', a: 'Bill Evans Trio', y: 1960, w: 'From Portrait in Jazz. The standard, played like falling light.' },
-  { s: 'leaves', t: 'Autumn Serenade', a: 'John Coltrane & Johnny Hartman', y: 1963, w: 'A baritone and a tenor sax in the same warm room.' },
-  { s: 'leaves', t: 'September in the Rain', a: 'Dinah Washington', y: 1961, w: '"The leaves of brown came tumbling down."' },
-  { s: 'leaves', t: 'Try to Remember', a: 'The Brothers Four', y: 1965, w: '"The kind of September when life was slow and oh so mellow."' },
-  { s: 'leaves', t: 'It Was a Very Good Year', a: 'Frank Sinatra', y: 1965, w: 'Sinatra in the autumn of the year, with Gordon Jenkins\' oboe.' },
-  { s: 'leaves', t: 'California Dreamin\'', a: 'The Mamas & The Papas', y: 1965, w: '"All the leaves are brown and the sky is grey." Flute solo and all.' },
-  { s: 'leaves', t: 'April Come She Will', a: 'Simon & Garfunkel', y: 1966, w: '"August, die she must. The autumn winds blow chilly and cold."' },
-  { s: 'leaves', t: 'Leaves That Are Green', a: 'Simon & Garfunkel', y: 1966, w: 'Harpsichord, and the leaves that are green turning to brown.' },
-  { s: 'leaves', t: 'Scarborough Fair / Canticle', a: 'Simon & Garfunkel', y: 1966, w: 'Parsley, sage, rosemary and thyme, sung in a cathedral of echo.' },
-  { s: 'leaves', t: 'Urge for Going', a: 'Tom Rush', y: 1966, w: 'Joni Mitchell\'s frost-on-the-town song, first recorded by Tom Rush. The definitive fall song.' },
-  { s: 'leaves', t: 'Four Strong Winds', a: 'Ian & Sylvia', y: 1963, w: '"Think I\'ll go out to Alberta, weather\'s good there in the fall."' },
-  { s: 'leaves', t: 'Turn! Turn! Turn!', a: 'The Byrds', y: 1965, w: 'To everything there is a season. Twelve-string Rickenbacker like church bells.' },
-  { s: 'leaves', t: 'Who Knows Where the Time Goes', a: 'Judy Collins', y: 1968, w: '"Across the evening sky, all the birds are leaving."' },
-  { s: 'leaves', t: 'These Days', a: 'Nico', y: 1967, w: 'Jackson Browne\'s song at sixteen, with harpsichord and a long autumn walk in it.' },
-  { s: 'leaves', t: 'Days', a: 'The Kinks', y: 1968, w: 'Thank you for the days. A hymn for the end of something.' },
-  { s: 'leaves', t: 'Wichita Lineman', a: 'Glen Campbell', y: 1968, w: 'Wires humming across an empty plain. The loneliest beautiful record.' },
-  { s: 'leaves', t: 'Those Were the Days', a: 'Mary Hopkin', y: 1968, w: 'A Russian waltz about a tavern, produced by Paul McCartney.' },
-  { s: 'leaves', t: 'The Windmills of Your Mind', a: 'Noel Harrison', y: 1968, w: '"The autumn leaves were turning to the colour of her hair."' },
-  { s: 'leaves', t: 'As Tears Go By', a: 'Marianne Faithfull', y: 1964, w: '"It is the evening of the day, I sit and watch the children play."' },
-  { s: 'leaves', t: 'Walk Away Renée', a: 'The Left Banke', y: 1966, w: 'Baroque pop: strings, harpsichord, flute, and rain on the sidewalk.' },
-  { s: 'leaves', t: 'The Great Pumpkin Waltz', a: 'Vince Guaraldi', y: 1966, w: 'Charlie Brown in the pumpkin patch. Piano jazz with leaves in it.' },
-  { s: 'leaves', t: 'In My Life', a: 'The Beatles', y: 1965, w: 'Places I remember, and the sped-up piano that sounds like a harpsichord.' },
-
-  // IV. Rain on the roof
-  { s: 'rain', t: 'Rhythm of the Rain', a: 'The Cascades', y: 1962, w: 'Celesta, thunder, and rain telling you just what a fool you\'ve been.' },
-  { s: 'rain', t: 'Walking in the Rain', a: 'The Ronettes', y: 1964, w: 'Phil Spector\'s wall of sound with a real thunderstorm in it.' },
-  { s: 'rain', t: 'Rain on the Roof', a: 'The Lovin\' Spoonful', y: 1966, w: 'You and me and the rain on the roof.' },
-  { s: 'rain', t: 'The Rain, the Park & Other Things', a: 'The Cowsills', y: 1967, w: 'The flower girl in the rain. Harmonies like a Disney chorus.' },
-  { s: 'rain', t: 'I Will Wait for You', a: 'Michel Legrand', y: 1964, w: 'From The Umbrellas of Cherbourg. Rain, umbrellas, and the whole town singing.' },
-  { s: 'rain', t: 'I Think It\'s Going to Rain Today', a: 'Randy Newman', y: 1968, w: 'Just piano and strings. "Scarecrows dressed in the latest styles."' },
-
-  // V. Across the water
-  { s: 'water', t: 'Le temps de l\'amour', a: 'Françoise Hardy', y: 1962, w: 'The time of love, sung with a shrug and a twangy guitar.' },
-  { s: 'water', t: 'La Javanaise', a: 'Serge Gainsbourg', y: 1963, w: 'An old-fashioned waltz, written for Juliette Gréco.' },
-  { s: 'water', t: 'Au cœur de septembre', a: 'Nana Mouskouri', y: 1967, w: '"In the heart of September." The French version of Try to Remember.' },
-  { s: 'water', t: 'A Man and a Woman (Un homme et une femme)', a: 'Francis Lai', y: 1966, w: 'Ba-da-ba-da. A beach in Deauville in the off-season.' },
-  { s: 'water', t: 'Il cielo in una stanza', a: 'Mina', y: 1960, w: 'The sky inside a room: the walls turn into infinite trees.' },
-  { s: 'water', t: 'La canzone di Marinella', a: 'Fabrizio De André', y: 1964, w: 'The wind sees how beautiful she is and carries her up onto a star.' },
-  { s: 'water', t: '29 settembre', a: 'Equipe 84', y: 1967, w: 'The twenty-ninth of September, written by Lucio Battisti. Soft psychedelia.' },
-  { s: 'water', t: 'La pioggia', a: 'Gigliola Cinquetti', y: 1969, w: '"The rain." Clouds black in the sky, and the sparrows not flying anymore.' },
-
-  // VI. Starlight
-  { s: 'night', t: 'Both Sides, Now', a: 'Judy Collins', y: 1967, w: 'Ice cream castles in the air, with a harpsichord.' },
-  { s: 'night', t: 'Sunday Morning', a: 'The Velvet Underground & Nico', y: 1967, w: 'Celesta and a sleepy Lou Reed. The gentlest thing they ever did.' },
-  { s: 'night', t: 'Nights in White Satin', a: 'The Moody Blues', y: 1967, w: 'Mellotron strings and a flute solo like a long sigh.' },
-  { s: 'night', t: 'Everybody\'s Talkin\'', a: 'Harry Nilsson', y: 1968, w: 'Going where the sun keeps shining through the pouring rain.' },
-  { s: 'night', t: 'The Puppy Song', a: 'Harry Nilsson', y: 1969, w: '"Dreams are nothing more than wishes." Music-hall whimsy, straight out of Disney.' },
-  { s: 'night', t: 'Fly Me to the Moon', a: 'Frank Sinatra', y: 1964, w: 'With Count Basie. Let me play among the stars.' },
-  { s: 'night', t: 'Waltz for Debby', a: 'Bill Evans Trio', y: 1961, w: 'A waltz for a niece, recorded live at the Village Vanguard with glasses clinking.' },
-  { s: 'night', t: 'My One and Only Love', a: 'John Coltrane & Johnny Hartman', y: 1963, w: 'The warmest ballad in jazz.' },
-  { s: 'night', t: 'Lujon', a: 'Henry Mancini', y: 1961, w: 'Vibraphone and strings. Mancini\'s most dreamlike two minutes.' },
-
-  // VII. Goodnight
-  { s: 'sleep', t: 'Dedicated to the One I Love', a: 'The Mamas & The Papas', y: 1967, w: 'Opens like a lullaby, then the whole choir comes in.' },
-  { s: 'sleep', t: 'Goodnight My Love', a: 'The Fleetwoods', y: 1963, w: 'Pleasant dreams and sleep tight, sung in a whisper.' },
-  { s: 'sleep', t: 'All I Have to Do Is Dream', a: 'The Everly Brothers', y: 1958, w: 'Dream, dream, dream.' },
-  { s: 'sleep', t: 'Guinnevere', a: 'Crosby, Stills & Nash', y: 1969, w: 'Green eyes, peacocks, and the harbour at night. Hushed and strange.' },
-  { s: 'sleep', t: 'River Man', a: 'Nick Drake', y: 1969, w: 'From Five Leaves Left. Strings that move like water under a bridge.' },
-  { s: 'sleep', t: 'Because', a: 'The Beatles', y: 1969, w: 'Nine-part harmony and a harpsichord. "Because the sky is blue, it makes me cry."' },
-  { s: 'sleep', t: 'Good Night', a: 'The Beatles', y: 1968, w: 'Ringo singing a lullaby over a full orchestra. The closest thing to track 1 the sixties made.' },
-  { s: 'sleep', t: 'Song for a Winter\'s Night', a: 'Gordon Lightfoot', y: 1967, w: 'The first frost. Where fall hands over to winter.' },
+  // wish
+  { s: "wish", t: "The Second Star to the Right", a: "The Jud Conlon Chorus & The Mellomen (Peter Pan soundtrack)", y: 1953, w: "The star itself: the choir over the opening credits of Peter Pan. Everything below is tuned to this." },
+  { s: "wish", t: "The Second Star to the Right", a: "Doris Day with Paul Weston & His Orchestra", y: 1953, w: "Doris cut the same song the year the film came out, with The Four Lads singing the harmony behind her." },
+  { s: "wish", t: "When You Wish Upon a Star", a: "Cliff Edwards with The Ken Darby Singers (Pinocchio soundtrack)", y: 1940, w: "Jiminy Cricket and the Ken Darby Singers. The other record this whole list is tuned to." },
+  { s: "wish", t: "A Dream Is a Wish Your Heart Makes", a: "Ilene Woods (Cinderella soundtrack)", y: 1950, w: "Cinderella at the window, with the chorus coming in under her." },
+  { s: "wish", t: "Alice in Wonderland", a: "Jud Conlon's Rhythmaires (Alice in Wonderland soundtrack)", y: 1951, w: "The main title. Same choir as Second Star, two years earlier." },
+  { s: "wish", t: "Once Upon a Dream", a: "Mary Costa & Bill Shirley (Sleeping Beauty soundtrack)", y: 1959, w: "A Tchaikovsky waltz with a full chorus. Pure 1959 Disney." },
+  { s: "wish", t: "Blue Bayou", a: "The Ken Darby Chorus (Make Mine Music soundtrack)", y: 1946, w: "A moonlit bayou sung by a choir and nothing else. The dreamiest thing Disney ever recorded." },
+  { s: "wish", t: "Trees", a: "Fred Waring & The Pennsylvanians (Melody Time soundtrack)", y: 1948, w: "\"I think that I shall never see a poem lovely as a tree.\" A glee club in full autumn colour." },
+  { s: "wish", t: "Blue Shadows on the Trail", a: "Roy Rogers & The Sons of the Pioneers (Melody Time soundtrack)", y: 1948, w: "Cowboy close harmony at dusk. The Sons of the Pioneers were the Mellomen of the prairie." },
+  { s: "wish", t: "You Can Fly! You Can Fly! You Can Fly!", a: "The Jud Conlon Chorus (Peter Pan soundtrack)", y: 1953, w: "Think of a wonderful thought. The chorus takes off over London." },
+  { s: "wish", t: "Never Never Land", a: "Mary Martin (Peter Pan, original Broadway cast)", y: 1954, w: "\"A place where dreams are born, and time is never planned.\"" },
+  { s: "wish", t: "Over the Rainbow", a: "Judy Garland", y: 1939, w: "Not Disney, but the same wish on the same kind of star." },
+  { s: "wish", t: "Swinging on a Star", a: "Bing Crosby with The Williams Brothers Quartet", y: 1944, w: "Carry moonbeams home in a jar. The Williams Brothers include a teenage Andy Williams." },
+  { s: "wish", t: "Feed the Birds (Tuppence a Bag)", a: "Julie Andrews (Mary Poppins soundtrack)", y: 1964, w: "Walt's favourite song. Dusk on the cathedral steps, chorus behind." },
+  { s: "wish", t: "Chim Chim Cher-ee", a: "Dick Van Dyke & Julie Andrews (Mary Poppins soundtrack)", y: 1964, w: "\"'Tween pavement and stars is the chimney sweep world.\"" },
+  { s: "wish", t: "Winnie the Pooh", a: "The Disney Studio Chorus (Winnie the Pooh and the Honey Tree)", y: 1966, w: "Deep in the Hundred Acre Wood. The studio chorus, sixties vintage." },
+  // pipers
+  { s: "pipers", t: "I'll Never Smile Again", a: "Tommy Dorsey & His Orchestra with Frank Sinatra & The Pied Pipers", y: 1940, w: "Young Sinatra inside a four-voice cushion, with celesta. The template for every ballad here." },
+  { s: "pipers", t: "Star Dust", a: "Tommy Dorsey & His Orchestra with Frank Sinatra & The Pied Pipers", y: 1940, w: "The Pied Pipers hum the clouds; Sinatra sings the stars." },
+  { s: "pipers", t: "Moonlight Cocktail", a: "Glenn Miller & His Orchestra with Ray Eberle & The Modernaires", y: 1942, w: "A few moonbeams, a couple of stars, stirred gently." },
+  { s: "pipers", t: "Elmer's Tune", a: "Glenn Miller & His Orchestra with Ray Eberle & The Modernaires", y: 1941, w: "\"Why are the stars always winkin' and blinkin' above?\"" },
+  { s: "pipers", t: "Whispering Grass (Don't Tell the Trees)", a: "The Ink Spots", y: 1940, w: "Bill Kenny's high tenor and Hoppy Jones' talking bass. Don't tell the trees." },
+  { s: "pipers", t: "I Don't Want to Set the World on Fire", a: "The Ink Spots", y: 1941, w: "The Ink Spots sound: guitar intro, tenor lead, the spoken verse." },
+  { s: "pipers", t: "I Can Dream, Can't I?", a: "The Andrews Sisters with Gordon Jenkins", y: 1949, w: "The sisters slowed down and wrapped in strings." },
+  { s: "pipers", t: "Moonlight Becomes You", a: "Bing Crosby", y: 1942, w: "Bing at his most hushed, from Road to Morocco." },
+  { s: "pipers", t: "Far Away Places", a: "Bing Crosby with The Ken Darby Singers", y: 1948, w: "The Pinocchio choir, four years on, behind Bing." },
+  { s: "pipers", t: "Nature Boy", a: "Nat King Cole", y: 1948, w: "\"There was a boy, a very strange enchanted boy.\" Strings and flute like a fairy tale." },
+  // golden
+  { s: "golden", t: "Mr. Sandman", a: "The Chordettes", y: 1954, w: "Bring me a dream. Four women in barbershop harmony." },
+  { s: "golden", t: "May You Always", a: "The McGuire Sisters", y: 1959, w: "\"May you always walk in sunshine.\" A blessing in three-part harmony." },
+  { s: "golden", t: "Graduation Day", a: "The Four Freshmen", y: 1956, w: "The jazz close-harmony group Brian Wilson learned everything from." },
+  { s: "golden", t: "Shangri-La", a: "The Four Coins", y: 1957, w: "Lush and slow, with the chorus floating above." },
+  { s: "golden", t: "Tonight You Belong to Me", a: "Patience & Prudence", y: 1956, w: "Two sisters, eleven and fourteen, in perfect harmony. Old-time and dreamlike." },
+  { s: "golden", t: "Twilight Time", a: "The Platters", y: 1958, w: "\"Heavenly shades of night are falling.\" The Platters were the Ink Spots' heirs." },
+  { s: "golden", t: "Smoke Gets in Your Eyes", a: "The Platters", y: 1958, w: "The 1933 ballad, sung like a last dance." },
+  { s: "golden", t: "Catch a Falling Star", a: "Perry Como", y: 1957, w: "Put it in your pocket, save it for a rainy day. The Ray Charles Singers behind him." },
+  { s: "golden", t: "Stardust", a: "Nat King Cole", y: 1957, w: "Nat with the Gordon Jenkins strings. The purple dusk of twilight time." },
+  { s: "golden", t: "The Twelfth of Never", a: "Johnny Mathis", y: 1957, w: "Mathis with a choir, in the key of forever." },
+  { s: "golden", t: "Que Sera, Sera (Whatever Will Be, Will Be)", a: "Doris Day", y: 1956, w: "The chorus answers her on every line." },
+  { s: "golden", t: "Tennessee Waltz", a: "Patti Page", y: 1950, w: "Patti Page harmonising with herself. The first big multitracked vocal." },
+  { s: "golden", t: "Allegheny Moon", a: "Patti Page", y: 1956, w: "A moon song with the chorus humming underneath." },
+  { s: "golden", t: "You Belong to Me", a: "Jo Stafford", y: 1952, w: "\"See the pyramids along the Nile.\" Jo Stafford, formerly of the Pied Pipers." },
+  { s: "golden", t: "Memories Are Made of This", a: "Dean Martin with The Easy Riders", y: 1955, w: "The Easy Riders chant the harmony while Dean remembers." },
+  { s: "golden", t: "The Three Bells", a: "The Browns", y: 1959, w: "Little Jimmy Brown and the chapel bells, sung soft as a hymn." },
+  { s: "golden", t: "Come Softly to Me", a: "The Fleetwoods", y: 1959, w: "Two girls and a boy whispering in harmony. Dum dum, dum-dooby-doo." },
+  { s: "golden", t: "Mr. Blue", a: "The Fleetwoods", y: 1959, w: "The Fleetwoods were the softest group of their day." },
+  { s: "golden", t: "Since I Don't Have You", a: "The Skyliners", y: 1959, w: "Doo-wop with a string section and a falsetto ending that goes up to the stars." },
+  { s: "golden", t: "To Know Him Is to Love Him", a: "The Teddy Bears", y: 1958, w: "Phil Spector's first record. Three voices, slow and dreamy." },
+  // leaves
+  { s: "leaves", t: "Early Autumn", a: "Jo Stafford with Paul Weston & His Orchestra", y: 1952, w: "\"When an early autumn walks the land and chills the breeze.\" The same Paul Weston as track 2." },
+  { s: "leaves", t: "Autumn Leaves", a: "Nat King Cole", y: 1955, w: "The falling leaves drift by the window, with Nelson Riddle's strings." },
+  { s: "leaves", t: "Moonlight in Vermont", a: "Frank Sinatra", y: 1957, w: "\"Pennies in a stream, falling leaves of sycamore.\"" },
+  { s: "leaves", t: "The September of My Years", a: "Frank Sinatra", y: 1965, w: "Sinatra at fifty, in the autumn of the year, with Gordon Jenkins." },
+  { s: "leaves", t: "When Sunny Gets Blue", a: "Johnny Mathis", y: 1957, w: "\"Her eyes get grey and cloudy, then the rain begins to fall.\"" },
+  { s: "leaves", t: "Moments to Remember", a: "The Four Lads", y: 1955, w: "\"Though summer turns to winter and the present disappears.\" The Four Lads from track 2." },
+  { s: "leaves", t: "Trees", a: "The Platters", y: 1961, w: "The Platters sing the poem from track 8 the way the Ink Spots would have." },
+  { s: "leaves", t: "The Old Lamplighter", a: "The Browns", y: 1960, w: "He made the night a little brighter. Lamp-lit streets, long ago." },
+  { s: "leaves", t: "Greenfields", a: "The Brothers Four", y: 1960, w: "\"Once there were green fields, kissed by the sun.\" The green is gone." },
+  { s: "leaves", t: "The Green Leaves of Summer", a: "The Brothers Four", y: 1960, w: "\"A time to be reaping, a time to be sowing.\" Harvest in four-part harmony." },
+  { s: "leaves", t: "Try to Remember", a: "The Brothers Four", y: 1965, w: "\"The kind of September when life was slow and oh so mellow.\"" },
+  { s: "leaves", t: "Autumn to May", a: "Peter, Paul & Mary", y: 1962, w: "A nonsense ballad about a silly little dog. Autumn to May." },
+  { s: "leaves", t: "The Carnival Is Over", a: "The Seekers", y: 1965, w: "A Russian folk tune in Australian close harmony. The booths are coming down." },
+  { s: "leaves", t: "The Warmth of the Sun", a: "The Beach Boys", y: 1964, w: "Brian's saddest ballad. The sun still warm, the love gone." },
+  { s: "leaves", t: "Leaves That Are Green", a: "Simon & Garfunkel", y: 1966, w: "\"Time hurries on, and the leaves that are green turn to brown.\"" },
+  { s: "leaves", t: "April Come She Will", a: "Simon & Garfunkel", y: 1966, w: "\"August, die she must. The autumn winds blow chilly and cold.\"" },
+  { s: "leaves", t: "California Dreamin'", a: "The Mamas & The Papas", y: 1965, w: "\"All the leaves are brown and the sky is grey.\" Four voices answering each other." },
+  { s: "leaves", t: "A Rather Blustery Day", a: "Sterling Holloway (Winnie the Pooh and the Blustery Day)", y: 1968, w: "Happy Windsday. Pooh in the wind, leaves everywhere." },
+  { s: "leaves", t: "The Rain Rain Rain Came Down Down Down", a: "The Disney Studio Chorus (Winnie the Pooh and the Blustery Day)", y: 1968, w: "The chorus and the rain, both coming down." },
+  { s: "leaves", t: "The Headless Horseman", a: "Bing Crosby (The Adventures of Ichabod and Mr. Toad)", y: 1949, w: "Bing tells Sleepy Hollow with a spooky chorus. The one for Halloween week." },
+  // sixties
+  { s: "sixties", t: "The Way You Look Tonight", a: "The Lettermen", y: 1961, w: "The Lettermen were the Four Freshmen sound for the sixties. Hushed and blended." },
+  { s: "sixties", t: "When I Fall in Love", a: "The Lettermen", y: 1961, w: "The whole group on the melody, barely above a breath." },
+  { s: "sixties", t: "Surfer Girl", a: "The Beach Boys", y: 1963, w: "Brian Wilson's first song, modelled on \"When You Wish Upon a Star.\"" },
+  { s: "sixties", t: "In My Room", a: "The Beach Boys", y: 1963, w: "Three brothers in close harmony, in a room with the lights off." },
+  { s: "sixties", t: "God Only Knows", a: "The Beach Boys", y: 1966, w: "French horn, sleigh bells, and the harmonies going round like a carousel." },
+  { s: "sixties", t: "Turn Around, Look at Me", a: "The Vogues", y: 1968, w: "A Pittsburgh quartet with a full orchestra. The sound of 1955 in 1968." },
+  { s: "sixties", t: "I'll Never Smile Again", a: "The Platters", y: 1961, w: "The Platters sing the Pied Pipers' song from track 17." },
+  { s: "sixties", t: "Can't Help Falling in Love", a: "Elvis Presley with The Jordanaires", y: 1961, w: "The Jordanaires hum the chords while Elvis takes his time." },
+  { s: "sixties", t: "Are You Lonesome Tonight?", a: "Elvis Presley with The Jordanaires", y: 1960, w: "A 1926 song, a spoken verse, and the quartet in the dark." },
+  { s: "sixties", t: "Welcome to My World", a: "Jim Reeves with The Anita Kerr Singers", y: 1964, w: "Nashville's studio choir, as soft as the Disney ones." },
+  { s: "sixties", t: "Sweet Dreams (Of You)", a: "Patsy Cline with The Jordanaires", y: 1963, w: "Patsy with strings and the Jordanaires." },
+  { s: "sixties", t: "The End of the World", a: "Skeeter Davis", y: 1962, w: "\"Why does the sun go on shining?\" Skeeter harmonising with herself." },
+  { s: "sixties", t: "Moon River", a: "Andy Williams", y: 1962, w: "The boy from the Williams Brothers Quartet, grown up, with a choir of his own." },
+  { s: "sixties", t: "Puff, the Magic Dragon", a: "Peter, Paul & Mary", y: 1963, w: "\"A dragon lives forever, but not so little boys.\" The Peter Pan song of the folk years." },
+  { s: "sixties", t: "Scarborough Fair / Canticle", a: "Simon & Garfunkel", y: 1966, w: "Two voices weaving two songs in a cathedral of echo." },
+  { s: "sixties", t: "Here, There and Everywhere", a: "The Beatles", y: 1966, w: "McCartney's Beach Boys song, with the \"ooh\" harmonies to prove it." },
+  { s: "sixties", t: "Dream a Little Dream of Me", a: "The Mamas & The Papas", y: 1968, w: "Mama Cass with the 1931 song. Stars shining bright above you." },
+  { s: "sixties", t: "Never My Love", a: "The Association", y: 1967, w: "Five-part harmony, soft as a pillow." },
+  { s: "sixties", t: "The Rain, the Park & Other Things", a: "The Cowsills", y: 1967, w: "A family singing like a Disney chorus, in the rain." },
+  { s: "sixties", t: "Kites Are Fun", a: "The Free Design", y: 1967, w: "Four siblings in Four Freshmen chords, flying kites." },
+  // sleep
+  { s: "sleep", t: "Baby Mine", a: "Betty Noyes (Dumbo soundtrack)", y: 1941, w: "The lullaby from Dumbo, with the chorus underneath." },
+  { s: "sleep", t: "La La Lu", a: "Peggy Lee (Lady and the Tramp soundtrack)", y: 1955, w: "Peggy Lee sings the baby to sleep." },
+  { s: "sleep", t: "Stay Awake", a: "Julie Andrews (Mary Poppins soundtrack)", y: 1964, w: "Reverse psychology, sung like a music box." },
+  { s: "sleep", t: "Hushabye Mountain", a: "Dick Van Dyke (Chitty Chitty Bang Bang soundtrack)", y: 1968, w: "The Sherman Brothers' gentlest lullaby, 1968." },
+  { s: "sleep", t: "Distant Melody", a: "Mary Martin (Peter Pan, original Broadway cast)", y: 1954, w: "\"Once upon a time and long ago, I heard someone singing soft and low.\"" },
+  { s: "sleep", t: "Goodnight, Sweetheart, Goodnight", a: "The McGuire Sisters", y: 1954, w: "The doo-wop goodnight, sung by three sisters." },
+  { s: "sleep", t: "Scarlet Ribbons (For Her Hair)", a: "The Browns", y: 1959, w: "A miracle in the night, told in a whisper." },
+  { s: "sleep", t: "Goodnight My Love", a: "The Fleetwoods", y: 1963, w: "Pleasant dreams and sleep tight." },
+  { s: "sleep", t: "Hushabye", a: "The Beach Boys", y: 1964, w: "The Beach Boys singing the Mystics' doo-wop lullaby." },
+  { s: "sleep", t: "All I Have to Do Is Dream", a: "The Everly Brothers", y: 1958, w: "Two brothers, one harmony. Dream, dream, dream." },
+  { s: "sleep", t: "Dream", a: "The Pied Pipers", y: 1945, w: "\"Dream, when you're feeling blue.\" Johnny Mercer's lullaby for grown-ups, by the group that started it all." },
+  { s: "sleep", t: "Dedicated to the One I Love", a: "The Mamas & The Papas", y: 1967, w: "Opens like a lullaby, then the whole choir comes in." },
+  { s: "sleep", t: "Our Prayer", a: "The Beach Boys", y: 1969, w: "A wordless a cappella hymn. The closest the sixties got to the Disney choirs." },
+  { s: "sleep", t: "Good Night", a: "The Beatles", y: 1968, w: "Ringo over a full orchestra and chorus. Straight on till morning." },
 ];
 
 /* ---------- Render ---------- */
@@ -390,7 +406,7 @@ let added = new Set();
 try { added = new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) {}
 function saveAdded() { try { localStorage.setItem(KEY, JSON.stringify([...added])); } catch (e) {} }
 
-const shortArtist = a => a.replace(/ with .*$/, '').replace(/ & His Orchestra$/, '').replace(/ \(Peter Pan soundtrack\)$/, '');
+const shortArtist = a => a.replace(/ \(.*\)$/, '').replace(/ with (Paul Weston|Gordon Jenkins).*$/, '').replace(/ & His Orchestra$/, '');
 const musicUrl = tr => 'https://music.apple.com/us/search?term=' + encodeURIComponent(tr.t + ' ' + shortArtist(tr.a));
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
