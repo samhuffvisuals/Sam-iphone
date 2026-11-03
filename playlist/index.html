@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Second Star</title>
-<meta name="description" content="A 1960s dreamy fall playlist for Apple Music: 75 songs that sound like The Second Star to the Right.">
+<meta name="description" content="A 1960s dreamy fall playlist for Apple Music: 76 songs that sound like The Second Star to the Right.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -216,7 +216,7 @@
   <header>
     <div class="eyebrow">An Apple Music playlist · the dreamy sixties</div>
     <h1>Second Star<br><em>to the right</em></h1>
-    <p class="tagline">A dreamy fall. Seventy-five old records that sound like a Disney night sky: strings, hushed harmonies, leaves coming down.</p>
+    <p class="tagline">A dreamy fall. Seventy-six old records that sound like a Disney night sky: strings, hushed harmonies, leaves coming down.</p>
     <div class="meta" id="meta"></div>
     <div class="actions">
       <a class="btn gold" id="openMusic" href="https://music.apple.com/us/search?term=second%20star%20to%20the%20right%20doris%20day" target="_blank" rel="noopener">
@@ -255,7 +255,7 @@
 <div class="sheet" id="sheet" role="dialog" aria-label="How to make this an Apple Music playlist">
   <div class="grip"></div>
   <h3>Make it an Apple Music playlist</h3>
-  <p>Apple doesn't let a web page drop a playlist into your library, so there are two ways to get these 75 songs in. The first takes about two minutes.</p>
+  <p>Apple doesn't let a web page drop a playlist into your library, so there are two ways to get these songs in. The first takes about two minutes.</p>
 
   <h4>1. Import the whole list at once</h4>
   <ol>
@@ -275,7 +275,7 @@
   </ol>
 
   <h4>Good to know</h4>
-  <p>Tracks 1 and 2 are the two Peter Pan records the whole list is tuned to, from 1953 and 1954. Everything else is 1958–1969. A few from France and Italy are in the <i>Across the water</i> section; skip that section if you want English only.</p>
+  <p>Tracks 1 to 3 are the Peter Pan records the whole list is tuned to, from 1953 and 1954. Everything else is 1958–1969. A few from France and Italy are in the <i>Across the water</i> section; skip that section if you want English only.</p>
 </div>
 
 <div class="toast" id="toast">Copied</div>
@@ -294,7 +294,8 @@ const SECTIONS = [
 
 const TRACKS = [
   // I. Second star
-  { s: 'star', t: 'The Second Star to the Right', a: 'Doris Day with Paul Weston & His Orchestra', y: 1953, w: 'The star itself. Doris cut the Peter Pan theme the year the film came out, with a choir behind her.' },
+  { s: 'star', t: 'The Second Star to the Right', a: 'The Jud Conlon Chorus & The Mellomen (Peter Pan soundtrack)', y: 1953, w: 'The star itself: the choir over the opening credits of Disney\'s Peter Pan. Everything below is tuned to this.' },
+  { s: 'star', t: 'The Second Star to the Right', a: 'Doris Day with Paul Weston & His Orchestra', y: 1953, w: 'Doris cut the same song the year the film came out, with The Four Lads behind her.' },
   { s: 'star', t: 'Never Never Land', a: 'Mary Martin', y: 1954, w: 'From the Broadway Peter Pan. "A place where dreams are born, and time is never planned."' },
   { s: 'star', t: 'When You Wish Upon a Star', a: 'Dion & The Belmonts', y: 1960, w: 'Disney\'s wish sung as Bronx doo-wop. Hit the Top 40 in the spring of 1960.' },
   { s: 'star', t: 'A Thousand Stars', a: 'Kathy Young with The Innocents', y: 1960, w: 'A teenager counting stars over a slow, swaying beat.' },
@@ -389,7 +390,7 @@ let added = new Set();
 try { added = new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) {}
 function saveAdded() { try { localStorage.setItem(KEY, JSON.stringify([...added])); } catch (e) {} }
 
-const shortArtist = a => a.replace(/ with .*$/, '').replace(/ & His Orchestra$/, '');
+const shortArtist = a => a.replace(/ with .*$/, '').replace(/ & His Orchestra$/, '').replace(/ \(Peter Pan soundtrack\)$/, '');
 const musicUrl = tr => 'https://music.apple.com/us/search?term=' + encodeURIComponent(tr.t + ' ' + shortArtist(tr.a));
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 

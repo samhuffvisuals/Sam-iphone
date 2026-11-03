@@ -1,6 +1,6 @@
 # Second Star
 
-A 1960s dreamy fall playlist for Apple Music: 75 old records that sound like **"The Second Star to the Right"** from Peter Pan. Strings, hushed harmonies, celesta, and leaves coming down. Open `/playlist/` on the Pages site.
+A 1960s dreamy fall playlist for Apple Music: 76 old records that sound like **"The Second Star to the Right"** from Peter Pan. Strings, hushed harmonies, celesta, and leaves coming down. Open `/playlist/` on the Pages site.
 
 The full song list is in [playlist.txt](playlist.txt), one `Artist - Title` per line, grouped into seven movements:
 
@@ -12,7 +12,7 @@ The full song list is in [playlist.txt](playlist.txt), one `Artist - Title` per 
 6. **Starlight**: late-sixties dreamers and the jazz that sounds like snow globes.
 7. **Goodnight**: lullabies to close the record.
 
-Tracks 1 and 2 are from 1953 and 1954 (Doris Day and Mary Martin singing the two Peter Pan songs). Everything else is 1958–1969.
+Tracks 1 to 3 are from 1953 and 1954: the Disney soundtrack choir and Doris Day singing "The Second Star to the Right", and Mary Martin's "Never Never Land". Everything else is 1958–1969.
 
 ## Put it on your iPhone Home Screen
 
