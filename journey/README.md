@@ -19,7 +19,7 @@ Open it from the Home Screen icon. The Home Screen app keeps its own storage, se
 
 ## Using it
 
-Two tabs at the bottom: **Map** and **Journal**.
+Three tabs at the bottom: **Map**, **Journal** and **Brainstorm**.
 
 **Map**
 
@@ -36,9 +36,15 @@ Two tabs at the bottom: **Map** and **Journal**.
 - Tap an entry to edit it. **Find on map** switches to the map and flies to it.
 - **+ Write** in the journal adds an entry without picking a spot; it is placed on the map at the level you choose.
 
+**Brainstorm**
+
+- A scratch space for rough ideas about all four parts: 1. Mountain, 2. Streams, 3. River, 4. Sea. Type into the box under a section and tap Add (or return). Nothing in Brainstorm is on the map.
+- Tap an idea to edit it, change its part of the landscape, or delete it. **Move to map** turns it into an official entry: the sheet opens prefilled, and on Save it is placed on the map and removed from Brainstorm.
+- The other way round: an entry's sheet (from the map or the journal) has **Move to Brainstorm**, and each journal entry has a **Move to Brainstorm** link. The entry comes off the map and the journal and becomes an idea in the same section.
+
 **Menu (⋯)**
 
 - **Six signs check-in** is the quick test from the video. **How this works** explains the landscape.
-- **Back up** saves everything to a file. **Restore** loads it back. Entries live only on your phone, so back up now and then.
+- **Back up** saves everything, entries and ideas, to a file. **Restore** loads it back. Entries live only on your phone, so back up now and then.
 
 **Offline**: open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all.

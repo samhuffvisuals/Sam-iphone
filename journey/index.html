@@ -169,6 +169,28 @@
   .entry .m { font-size: 12px; color: var(--ink-soft); margin-top: 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .entry .m .find { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--red); padding: 2px 0; }
   .jempty { text-align: center; color: var(--ink-soft); font-family: var(--serif); font-style: italic; font-size: 19px; padding: 60px 20px; line-height: 1.4; }
+  .m .act { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--red); padding: 2px 0; }
+  .m .act.soft { color: var(--ink-soft); }
+
+  /* ---------- Brainstorm ---------- */
+  #brainstorm { position: absolute; inset: 0; z-index: 3; background: var(--paper); display: none; flex-direction: column; }
+  #brainstorm.on { display: flex; }
+  #brainstorm .scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: calc(var(--safe-top) + 84px) 16px 120px; }
+  .jhead p { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; line-height: 1.4; }
+  .idea { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); align-items: flex-start; }
+  .idea .mark { width: 10px; height: 10px; border: 1.5px solid var(--ink-soft); border-radius: 2px; margin-top: 8px; flex: 0 0 auto; transform: rotate(45deg); }
+  .idea .body { flex: 1; min-width: 0; text-align: left; }
+  .idea .t { font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.3; white-space: pre-wrap; word-wrap: break-word; color: var(--ink); }
+  .idea .m { font-size: 12px; color: var(--ink-soft); margin-top: 3px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .quick { display: flex; gap: 8px; align-items: center; padding: 10px 0 4px; }
+  .quick input {
+    flex: 1; min-width: 0; border: 1px dashed var(--ink-soft); border-radius: 12px; background: #fff; padding: 9px 12px;
+    font-family: var(--serif); font-style: italic; font-size: 17px; outline: none;
+  }
+  .quick input:focus { border-style: solid; border-color: var(--red); }
+  .quick button { height: 38px; padding: 0 14px; border-radius: 19px; background: var(--ink); color: var(--paper); font-family: var(--serif); font-style: italic; font-size: 16px; flex: 0 0 auto; }
+  .sheet .actions .pill.alt { background: var(--sea); }
+  .sheet .actions.two { margin-top: 8px; }
 
   /* ---------- Sheets ---------- */
   .backdrop { position: absolute; inset: 0; z-index: 10; background: rgba(47,70,68,.28); display: none; }
@@ -236,6 +258,10 @@
   <div class="scroll" id="journalScroll"></div>
 </div>
 
+<div id="brainstorm">
+  <div class="scroll" id="brainScroll"></div>
+</div>
+
 <div class="top">
   <div class="title">Journey to Clean Fuel<small>Water flows downhill</small></div>
   <div class="right">
@@ -271,6 +297,10 @@
       <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
       Journal
     </button>
+    <button id="tabBrain">
+      <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.3 1.1 2.2h5c.1-.9.5-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+      Brainstorm
+    </button>
   </div>
 </div>
 
@@ -300,6 +330,31 @@
     <button class="pill" id="noteCancel">Cancel</button>
     <button class="pill primary" id="noteSave">Save</button>
   </div>
+  <div class="actions two hide" id="noteToBrainRow">
+    <button class="pill alt" id="noteToBrain">Move to Brainstorm</button>
+  </div>
+</div>
+
+<!-- Idea sheet (brainstorm) -->
+<div class="sheet" id="ideaSheet">
+  <h2 id="ideaTitle">Idea</h2>
+  <p class="sub" id="ideaSub">A rough thought. Nothing here goes on the map until you move it.</p>
+  <textarea id="ideaText" placeholder="Jot the idea…" rows="4"></textarea>
+  <div class="seglabel">Which part of the landscape?</div>
+  <div class="seg" id="ideaLevelSeg">
+    <button data-level="past">Mountain<small>Past</small></button>
+    <button data-level="belief">Streams<small>Beliefs</small></button>
+    <button data-level="state">River<small>State</small></button>
+    <button data-level="behavior">Sea<small>Behavior</small></button>
+  </div>
+  <div class="actions">
+    <button class="pill danger" id="ideaDelete">Delete</button>
+    <button class="pill" id="ideaCancel">Cancel</button>
+    <button class="pill primary" id="ideaSave">Save</button>
+  </div>
+  <div class="actions two">
+    <button class="pill alt" id="ideaToMap">Move to the map</button>
+  </div>
 </div>
 
 <!-- Six signs -->
@@ -322,6 +377,7 @@
   <p>Most people stand by the sea with a bucket. Deeper change happens upstream. Start where you feel it (the river), then trace it up to the belief, then to the moment on the mountain where that belief first made sense.</p>
   <p><b>Map:</b> drag with one finger to turn the landscape, pinch to zoom, drag with two fingers to slide it. Hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 to fly to each level.</p>
   <p><b>Journal:</b> everything you write on the map, as one organized list by level. Tap an entry to edit it, or <i>Find on map</i> to fly to it.</p>
+  <p><b>Brainstorm:</b> a scratch space for rough ideas about all four parts: mountain, streams, river, sea. Nothing there is on the map. Move an idea to the map when it feels true, or move a map entry back to Brainstorm when you are not sure about it yet.</p>
   <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all. Your entries always stay on the phone.</p>
 </div>
 
@@ -400,8 +456,8 @@
   // ---------- State ----------
   let data = load();
   function load() {
-    try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && Array.isArray(d.notes)) return d; } catch (e) {}
-    return { notes: [], signs: [] };
+    try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && Array.isArray(d.notes)) { if (!Array.isArray(d.ideas)) d.ideas = []; return d; } } catch (e) {}
+    return { notes: [], signs: [], ideas: [] };
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -893,14 +949,17 @@
   function setTab(t) {
     tab = t;
     $('journal').classList.toggle('on', t === 'journal');
-    $('tabMap').classList.toggle('on', t === 'map'); $('tabJournal').classList.toggle('on', t === 'journal');
+    $('brainstorm').classList.toggle('on', t === 'brainstorm');
+    $('tabMap').classList.toggle('on', t === 'map'); $('tabJournal').classList.toggle('on', t === 'journal'); $('tabBrain').classList.toggle('on', t === 'brainstorm');
     $('mapUI').classList.toggle('hide', t !== 'map'); $('journalUI').classList.toggle('hide', t !== 'journal');
     $('btnFit').classList.toggle('hide', t !== 'map');
-    if (t === 'journal') renderJournal(); else requestRender();
+    refreshTab(); if (t === 'map') requestRender();
     hideBubble();
   }
+  function refreshTab() { if (tab === 'journal') renderJournal(); else if (tab === 'brainstorm') renderBrainstorm(); }
   $('tabMap').addEventListener('click', () => setTab('map'));
   $('tabJournal').addEventListener('click', () => setTab('journal'));
+  $('tabBrain').addEventListener('click', () => setTab('brainstorm'));
 
   // ---------- Sheets ----------
   const backdrop = $('backdrop');
@@ -944,25 +1003,33 @@
     x = Math.round(clamp(x, 5, W - 5)); z = Math.round(clamp(z, 5, D - 5));
     editing = { x, y: z, level: levelAt(x, z), fuel: '' };
     ghostPt = [x, z]; frameOnPoint(x, z);
-    $('noteTitle').textContent = 'New entry'; $('noteDelete').classList.add('hide'); noteText.value = '';
+    $('noteTitle').textContent = 'New entry'; $('noteDelete').classList.add('hide'); $('noteToBrainRow').classList.add('hide'); noteText.value = '';
     setLevel(editing.level); setFuel('');
     show('noteSheet'); setTimeout(() => noteText.focus(), 320);
   }
-  function openNoteBlank() {
-    editing = { x: null, y: null, level: 'state', fuel: '' };
+  function openNoteBlank(level, text, fromIdea, fuel) {
+    editing = { x: null, y: null, level: level || 'state', fuel: fuel || '', fromIdea: fromIdea || null };
     ghostPt = null;
-    $('noteTitle').textContent = 'New entry'; $('noteDelete').classList.add('hide'); noteText.value = '';
-    setLevel('state'); setFuel('');
+    $('noteTitle').textContent = fromIdea ? 'Move idea to the map' : 'New entry'; $('noteDelete').classList.add('hide'); $('noteToBrainRow').classList.add('hide'); noteText.value = text || '';
+    setLevel(editing.level); setFuel(editing.fuel);
     show('noteSheet'); setTimeout(() => noteText.focus(), 320);
   }
   function openNote(id) {
     const n = data.notes.find(n => n.id === id); if (!n) return;
     editing = { id, x: n.x, y: n.y, level: n.level, fuel: n.fuel || '' };
     if (tab === 'map') { ghostPt = [n.x, n.y]; frameOnPoint(n.x, n.y); }
-    $('noteTitle').textContent = 'Entry'; $('noteDelete').classList.remove('hide'); noteText.value = n.text;
+    $('noteTitle').textContent = 'Entry'; $('noteDelete').classList.remove('hide'); $('noteToBrainRow').classList.remove('hide'); noteText.value = n.text;
     setLevel(n.level); setFuel(n.fuel);
     show('noteSheet');
   }
+  // Demote a map entry to a rough idea in Brainstorm
+  function entryToBrainstorm(id) {
+    const n = data.notes.find(n => n.id === id); if (!n) return;
+    data.notes = data.notes.filter(m => m.id !== id);
+    data.ideas.push({ id: uid(), level: n.level, text: n.text, fuel: n.fuel || '', created: Date.now(), from: n.created });
+    save(); syncNoteEls(); closeSheets(); setTab('brainstorm');
+  }
+  $('noteToBrain').addEventListener('click', () => { if (editing && editing.id) entryToBrainstorm(editing.id); });
   function autoPlace(level) {
     const pick = (pts, a, b) => { const p = pts[Math.floor(pts.length * rand(a, b))]; return [p[0] + rand(-6, 6), p[1] + rand(-6, 6)]; };
     const rr = Math.random;
@@ -981,15 +1048,89 @@
       let x = editing.x, z = editing.y;
       if (x == null) { [x, z] = autoPlace(editing.level); x = Math.round(x); z = Math.round(z); }
       data.notes.push({ id: uid(), x, y: z, text, level: editing.level, fuel: editing.fuel, created: now, updated: now });
+      if (editing.fromIdea) data.ideas = data.ideas.filter(i => i.id !== editing.fromIdea);
     }
-    save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
+    save(); syncNoteEls(); closeSheets(); refreshTab();
   });
   $('noteCancel').addEventListener('click', closeSheets);
   $('noteDelete').addEventListener('click', () => {
     if (!confirm('Delete this entry?')) return;
     data.notes = data.notes.filter(n => n.id !== editing.id);
-    save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
+    save(); syncNoteEls(); closeSheets(); refreshTab();
   });
+
+  // ---------- Brainstorm ----------
+  let ideaEditing = null;
+  const ideaText = $('ideaText');
+  function setIdeaLevel(k) { ideaEditing.level = k; [...$('ideaLevelSeg').children].forEach(b => b.classList.toggle('on', b.dataset.level === k)); }
+  $('ideaLevelSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setIdeaLevel(b.dataset.level); });
+  function openIdea(id) {
+    const i = data.ideas.find(i => i.id === id); if (!i) return;
+    ideaEditing = { id, level: i.level };
+    ideaText.value = i.text; setIdeaLevel(i.level);
+    show('ideaSheet');
+  }
+  $('ideaSave').addEventListener('click', () => {
+    const text = ideaText.value.trim(); if (!text) { ideaText.focus(); return; }
+    const i = data.ideas.find(i => i.id === ideaEditing.id); if (i) Object.assign(i, { text, level: ideaEditing.level, updated: Date.now() });
+    save(); closeSheets(); renderBrainstorm();
+  });
+  $('ideaCancel').addEventListener('click', closeSheets);
+  $('ideaDelete').addEventListener('click', () => {
+    if (!confirm('Delete this idea?')) return;
+    data.ideas = data.ideas.filter(i => i.id !== ideaEditing.id); save(); closeSheets(); renderBrainstorm();
+  });
+  $('ideaToMap').addEventListener('click', () => {
+    const i = data.ideas.find(i => i.id === ideaEditing.id); if (!i) return;
+    const text = ideaText.value.trim() || i.text;
+    closeSheets();
+    openNoteBlank(ideaEditing.level, text, i.id, i.fuel);
+  });
+  function addIdea(level, text) {
+    text = text.trim(); if (!text) return;
+    data.ideas.push({ id: uid(), level, text, fuel: '', created: Date.now() });
+    save(); renderBrainstorm();
+  }
+  function renderBrainstorm() {
+    const box = $('brainScroll');
+    const drafts = {}; box.querySelectorAll('.quick input').forEach(inp => { if (inp.value) drafts[inp.dataset.level] = inp.value; });
+    const focusLevel = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.level : null;
+    box.innerHTML = '';
+    const head = document.createElement('div'); head.className = 'jhead';
+    head.innerHTML = `<div><h1>Brainstorm</h1><p>Rough ideas for every part of the landscape. Nothing here is on the map yet.</p></div><span class="count">${data.ideas.length ? data.ideas.length + (data.ideas.length === 1 ? ' idea' : ' ideas') : ''}</span>`;
+    box.appendChild(head);
+    const hints = { past: 'An idea about the mountain…', belief: 'An idea about a stream…', state: 'An idea about the river…', behavior: 'An idea about the sea…' };
+    for (const k of ['past', 'belief', 'state', 'behavior']) {
+      const L = LEVELS[k];
+      const ideas = data.ideas.filter(i => i.level === k).sort((a, b) => b.created - a.created);
+      const sec = document.createElement('section'); sec.className = 'jsec';
+      sec.innerHTML = `<h2>${L.n}. ${L.where} <small>${L.name}${ideas.length ? ' · ' + ideas.length : ''}</small></h2><div class="rule"></div>`;
+      ideas.forEach(i => {
+        const row = document.createElement('div'); row.className = 'idea';
+        const mark = document.createElement('span'); mark.className = 'mark';
+        const body = document.createElement('button'); body.className = 'body';
+        const t = document.createElement('div'); t.className = 't'; t.textContent = i.text;
+        const m = document.createElement('div'); m.className = 'm';
+        const when = document.createElement('span'); when.textContent = fmtDate(i.created); m.appendChild(when);
+        const toMap = document.createElement('button'); toMap.className = 'act'; toMap.textContent = 'Move to map';
+        toMap.addEventListener('click', ev => { ev.stopPropagation(); openNoteBlank(i.level, i.text, i.id, i.fuel); });
+        m.appendChild(toMap);
+        body.appendChild(t); body.appendChild(m);
+        body.addEventListener('click', () => openIdea(i.id));
+        row.appendChild(mark); row.appendChild(body); sec.appendChild(row);
+      });
+      const q = document.createElement('div'); q.className = 'quick';
+      const inp = document.createElement('input'); inp.type = 'text'; inp.placeholder = hints[k]; inp.dataset.level = k; inp.autocomplete = 'off'; inp.enterKeyHint = 'done';
+      if (drafts[k]) inp.value = drafts[k];
+      const add = document.createElement('button'); add.textContent = 'Add';
+      const commit = () => { const v = inp.value; if (v.trim()) { inp.value = ''; addIdea(k, v); } };
+      add.addEventListener('click', commit);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+      q.appendChild(inp); q.appendChild(add); sec.appendChild(q);
+      box.appendChild(sec);
+      if (focusLevel === k) setTimeout(() => inp.focus(), 0);
+    }
+  }
 
   // ---------- Buttons ----------
   $('btnFit').addEventListener('click', () => { placing = false; setHint(); fitHome(); hideBubble(); });
@@ -1007,7 +1148,7 @@
     box.appendChild(head);
     if (!data.notes.length) {
       const e = document.createElement('div'); e.className = 'jempty';
-      e.textContent = 'Nothing here yet. Everything you write on the map appears here, organized by level. Hold a spot on the map, or tap + Write.';
+      e.textContent = 'Nothing here yet. Everything you write on the map appears here, organized by level. Hold a spot on the map, or tap + Write. Rough ideas live in Brainstorm.';
       box.appendChild(e); return;
     }
     for (const k of ['past', 'belief', 'state', 'behavior']) {
@@ -1026,6 +1167,9 @@
         const find = document.createElement('button'); find.className = 'find'; find.textContent = 'Find on map';
         find.addEventListener('click', ev => { ev.stopPropagation(); setTab('map'); flyTo({ tx: n.x, tz: n.y, dist: Math.min(cam.dist, 650) }, 700); const el = noteEls.get(n.id); if (el) { el.classList.add('lit'); setTimeout(() => { el.classList.remove('lit'); requestRender(); }, 2400); } });
         m.appendChild(find);
+        const demote = document.createElement('button'); demote.className = 'act soft'; demote.textContent = 'Move to Brainstorm';
+        demote.addEventListener('click', ev => { ev.stopPropagation(); if (confirm('Take this off the map and keep it as an idea in Brainstorm?')) entryToBrainstorm(n.id); });
+        m.appendChild(demote);
         body.appendChild(t); body.appendChild(m);
         body.addEventListener('click', () => openNote(n.id));
         row.appendChild(dot); row.appendChild(body); sec.appendChild(row);
@@ -1068,15 +1212,15 @@
       try {
         const d = JSON.parse(r.result); if (!d || !Array.isArray(d.notes)) throw 0;
         if (!confirm(`Restore ${d.notes.length} entries? This replaces what is here now.`)) return;
-        data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [] };
-        save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
+        data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [], ideas: Array.isArray(d.ideas) ? d.ideas : [] };
+        save(); syncNoteEls(); closeSheets(); refreshTab();
       } catch (_) { alert('That file is not a Journey to Clean Fuel backup.'); }
     };
     r.readAsText(f); e.target.value = '';
   });
   $('menuReset').addEventListener('click', () => {
-    if (!confirm('Clear every entry? Back up first if you want to keep them.')) return;
-    data = { notes: [], signs: [] }; save(); syncNoteEls(); closeSheets(); if (tab === 'journal') renderJournal();
+    if (!confirm('Clear every entry and idea? Back up first if you want to keep them.')) return;
+    data = { notes: [], signs: [], ideas: [] }; save(); syncNoteEls(); closeSheets(); refreshTab();
   });
 
   // ---------- Boot ----------
