@@ -190,6 +190,60 @@
   .quick input:focus { border-style: solid; border-color: var(--red); }
   .quick button { height: 38px; padding: 0 14px; border-radius: 19px; background: var(--ink); color: var(--paper); font-family: var(--serif); font-style: italic; font-size: 16px; flex: 0 0 auto; }
   .sheet .actions .pill.alt { background: var(--sea); }
+
+  /* ---------- Chat ---------- */
+  #chat { position: absolute; inset: 0; z-index: 3; background: var(--paper); display: none; flex-direction: column; }
+  #chat.on { display: flex; }
+  #chat .scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: calc(var(--safe-top) + 84px) 16px 190px; }
+  .chead { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; }
+  .chead h1 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 30px; margin: 0; }
+  .chead p { margin: 2px 0 0; color: var(--ink-soft); font-size: 13px; }
+  .chead .btns { display: flex; gap: 6px; }
+  .chead .btns button { height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--ink); }
+  .msg { margin: 0 0 14px; display: flex; }
+  .msg.user { justify-content: flex-end; }
+  .msg .bub { max-width: 86%; font-size: 16px; line-height: 1.45; }
+  .msg.user .bub { background: var(--ink); color: var(--paper); border-radius: 18px 18px 4px 18px; padding: 10px 14px; font-family: var(--serif); font-style: italic; font-size: 17px; white-space: pre-wrap; word-wrap: break-word; }
+  .msg.assistant .bub { font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.4; color: var(--ink); padding: 4px 0 4px 14px; border-left: 1.5px solid var(--red); word-wrap: break-word; }
+  .msg.assistant .bub p { margin: 0 0 10px; }
+  .msg.assistant .bub p:last-child { margin-bottom: 0; }
+  .msg.assistant .bub ul { margin: 0 0 10px; padding-left: 18px; }
+  .msg.assistant .bub b { font-weight: 600; }
+  .msg.assistant .bub .cursor { display: inline-block; width: 8px; height: 16px; background: var(--red); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { to { opacity: 0; } }
+  .msg .sys { color: var(--red); font-size: 13px; font-family: var(--ui); padding: 6px 0 0 14px; }
+  .ecard { margin: 10px 0 4px; border: 1px dashed var(--ink-soft); border-radius: 12px; padding: 10px 12px; background: #fff; font-style: normal; }
+  .ecard .et { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.3; }
+  .ecard .em { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font: 11px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+  .ecard .em button { height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid var(--ink); background: var(--card); font-family: var(--serif); font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+  .ecard .em button.done { border-color: var(--line); color: var(--ink-soft); background: transparent; }
+  .starters { display: flex; flex-direction: column; gap: 8px; margin: 18px 0; }
+  .starters button { text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; background: var(--card); font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); line-height: 1.3; }
+  .starters button:active { background: var(--sea); }
+  .setup { border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; margin: 10px 0 16px; background: var(--card); font-size: 14.5px; line-height: 1.45; }
+  .setup h3 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 20px; margin: 0 0 6px; }
+  .setup ol { margin: 6px 0 10px; padding-left: 20px; }
+  .setup li { margin: 0 0 4px; }
+  .setup .pill { height: 40px; }
+  .composer { display: flex; gap: 8px; align-items: flex-end; width: 100%; padding: 0 12px; }
+  .composer textarea {
+    flex: 1; min-height: 44px; max-height: 140px; border: 1px solid var(--ink); border-radius: 22px; background: #fff;
+    padding: 11px 16px; font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.3; outline: none; resize: none;
+  }
+  .composer textarea:focus { border-color: var(--red); }
+  .composer button { width: 44px; height: 44px; border-radius: 22px; background: var(--ink); color: var(--paper); flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+  .composer button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .composer button.stop { background: var(--red); }
+  .composer button:disabled { opacity: .4; }
+  .bottom.chatmode { bottom: var(--kb, 0px); }
+  .sheet input[type=password], .sheet input[type=text], .sheet select {
+    width: 100%; border: 1px solid var(--ink); border-radius: 12px; background: #fff; padding: 10px 12px; font-size: 16px; outline: none; -webkit-appearance: none;
+  }
+  .sheet input:focus { border-color: var(--red); }
+  .sheet textarea.plain { font-family: var(--ui); font-style: normal; font-size: 15px; min-height: 90px; }
+  .sheet .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; font-size: 15px; }
+  .sheet .toggle input { width: 22px; height: 22px; accent-color: var(--teal); }
+  .sheet .note { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; margin: 4px 0 0; }
   .sheet .actions.two { margin-top: 8px; }
 
   /* ---------- Sheets ---------- */
@@ -262,6 +316,10 @@
   <div class="scroll" id="brainScroll"></div>
 </div>
 
+<div id="chat">
+  <div class="scroll" id="chatScroll"></div>
+</div>
+
 <div class="top">
   <div class="title">Journey to Clean Fuel<small>Water flows downhill</small></div>
   <div class="right">
@@ -288,6 +346,12 @@
   <div id="journalUI" class="hide" style="display:contents">
     <div class="row"><button class="pill wide primary" id="btnAddJournal">+ Write</button></div>
   </div>
+  <div id="chatUI" class="hide" style="display:contents">
+    <div class="composer">
+      <textarea id="chatInput" rows="1" placeholder="What is going on for you?" enterkeyhint="send"></textarea>
+      <button id="chatSend" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    </div>
+  </div>
   <div class="tabs">
     <button id="tabMap" class="on">
       <svg viewBox="0 0 24 24"><path d="M3 18 L9 5 L13 12 L15.5 9 L21 18 Z"/><path d="M3 21h18"/></svg>
@@ -300,6 +364,10 @@
     <button id="tabBrain">
       <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.3 1.1 2.2h5c.1-.9.5-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
       Brainstorm
+    </button>
+    <button id="tabChat">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+      Chat
     </button>
   </div>
 </div>
@@ -378,7 +446,31 @@
   <p><b>Map:</b> drag with one finger to turn the landscape, pinch to zoom, drag with two fingers to slide it. Hold a spot to write there. Tap an entry to edit it. Tap 1, 2, 3, 4 to fly to each level.</p>
   <p><b>Journal:</b> everything you write on the map, as one organized list by level. Tap an entry to edit it, or <i>Find on map</i> to fly to it.</p>
   <p><b>Brainstorm:</b> a scratch space for rough ideas about all four parts: mountain, streams, river, sea. Nothing there is on the map. Move an idea to the map when it feels true, or move a map entry back to Brainstorm when you are not sure about it yet.</p>
-  <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all. Your entries always stay on the phone.</p>
+  <p><b>Chat:</b> a guide who knows the whole training and, if you allow it, what you have written on the map. Talk through what is going on and it will help you trace it upstream, sit with it, and find the belief underneath. It runs on Claude with your own API key, so it needs a connection.</p>
+  <p><b>Offline:</b> open the app once with a connection and it is saved to your phone. After that everything except Chat works with no WiFi at all. Your entries always stay on the phone.</p>
+</div>
+
+<!-- Chat settings -->
+<div class="sheet" id="chatSettingsSheet">
+  <h2>Chat settings</h2>
+  <p class="sub">The guide runs on Claude, using your own API key. Messages go from your phone straight to Anthropic. Nothing else is involved.</p>
+  <div class="seglabel">Anthropic API key</div>
+  <input type="password" id="csKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <p class="note">Stored only on this phone, never in backups. Get one at console.anthropic.com → API keys. Usage is billed to your Anthropic account.</p>
+  <div class="seglabel">Model</div>
+  <select id="csModel">
+    <option value="claude-opus-5-5">Claude Opus 5.5 (recommended)</option>
+    <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (faster, cheaper)</option>
+    <option value="claude-haiku-5-5">Claude Haiku 5.5 (cheapest)</option>
+  </select>
+  <label class="toggle"><span>Let the guide read my map, journal and brainstorm<br><small class="note">So it can connect what you have already written.</small></span><input type="checkbox" id="csShare" checked></label>
+  <div class="seglabel">Extra teachings (optional)</div>
+  <textarea id="csTeach" class="plain" placeholder="Paste captions or quotes from @diewithoutregretss, or anything else you want the guide to draw on."></textarea>
+  <p class="note">The guide already knows the full Dirty Fuel to Clean Fuel training. Whatever you paste here is added to that.</p>
+  <div class="actions">
+    <button class="pill" id="csCancel">Cancel</button>
+    <button class="pill primary" id="csSave">Save</button>
+  </div>
 </div>
 
 <!-- Menu -->
@@ -456,8 +548,8 @@
   // ---------- State ----------
   let data = load();
   function load() {
-    try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && Array.isArray(d.notes)) { if (!Array.isArray(d.ideas)) d.ideas = []; return d; } } catch (e) {}
-    return { notes: [], signs: [], ideas: [] };
+    try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d && Array.isArray(d.notes)) { if (!Array.isArray(d.ideas)) d.ideas = []; if (!Array.isArray(d.chat)) d.chat = []; return d; } } catch (e) {}
+    return { notes: [], signs: [], ideas: [], chat: [] };
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -950,13 +1042,16 @@
     tab = t;
     $('journal').classList.toggle('on', t === 'journal');
     $('brainstorm').classList.toggle('on', t === 'brainstorm');
-    $('tabMap').classList.toggle('on', t === 'map'); $('tabJournal').classList.toggle('on', t === 'journal'); $('tabBrain').classList.toggle('on', t === 'brainstorm');
-    $('mapUI').classList.toggle('hide', t !== 'map'); $('journalUI').classList.toggle('hide', t !== 'journal');
+    $('chat').classList.toggle('on', t === 'chat');
+    $('tabMap').classList.toggle('on', t === 'map'); $('tabJournal').classList.toggle('on', t === 'journal'); $('tabBrain').classList.toggle('on', t === 'brainstorm'); $('tabChat').classList.toggle('on', t === 'chat');
+    $('mapUI').classList.toggle('hide', t !== 'map'); $('journalUI').classList.toggle('hide', t !== 'journal'); $('chatUI').classList.toggle('hide', t !== 'chat');
+    document.querySelector('.bottom').classList.toggle('chatmode', t === 'chat');
     $('btnFit').classList.toggle('hide', t !== 'map');
     refreshTab(); if (t === 'map') requestRender();
     hideBubble();
   }
-  function refreshTab() { if (tab === 'journal') renderJournal(); else if (tab === 'brainstorm') renderBrainstorm(); }
+  function refreshTab() { if (tab === 'journal') renderJournal(); else if (tab === 'brainstorm') renderBrainstorm(); else if (tab === 'chat') renderChat(); }
+  $('tabChat').addEventListener('click', () => setTab('chat'));
   $('tabMap').addEventListener('click', () => setTab('map'));
   $('tabJournal').addEventListener('click', () => setTab('journal'));
   $('tabBrain').addEventListener('click', () => setTab('brainstorm'));
@@ -1178,6 +1273,227 @@
     }
   }
 
+  // ---------- Chat: the guide ----------
+  const CS_KEY = 'journey-chat-settings-v1';
+  let cs = { key: '', model: 'claude-opus-5-5', share: true, teach: '' };
+  try { Object.assign(cs, JSON.parse(localStorage.getItem(CS_KEY) || '{}')); } catch (e) {}
+  function saveCs() { try { localStorage.setItem(CS_KEY, JSON.stringify(cs)); } catch (e) {} }
+
+  const GUIDE_SYSTEM = `You are the guide inside "Journey to Clean Fuel", a private iPhone journaling app. The person talking to you is a high achiever using the app to uncover their dirty fuel and move toward clean fuel. You are warm, direct, unhurried and plain-spoken, like a good coach talking to a friend over coffee. No hype, no therapy jargon, no lectures. You are not Jude Fredman and never claim to be him; you teach his method faithfully and credit it as his when relevant.
+
+THE TEACHING (from Jude Fredman's training "Dirty Fuel to Clean Fuel", and his Instagram @diewithoutregretss, where he is a coach and founder who helps people change subconscious blocks and talks about living so you die without regrets):
+
+Dirty fuel is motivation that comes from fear, shame, proving, approval, control, or not feeling enough. It works: it builds businesses, grows audiences, wins titles. That is why it is hard to spot. But it comes with a price, and most high achievers reach a crossroads: keep paying it, or cash in for something cleaner and, paradoxically, more powerful. Clean fuel is the same ambition, the same high standards, the same capacity for work, just different water: love, curiosity, purpose, service, enough-ness. Clean fuel is not a better behavior or a good mood you adopt on Monday. It is what the river and sea look like when different streams feed them.
+
+Six common signs of dirty fuel: 1) your emotional state is dictated by external results, your mood graph matches your work graph; 2) you cannot psychologically switch off, the laptop is shut but up here you are still at work; 3) you self-sabotage through productive procrastination, the important thing slides while you do other productive things; 4) achievement never creates lasting satisfaction, the goalposts move, the win feels good for about four minutes; 5) other people's success makes something in you tighten; 6) an underlying sense of emptiness despite the success. The score is not the point. One sign hitting hard can matter more than four hitting slightly. Ask: am I running on dirty fuel? Notice the first answer.
+
+The four levels of change are one landscape, and water flows downhill. Level 1, the mountain: past experiences, as they live in you now. Childhood is the highest ground because the shape of the mountain decides where all the water runs. Level 2, the streams: beliefs. Rain hits the top and finds routes through the rock; not one stream, dozens. A belief is a conclusion a child's mind drew from something that happened: who I am, what I am worth, what is safe, what I must do to deserve love, respect, belonging, approval, security. The mountain is what happened; the streams are what you concluded it meant. Level 3, the river: state. The streams converge into one body of water, your day to day mood, thoughts, emotions, the felt experience of being you. Beliefs shape the meaning your brain gives to events, so dozens of beliefs pour into one current; you are not standing in a stream, you are standing in a river. Level 4, the sea: behavior. Actions, avoidances, habits, the things you do and the things you can never quite make yourself do. It is the level almost everyone tries to fix.
+
+Most people work at levels 3 and 4: discipline, willpower, systems, routines, accountability at the sea; breathwork, meditation, journaling, cold plunges, much therapy at the river. None of it is wrong, but if the belief upstream has not changed, the same water keeps arriving. That is why January's routine is gone by April and a great week is back to normal by Tuesday. You are standing by the sea with a bucket while water keeps coming down the mountain. Deeper change happens upstream at levels 1 and 2.
+
+Important distinction: the mountain is not literally what happened. What happened is over. The mountain is your internal experience of what happened as it lives in you now. Something objectively happened, and the meaning a child attached to it may not be objectively true. "Dad was distant" became "Dad doesn't love me" became "I'm not worthy of love". "I was bullied" became "there is something wrong with me" became "I need to be impressive to be accepted". "My parents worried about money" became "we are not safe" became "I need to stay in control to be safe". The facts are facts. The meanings were made by a child doing their best with a child's understanding. Change the meaning and the stream can run differently.
+
+Why a child picks the painful meaning: a child's brain has one job after pain, work out how to stop it happening again, and it needs an explanation to build a strategy. "The world is unpredictable and this had nothing to do with me" may be truer but a child can do nothing with it, so "it must be me" is strangely safer, because if I am the problem I can become the solution: more impressive, more useful, more in control, needing no one. The strategy works for a while and can build an extraordinarily capable adult. A strategy that once created safety can later become a prison.
+
+Dirty fuel at each level: at the sea it is what it makes you do (working when you do not need to, micromanaging, not taking the holiday or answering emails through it, setting the next target the week you hit the last one, productive procrastination). At the river it is how it feels (mood rising and falling with results, the flinch when someone wins, the achievement that felt good for four minutes, the sense that something is missing). At the streams it is what you believe, often subconsciously ("I'm not worthy unless I'm achieving", "my value is what I produce", "being impressive is safer than being me", "if I stop it all falls apart", "if I'm not in control I'm not safe", "love is something I earn"). At the mountain it is the meaning attached to past experiences: being compared to a sibling, criticized at exactly the wrong moment, achievement being what got you noticed, a parent emotionally hard to reach, having to become reliable when things felt unstable, or simply learning in a loving home which kind of person got the most safety, praise or connection. Size of the event matters less than what it came to mean. Because of all this, dirty fuel is not a conscious choice and you cannot just decide to be motivated by love; that is asking the river to choose different water. The six signs travel together because they are downstream expressions of the same handful of beliefs.
+
+The self-awareness trap: awareness is essential and, on its own, useless. It is an X-ray. You need it to see what is broken, but expecting the X-ray to heal the bone is insane. Some of the most self-aware people are the most miserable. At some point you stop studying the X-ray and treat the bone. Understanding, talking about it, and arguing with the belief intellectually are not enough.
+
+How beliefs actually change (memory reconsolidation, explained simply): when an old emotional learning is brought back online (reactivation) and, while active, meets an experience that does not fit what it predicts (a mismatch, a prediction error), the old learning becomes temporarily open to updating before it stabilizes again. Not an affirmation, not a thought placed on top, a felt experience the old rule cannot explain. In landscape terms, the old stream runs again and for a while the rock around it becomes changeable.
+
+The three step method, trace, surrender, replace: TRACE starts where you actually experience it, the river: the anxiety, pressure, shame, the inability to switch off, the need to control. Follow the feeling upstream to the belief feeding it, then further to the experience where that belief first made sense. You do not need to already know the memory or the belief; you bring the pattern and work backwards, and the gap between what you know and what you feel is the trail. SURRENDER is the part people do not expect: instead of arguing with the feeling, fixing it, or reassuring yourself with achievements, stop fighting it. Let the old learning become active and let the emotion that was never fully processed move through the body: where it lives, the tightness, pressure, heaviness, fear, sadness. You cannot change what you cannot accept; what you resist persists. REPLACE works on two levels: first the meaning of the specific moment (getting the answer wrong did not mean everyone saw a fraud; dad being away did not mean she did not matter; not knowing what would happen did not mean danger), then the broader rule that grew from it. The replacement must be unconditional, not "I'm an incredible CEO" (still conditional, still has to be kept up) but "I am always enough, exactly as I am", "I can let people see me fully, what I know and what I don't, and I am still worthy of respect", "I matter whether or not anyone is paying attention", "I am safe even when I am not in control", "my safety comes from trusting myself, not controlling everything". Then TEST: does the same trigger still create the same reaction, does the old belief still feel as true, does the new one feel emotionally real, does behavior downstream change without force.
+
+Three examples to draw on: Daniel, a tech CEO hijacked for weeks by one paragraph in a profile; underneath, "I'm not good enough" and "people think I'm more capable than I am and will find out"; the mountain was a classroom at nine, guessing wrong in front of the class, the teacher saying "I'm surprised you didn't know that"; afterwards criticism still registered but stopped hijacking him and he led better than ever. Maya, a creator whose mood lived and died by engagement; underneath, "if people aren't paying attention to me I don't matter"; the mountain was a happy memory, her third birthday with her military dad fully present, precious because it was rare; afterwards a post flopped and she said "huh, that didn't land" and went for lunch, and her work grew faster. Tom, a business owner who could not delegate; underneath, "if I'm not in control I'm not safe"; the mountain was a cross-country move at ten; afterwards his team made decisions, he stopped checking his phone through dinner, and revenue doubled. Jude's own mountain: bullied at ten, concluding "I'm not worthy of respect" and "being impressive is safer than being me", burning out six years into his agency with all six signs, finding in a hypnotherapy session that there was nothing wrong with that ten-year-old, and over time doing the work stream by stream.
+
+HOW YOU WORK IN THIS APP:
+- The person is on a phone. Keep replies short: usually two to six sentences, and one question at a time. Never a wall of text. Never numbered lectures unless they ask for the full picture.
+- Lead with reflection, then one good question. Follow the feeling upstream: what is the water today (river), what does it say about you (stream), when did that first feel true (mountain). When something tender comes up, slow down and invite surrender before any reframing: where is it in the body, can it be here for a moment, what did the younger you need. Only move to replace when the old meaning has been felt, and make the replacement unconditional.
+- You are a guide, not a hypnotherapist or a therapist. Do not run hypnosis scripts. If someone describes crisis, self-harm, abuse happening now, or feeling unsafe, respond with care and point them to local emergency services or a crisis line, and encourage real human support.
+- Be honest when the method has limits: deep subconscious work is hard to do alone, and that is not a failure.
+- If the person's map, journal and brainstorm are provided in the context, use them: notice connections between entries across levels, name the stream that several entries share, and refer to their own words. Do not list all their entries back to them.
+- When you and the person land on something worth keeping, offer it as an entry card so they can put it on their landscape. Write it on its own line exactly in this form: [[entry|LEVEL|FUEL|TEXT]] where LEVEL is one of past, belief, state, behavior; FUEL is dirty, clean, or blank; TEXT is a short first-person line in their words (under 140 characters). Offer at most two cards per reply, and only when something has actually surfaced. Never put a card in your first reply of a conversation.
+- Plain text only. No markdown headings, no tables. You may use a short dash list when listing the six signs or similar. Use the person's language and keep the landscape imagery alive: mountain, streams, river, sea, water flows downhill.`;
+
+  function levelName(k) { return LEVELS[k] ? `${LEVELS[k].n}. ${LEVELS[k].where} (${LEVELS[k].name.toLowerCase()})` : k; }
+  function userContext() {
+    if (!cs.share) return 'The person has chosen not to share their entries with you.';
+    const lines = [];
+    const notes = [...data.notes].sort((a, b) => b.created - a.created).slice(0, 60);
+    if (notes.length) {
+      lines.push('WHAT THEY HAVE WRITTEN ON THE LANDSCAPE (newest first):');
+      for (const k of ['past', 'belief', 'state', 'behavior']) {
+        const ns = notes.filter(n => n.level === k); if (!ns.length) continue;
+        lines.push(levelName(k) + ':');
+        ns.forEach(n => lines.push(`- ${n.text}${n.fuel ? ' [' + n.fuel + ' fuel]' : ''} (${new Date(n.created).toLocaleDateString()})`));
+      }
+    } else lines.push('They have not written anything on the landscape yet.');
+    const ideas = [...data.ideas].sort((a, b) => b.created - a.created).slice(0, 40);
+    if (ideas.length) { lines.push('ROUGH IDEAS IN BRAINSTORM (not yet on the map):'); ideas.forEach(i => lines.push(`- (${LEVELS[i.level] ? LEVELS[i.level].where : i.level}) ${i.text}`)); }
+    const ticked = (data.signs || []).map((v, i) => v ? i + 1 : 0).filter(Boolean);
+    if (ticked.length) lines.push('SIX SIGNS THEY TICKED: ' + ticked.join(', '));
+    lines.push('Today is ' + new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) + '.');
+    return lines.join('\n');
+  }
+  function apiMessages() {
+    const out = [];
+    const src = data.chat.slice(-40);
+    for (const m of src) {
+      if (!m.content || !m.content.trim()) continue;
+      if (out.length && out[out.length - 1].role === m.role) out[out.length - 1].content += '\n\n' + m.content;
+      else out.push({ role: m.role, content: m.content });
+    }
+    while (out.length && out[0].role !== 'user') out.shift();
+    return out;
+  }
+  let streaming = null; // AbortController while a reply streams
+  async function askGuide() {
+    const sys = [{ type: 'text', text: GUIDE_SYSTEM + (cs.teach && cs.teach.trim() ? '\n\nEXTRA TEACHINGS THE PERSON ADDED (quotes and captions they collected; draw on them in the same spirit):\n' + cs.teach.trim().slice(0, 12000) : ''), cache_control: { type: 'ephemeral' } },
+                 { type: 'text', text: userContext() }];
+    const body = { model: cs.model, max_tokens: 8000, stream: true, system: sys, messages: apiMessages(), output_config: { effort: 'medium' } };
+    const headers = { 'content-type': 'application/json', 'x-api-key': cs.key, 'anthropic-version': '2026-10-21', 'anthropic-dangerous-direct-browser-access': 'true' };
+    if (cs.model !== 'claude-haiku-5-5') { body.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
+    streaming = new AbortController();
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal: streaming.signal });
+    if (!res.ok) {
+      let msg = res.status + ' ' + res.statusText;
+      try { const j = await res.json(); if (j.error && j.error.message) msg = j.error.message; } catch (e) {}
+      if (res.status === 401) msg = 'That API key was rejected. Check it in Chat settings.';
+      if (res.status === 429) msg = 'Rate limit or credit limit reached on your Anthropic account. Try again in a moment.';
+      throw new Error(msg);
+    }
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '', text = '', stop = null;
+    const last = data.chat[data.chat.length - 1];
+    while (true) {
+      const { value, done } = await reader.read(); if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const parts = buf.split('\n\n'); buf = parts.pop();
+      for (const part of parts) {
+        for (const line of part.split('\n')) {
+          if (!line.startsWith('data:')) continue;
+          let ev; try { ev = JSON.parse(line.slice(5).trim()); } catch (e) { continue; }
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') { text += ev.delta.text; last.content = text; paintStreaming(); }
+          else if (ev.type === 'message_delta' && ev.delta) stop = ev.delta.stop_reason || stop;
+          else if (ev.type === 'error') throw new Error(ev.error && ev.error.message || 'The model returned an error.');
+        }
+      }
+    }
+    if (stop === 'refusal' && !text.trim()) throw new Error('The model declined to answer that one. Try putting it another way.');
+    if (stop === 'max_tokens') text += '\n\n(…I ran out of room there. Say "go on" if you want the rest.)';
+    last.content = text.trim();
+  }
+  async function sendChat(textIn) {
+    const text = (textIn != null ? textIn : $('chatInput').value).trim();
+    if (!text || streaming) return;
+    if (!cs.key) { show('chatSettingsSheet'); return; }
+    $('chatInput').value = ''; autoGrow();
+    data.chat.push({ role: 'user', content: text, t: Date.now() });
+    data.chat.push({ role: 'assistant', content: '', t: Date.now() });
+    save(); renderChat(true); setSending(true);
+    try {
+      if (!navigator.onLine) throw new Error('No connection. Chat needs internet; everything else in the app works offline.');
+      await askGuide();
+    } catch (e) {
+      const last = data.chat[data.chat.length - 1];
+      if (e.name === 'AbortError') { if (!last.content) data.chat.pop(); else last.content += ' …'; }
+      else { if (!last.content) data.chat.pop(); data.chat.push({ role: 'sys', content: e.message || String(e), t: Date.now() }); }
+    }
+    streaming = null; setSending(false); save(); renderChat(true);
+  }
+  function setSending(on) {
+    const b = $('chatSend');
+    b.classList.toggle('stop', on);
+    b.innerHTML = on ? '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  }
+  $('chatSend').addEventListener('click', () => { if (streaming) streaming.abort(); else sendChat(); });
+  const chatInput = $('chatInput');
+  function autoGrow() { chatInput.style.height = 'auto'; chatInput.style.height = Math.min(140, chatInput.scrollHeight) + 'px'; }
+  chatInput.addEventListener('input', autoGrow);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+  chatInput.addEventListener('focus', () => setTimeout(() => scrollChat(true), 350));
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const CARD_RE = /\[\[entry\|([a-z]+)\|([a-z]*)\|([^\]]+)\]\]/g;
+  function renderAssistant(m, idx, live) {
+    const cards = []; let text = m.content.replace(CARD_RE, (all, level, fuel, body) => { cards.push({ level, fuel, text: body.trim() }); return ''; });
+    const paras = text.trim().split(/\n{2,}/).map(p => {
+      const lines = p.split('\n');
+      if (lines.length > 1 && lines.every(l => /^\s*[-•]\s+/.test(l))) return '<ul>' + lines.map(l => '<li>' + inline(l.replace(/^\s*[-•]\s+/, '')) + '</li>').join('') + '</ul>';
+      return '<p>' + inline(p).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+    let html = paras + (live ? '<span class="cursor"></span>' : '');
+    cards.forEach((c, i) => {
+      const L = LEVELS[c.level] || LEVELS.state; const added = (m.added || {})[i];
+      html += `<div class="ecard"><div class="et">${esc(c.text)}</div><div class="em"><span>${L.n}. ${L.where}${c.fuel ? ' · ' + c.fuel + ' fuel' : ''}</span>` +
+        (added ? `<button class="done" disabled>${added === 'map' ? 'On the map' : 'In Brainstorm'}</button>` :
+          `<button data-card="${idx}:${i}:map">Add to map</button><button data-card="${idx}:${i}:brain">Brainstorm</button>`) + '</div></div>';
+    });
+    return html;
+  }
+  function inline(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function cardFromMsg(idx, ci) {
+    const m = data.chat[idx]; let k = 0, found = null;
+    m.content.replace(CARD_RE, (all, level, fuel, body) => { if (k++ === ci) found = { level: LEVELS[level] ? level : 'state', fuel: fuel === 'dirty' || fuel === 'clean' ? fuel : '', text: body.trim() }; return ''; });
+    return found;
+  }
+  $('chatScroll').addEventListener('click', e => {
+    const b = e.target.closest('[data-card]'); if (!b) return;
+    const [idx, ci, where] = b.dataset.card.split(':'); const c = cardFromMsg(+idx, +ci); if (!c) return;
+    const now = Date.now();
+    if (where === 'map') { const [x, z] = autoPlace(c.level); data.notes.push({ id: uid(), x: Math.round(x), y: Math.round(z), text: c.text, level: c.level, fuel: c.fuel, created: now, updated: now }); syncNoteEls(); }
+    else data.ideas.push({ id: uid(), level: c.level, text: c.text, fuel: c.fuel, created: now });
+    const m = data.chat[+idx]; m.added = m.added || {}; m.added[ci] = where; save(); renderChat();
+  });
+  const STARTERS = [
+    'Help me work out what is actually driving me today.',
+    'Take me through the six signs, one at a time.',
+    'Something tightened in my chest today. Help me trace it upstream.',
+    'Look at what I have written so far. What stream do these share?'
+  ];
+  function renderChat(toBottom) {
+    const box = $('chatScroll');
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+    let html = `<div class="chead"><div><h1>Chat</h1><p>A guide through your landscape. Runs on Claude.</p></div><div class="btns"><button id="chatNew">New</button><button id="chatSettings">Settings</button></div></div>`;
+    if (!cs.key) {
+      html += `<div class="setup"><h3>One thing to set up</h3>The guide runs on Claude, using an API key from your own Anthropic account, so your conversations go straight from your phone to Anthropic and nowhere else.<ol><li>On a computer or in Safari, go to <b>console.anthropic.com</b>, sign in, open <b>API keys</b> and create one.</li><li>Copy it and paste it into Settings here.</li></ol>Usage is billed to that account; a long conversation costs cents. <div style="margin-top:10px"><button class="pill primary" id="chatSetup">Open settings</button></div></div>`;
+    }
+    if (!data.chat.length) {
+      html += `<div class="msg assistant"><div class="bub"><p>I know the whole training, and${cs.share ? ' I can see what you have written on your landscape' : ' I will work only from what you tell me here'}. Start wherever it is loudest: a feeling, a behavior you cannot stop, something that happened today. We will follow the water upstream from there.</p></div></div>`;
+      html += '<div class="starters">' + STARTERS.map((s, i) => `<button data-starter="${i}">${esc(s)}</button>`).join('') + '</div>';
+    }
+    data.chat.forEach((m, idx) => {
+      const live = streaming && idx === data.chat.length - 1 && m.role === 'assistant';
+      if (m.role === 'user') html += `<div class="msg user"><div class="bub">${esc(m.content)}</div></div>`;
+      else if (m.role === 'sys') html += `<div class="msg assistant"><div class="sys">${esc(m.content)}</div></div>`;
+      else html += `<div class="msg assistant"><div class="bub" data-idx="${idx}">${renderAssistant(m, idx, live)}</div></div>`;
+    });
+    box.innerHTML = html;
+    $('chatNew').addEventListener('click', () => { if (streaming) streaming.abort(); if (!data.chat.length || confirm('Start a new conversation? The old one is cleared.')) { data.chat = []; save(); renderChat(); } });
+    $('chatSettings').addEventListener('click', openChatSettings);
+    const su = $('chatSetup'); if (su) su.addEventListener('click', openChatSettings);
+    box.querySelectorAll('[data-starter]').forEach(b => b.addEventListener('click', () => sendChat(STARTERS[+b.dataset.starter])));
+    if (!data.chat.length) box.scrollTop = 0; else if (toBottom || nearBottom) scrollChat(toBottom);
+  }
+  function paintStreaming() {
+    const idx = data.chat.length - 1; const el = $('chatScroll').querySelector(`.bub[data-idx="${idx}"]`);
+    if (!el) { renderChat(true); return; }
+    const box = $('chatScroll'); const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 160;
+    el.innerHTML = renderAssistant(data.chat[idx], idx, true);
+    if (nearBottom) scrollChat(false);
+  }
+  function scrollChat(smooth) { const box = $('chatScroll'); box.scrollTo({ top: box.scrollHeight, behavior: smooth ? 'smooth' : 'auto' }); }
+
+  function openChatSettings() {
+    $('csKey').value = cs.key; $('csModel').value = cs.model; $('csShare').checked = !!cs.share; $('csTeach').value = cs.teach || '';
+    show('chatSettingsSheet');
+  }
+  $('csCancel').addEventListener('click', closeSheets);
+  $('csSave').addEventListener('click', () => {
+    cs.key = $('csKey').value.trim(); cs.model = $('csModel').value; cs.share = $('csShare').checked; cs.teach = $('csTeach').value;
+    saveCs(); closeSheets(); if (tab === 'chat') renderChat();
+  });
+  window.addEventListener('online', () => { if (tab === 'chat') renderChat(); });
+
   // Six signs
   function renderSigns() {
     const box = $('signsList'); box.innerHTML = '';
@@ -1212,7 +1528,7 @@
       try {
         const d = JSON.parse(r.result); if (!d || !Array.isArray(d.notes)) throw 0;
         if (!confirm(`Restore ${d.notes.length} entries? This replaces what is here now.`)) return;
-        data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [], ideas: Array.isArray(d.ideas) ? d.ideas : [] };
+        data = { notes: d.notes, signs: Array.isArray(d.signs) ? d.signs : [], ideas: Array.isArray(d.ideas) ? d.ideas : [], chat: Array.isArray(d.chat) ? d.chat : [] };
         save(); syncNoteEls(); closeSheets(); refreshTab();
       } catch (_) { alert('That file is not a Journey to Clean Fuel backup.'); }
     };
@@ -1220,7 +1536,7 @@
   });
   $('menuReset').addEventListener('click', () => {
     if (!confirm('Clear every entry and idea? Back up first if you want to keep them.')) return;
-    data = { notes: [], signs: [], ideas: [] }; save(); syncNoteEls(); closeSheets(); refreshTab();
+    data = { notes: [], signs: [], ideas: [], chat: [] }; save(); syncNoteEls(); closeSheets(); refreshTab();
   });
 
   // ---------- Boot ----------

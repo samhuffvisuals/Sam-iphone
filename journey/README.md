@@ -19,7 +19,7 @@ Open it from the Home Screen icon. The Home Screen app keeps its own storage, se
 
 ## Using it
 
-Three tabs at the bottom: **Map**, **Journal** and **Brainstorm**.
+Four tabs at the bottom: **Map**, **Journal**, **Brainstorm** and **Chat**.
 
 **Map**
 
@@ -42,9 +42,18 @@ Three tabs at the bottom: **Map**, **Journal** and **Brainstorm**.
 - Tap an idea to edit it, change its part of the landscape, or delete it. **Move to map** turns it into an official entry: the sheet opens prefilled, and on Save it is placed on the map and removed from Brainstorm.
 - The other way round: an entry's sheet (from the map or the journal) has **Move to Brainstorm**, and each journal entry has a **Move to Brainstorm** link. The entry comes off the map and the journal and becomes an idea in the same section.
 
+**Chat**
+
+- A guide that knows the whole Dirty Fuel to Clean Fuel training (the four levels, the six signs, why change at the river and the sea does not hold, trace → surrender → replace, the Daniel, Maya and Tom examples) and talks the way a good coach does: short replies, one question at a time, following the feeling upstream.
+- It runs on Claude using **your own Anthropic API key**. Tap **Settings** in the chat, paste a key from console.anthropic.com → API keys, and choose a model (Opus 5.5 recommended). Messages go from your phone straight to Anthropic; the key is stored only on the phone and is never included in backups. Usage is billed to your Anthropic account.
+- With **Let the guide read my map, journal and brainstorm** on (default), the guide sees your entries and ideas and can connect them. Turn it off to keep the chat separate.
+- **Extra teachings**: paste captions or quotes (for example from @diewithoutregretss) and the guide draws on them too.
+- When something surfaces, the guide offers an **entry card**. Tap **Add to map** or **Brainstorm** to keep it.
+- Chat needs a connection. Everything else in the app works offline.
+
 **Menu (⋯)**
 
 - **Six signs check-in** is the quick test from the video. **How this works** explains the landscape.
 - **Back up** saves everything, entries and ideas, to a file. **Restore** loads it back. Entries live only on your phone, so back up now and then.
 
-**Offline**: open the app once with a connection and it is saved to your phone. After that it works with no WiFi at all.
+**Offline**: open the app once with a connection and it is saved to your phone. After that everything except Chat works with no WiFi at all.
