@@ -382,7 +382,7 @@ export function renderList({ animate = false, clearTransforms = false } = {}) {
   for (const c of s.categories) {
     const list = visible.filter((t) => t.catId === c.id);
     // Groceries always shows: it's a running list, with a section for every store.
-    const grocery = isGroceryCat(c) && c.id === s.categories.find(isGroceryCat).id;
+    const grocery = isGroceryCat(c);
     if (!list.length && !grocery) continue;
     list.sort((a, b) => !!done[a.id] - !!done[b.id] || a.order - b.order);
 

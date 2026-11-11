@@ -1231,6 +1231,8 @@ button.cell:active { transform: scale(.88); }
 .store-order button:disabled { opacity: .25; }
 .store-order button:active:not(:disabled) { background: rgba(255, 255, 255, .7); }
 .store-new { margin-top: 12px; }
+.g-linked-cat { margin: 0 4px 10px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+.g-linked-cat b { color: var(--text); }
 
 /* ============ Sheets: menu, pack picker ============ */
 

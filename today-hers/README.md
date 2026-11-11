@@ -40,6 +40,7 @@ Hold a task and let go to get **Duplicate**, **Add steps**, **Edit** and **Delet
 
 - **Add to a store** with the **Add to Costco** row under that store, or pick the store in the add screen. **Add to Groceries** at the top is for things that can come from anywhere (they show under *Any store*).
 - **Several at once:** `milk, eggs, bread` (or a pasted list, one per line) becomes three items. Names like *mac and cheese* stay whole.
+- **Which category is the grocery list:** Groceries, unless she picks another. Open any category (long-press its header, or Settings → Categories) and turn on **Grocery list** to show the stores there instead. Only one category can be the grocery list.
 - **Fold a store away** by tapping its name. The count shows how much is done there.
 - **Reorder & edit stores** (under the list, or in Settings → Grocery stores): move stores up and down with the arrows, rename them, change the emoji, delete one, or add another (Walmart, Aldi, Kroger, Publix, Sprouts and more in one tap, or any name). Deleting a store keeps its items: they move to *Any store*.
 - **Move an item** to another store by tapping it and picking the store.

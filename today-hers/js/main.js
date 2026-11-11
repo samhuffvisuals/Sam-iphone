@@ -1,5 +1,5 @@
 // Entry point: boot, day rollover triggers, and top-level wiring.
-import { store, seed, remember, migrate } from './store.js';
+import { store, seed, remember, migrate, ensureGroceryCat } from './store.js';
 import { rollover } from './rollover.js';
 import { haptic, setHapticsEnabled, installHaptics } from './haptics.js';
 import { toggleTask, deleteTask, reorder, toggleCollapse, carryTasks, dismissCarry, toggleSub, toggleSubsOpen, toggleStoreFold } from './actions.js';
@@ -32,6 +32,7 @@ function boot() {
   rollover(s);
   seed(s, s.day.key);
   migrate(s, s.day.key);
+  ensureGroceryCat(s);
   // First run with suggestions: learn from what's already here.
   if (!Object.keys(s.recent).length) {
     for (const t of s.tasks) remember(s, t.text, t.catId, 0);

@@ -408,6 +408,9 @@ export function openCategory(id, { onSave } = {}) {
       </div>
       <div class="emoji-pick">${EMOJI.map((e) => `<button type="button" data-e="${e}">${e}</button>`).join('')}</div>
       <div class="palette">${PALETTE.map((p) => `<button type="button" class="swatch" data-color="${p.id}" style="--c:${p.hex}" aria-label="${p.id}"></button>`).join('')}</div>
+      <div class="set-group" style="margin-top:18px">
+        <button class="set-row" type="button" data-grocery><span class="label">Grocery list<small>Shows a section for each of your grocery stores</small></span><span class="toggle" role="switch"></span></button>
+      </div>
       <button class="btn" type="button" data-save>${c ? 'Save' : 'Create category'}</button>
       ${c && todayCount ? `
       <h3>Move today's tasks</h3>
@@ -428,6 +431,16 @@ export function openCategory(id, { onSave } = {}) {
   };
   paint();
   if (!c) nameInput.focus({ preventScroll: true });
+
+  // Only one category can be the grocery list; switching this on moves the stores here.
+  let groceryOn = !!c && c.id === s.settings.groceryCatId;
+  const paintGrocery = () => sheet.$('[data-grocery] .toggle').setAttribute('aria-checked', String(groceryOn));
+  paintGrocery();
+  sheet.$('[data-grocery]').addEventListener('click', () => {
+    groceryOn = !groceryOn;
+    haptic('tap');
+    paintGrocery();
+  });
 
   emojiInput.addEventListener('input', () => {
     const g = firstGrapheme(emojiInput.value.trim());
@@ -457,6 +470,12 @@ export function openCategory(id, { onSave } = {}) {
   const save = () => {
     const name = nameInput.value.trim() || 'Untitled';
     const saved = saveCategory({ id: c?.id, name, emoji, color });
+    if (saved) {
+      if (groceryOn) s.settings.groceryCatId = saved.id;
+      else if (s.settings.groceryCatId === saved.id) s.settings.groceryCatId = null;
+      store.save();
+      render({ animate: true });
+    }
     sheet.close();
     if (saved) onSave?.(saved);
   };
@@ -594,7 +613,7 @@ export function openPack(id, { onSave } = {}) {
 
 /* ---------- settings ---------- */
 
-export const APP_VERSION = 'v3.18';
+export const APP_VERSION = 'v3.19';
 
 const toMinutes = (v) => {
   const [h, m] = v.split(':').map(Number);
@@ -634,6 +653,7 @@ export function openSettings() {
       <div class="set-group">
         <button class="set-row" type="button" data-act="stores"><span class="label">Reorder & edit stores<small data-role="storenames"></small></span>${ICON.right}</button>
       </div>
+      <p class="hint" data-role="storehint"></p>
 
       <h3>Categories</h3>
       <div class="set-group" data-role="cats"></div>
@@ -692,6 +712,10 @@ export function openSettings() {
   };
   paintToggles();
   sheet.$('[data-role=storenames]').textContent = s.stores.map((x) => x.name).join(' · ') || 'No stores yet';
+  const gcat = s.categories.find(isGroceryCat);
+  sheet.$('[data-role=storehint]').textContent = gcat
+    ? `Each store is a section in your ${gcat.emoji} ${gcat.name} category.`
+    : 'No category is your grocery list. Open a category and turn on Grocery list to show your stores there.';
   paintCats();
   paintPacks();
 
@@ -1001,7 +1025,8 @@ export function openStores() {
     title: 'Grocery stores',
     className: 'stores-sheet',
     content: `
-      <p class="hint" style="margin:0 4px 12px">Sections in Groceries follow this order. Use the arrows to move a store.</p>
+      <div data-role="link"></div>
+      <p class="hint" style="margin:0 4px 12px">Sections follow this order. Use the arrows to move a store.</p>
       <ul class="store-order" data-role="list"></ul>
       <h3>Add a store</h3>
       <div class="chips" data-role="picks"></div>
@@ -1012,6 +1037,24 @@ export function openStores() {
       <button class="btn" type="button" data-act="done">Done</button>`,
   });
   const color = colorOf(catOf(s.categories.find(isGroceryCat)?.id || 'general').color);
+
+  const paintLink = () => {
+    const gcat = s.categories.find(isGroceryCat);
+    sheet.$('[data-role=link]').innerHTML = gcat
+      ? `<p class="g-linked-cat">Showing in <b>${esc(gcat.emoji)} ${esc(gcat.name)}</b></p>`
+      : `<button type="button" class="btn" data-act="make-cat" style="margin:0 0 14px">Make a 🛒 Groceries category for these</button>`;
+  };
+  paintLink();
+  sheet.body.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-act=make-cat]')) return;
+    const found = s.categories.find((x) => /grocer/i.test(x.name));
+    const cat = found || saveCategory({ name: 'Groceries', emoji: '🛒', color: 'green' });
+    s.settings.groceryCatId = cat.id;
+    store.save();
+    render({ animate: true });
+    haptic('success');
+    paintLink();
+  });
 
   const paint = () => {
     const n = s.stores.length;

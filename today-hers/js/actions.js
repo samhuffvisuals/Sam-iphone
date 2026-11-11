@@ -217,6 +217,7 @@ export function deleteCategory(id) {
   for (const p of s.packs) if (p.catId === id) p.catId = 'general';
   delete s.settings.collapsed[id];
   if (s.settings.lastCat === id) s.settings.lastCat = 'general';
+  if (s.settings.groceryCatId === id) s.settings.groceryCatId = null;
   store.save();
   haptic('tap');
   render({ animate: true });
