@@ -2,7 +2,7 @@
 // Bump VERSION whenever you deploy changed files so phones pick up the update.
 // The name keeps the prefix: other apps share this origin, and only our own old caches get cleared.
 const PREFIX = 'today-hers-';
-const VERSION = PREFIX + 'v4';
+const VERSION = PREFIX + 'v5';
 
 const ASSETS = [
   './',

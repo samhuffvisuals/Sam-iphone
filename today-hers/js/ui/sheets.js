@@ -1,8 +1,8 @@
 // Bottom sheets: quick add, edit task, category editor, settings.
-import { store, PALETTE, MAX_PACKS, suggest, exportData, importData, eraseAll, isGroceryCat } from '../store.js';
+import { store, PALETTE, MAX_PACKS, suggest, exportData, importData, eraseAll, isGroceryCat, STORE_PICKS } from '../store.js';
 import { haptic, setHapticsEnabled, overlayHaptics, stats as hapticStats } from '../haptics.js';
-import { addTask, editTask, deleteTask, saveCategory, deleteCategory, savePack, deletePack, moveGroupTasks, addPack, addSubs, removeSub, duplicateTask } from '../actions.js';
-import { colorOf, catOf, DAY_ORDER, DAY_SHORT, DAY_NAME } from './render.js';
+import { addTask, editTask, deleteTask, saveCategory, deleteCategory, savePack, deletePack, moveGroupTasks, addPack, addSubs, removeSub, duplicateTask, moveStore, addStore, editStore, deleteStore } from '../actions.js';
+import { colorOf, catOf, render, DAY_ORDER, DAY_SHORT, DAY_NAME } from './render.js';
 import { tasksFor } from '../rollover.js';
 import { openHistory } from './history.js';
 import { toast } from './toast.js';
@@ -87,7 +87,7 @@ function dragToDismiss(handle, panel, close) {
 
 function taskControls(init) {
   let sheet = null;
-  const st = { catId: init.catId, type: init.type, days: init.days ? [...init.days] : null };
+  const st = { catId: init.catId, type: init.type, days: init.days ? [...init.days] : null, store: init.store || null };
   const html = `
     <div class="seg" data-role="type">
       <button type="button" data-v="today">Today only</button>
@@ -96,7 +96,8 @@ function taskControls(init) {
     <div class="days-pick" data-role="days">
       ${DAY_ORDER.map((d) => `<button type="button" data-d="${d}" aria-label="${DAY_NAME[d]}">${DAY_SHORT[d]}</button>`).join('')}
     </div>
-    <div class="chips" data-role="chips"></div>`;
+    <div class="chips" data-role="chips"></div>
+    <div class="store-pick" data-role="stores"><h3>Store</h3><div class="chips"></div></div>`;
 
   function paint() {
     sheet.$$('[data-role=type] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === st.type)));
@@ -108,7 +109,20 @@ function taskControls(init) {
     paintChips();
   }
 
+  // Which store, for groceries. "Any store" when it doesn't matter.
+  function paintStores() {
+    const box = sheet.$('[data-role=stores]');
+    const show = isGroceryCat(catOf(st.catId));
+    box.hidden = !show;
+    if (!show) return;
+    const opts = [{ id: null, name: 'Any store', emoji: '🛍️' }, ...store.state.stores];
+    box.querySelector('.chips').innerHTML = opts
+      .map((x) => `<button type="button" class="chip" data-store="${x.id || ''}" style="--c:${colorOf(catOf(st.catId).color)}" aria-pressed="${(x.id || null) === st.store}"><span>${esc(x.emoji)}</span>${esc(x.name)}</button>`)
+      .join('');
+  }
+
   function paintChips() {
+    paintStores();
     const cats = store.state.categories;
     const chips = sheet.$('[data-role=chips]');
     chips.innerHTML =
@@ -145,6 +159,14 @@ function taskControls(init) {
       haptic('tap');
       paint();
     });
+    sheet.$('[data-role=stores]').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-store]');
+      if (!b) return;
+      st.store = b.dataset.store || null;
+      haptic('tap');
+      paintStores();
+      onNewCategory?.refocus?.();
+    });
     sheet.$('[data-role=chips]').addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
@@ -177,7 +199,7 @@ export function openQuickAdd(preset = {}) {
   const want = preset.catId || s.settings.lastCat;
   const catId = s.categories.some((c) => c.id === want) ? want : 'general';
   const type = preset.type || (s.settings.lastType === 'daily' ? 'daily' : 'today');
-  const ctl = taskControls({ catId, type, days: null });
+  const ctl = taskControls({ catId, type, days: null, store: preset.store || null });
   let added = 0;
 
   const sheet = openSheet({
@@ -270,7 +292,7 @@ export function openQuickAdd(preset = {}) {
 export function openEdit(id) {
   const t = store.state.tasks.find((x) => x.id === id);
   if (!t) return;
-  const ctl = taskControls({ catId: t.catId, type: t.type, days: t.days });
+  const ctl = taskControls({ catId: t.catId, type: t.type, days: t.days, store: t.store });
   const sheet = openSheet({
     title: 'Edit task',
     content: `
@@ -572,7 +594,7 @@ export function openPack(id, { onSave } = {}) {
 
 /* ---------- settings ---------- */
 
-export const APP_VERSION = 'v3.17';
+export const APP_VERSION = 'v3.18';
 
 const toMinutes = (v) => {
   const [h, m] = v.split(':').map(Number);
@@ -607,6 +629,11 @@ export function openSettings() {
       <h3>Packs</h3>
       <div class="set-group" data-role="packs"></div>
       <p class="hint">A pack is a set of tasks you add often. On the main screen, tap a pack to pick which of its tasks go on today, and long-press it to edit it.</p>
+
+      <h3>Grocery stores</h3>
+      <div class="set-group">
+        <button class="set-row" type="button" data-act="stores"><span class="label">Reorder & edit stores<small data-role="storenames"></small></span>${ICON.right}</button>
+      </div>
 
       <h3>Categories</h3>
       <div class="set-group" data-role="cats"></div>
@@ -664,6 +691,7 @@ export function openSettings() {
         : `<div class="set-row muted"><span class="label">Maximum of ${MAX_PACKS} packs</span></div>`);
   };
   paintToggles();
+  sheet.$('[data-role=storenames]').textContent = s.stores.map((x) => x.name).join(' · ') || 'No stores yet';
   paintCats();
   paintPacks();
 
@@ -718,6 +746,7 @@ export function openSettings() {
   sheet.body.addEventListener('click', (e) => {
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (act === 'history') openHistory();
+    if (act === 'stores') openStores();
     if (act === 'export') doExport();
     if (act === 'import') fileInput.click();
     if (act === 'refresh') hardRefresh();
@@ -888,10 +917,17 @@ export function openPackPicker(packId) {
   const onList = new Set(tasksFor(s, s.day.key).map((t) => t.text.trim().toLowerCase()));
   const free = p.items.filter((x) => !onList.has(x.toLowerCase()));
   const picked = new Set(free);
+  // A grocery pack can drop its items straight into one store's section.
+  const grocery = isGroceryCat(catOf(p.catId));
+  let storeId = null;
+  const storeChips = () => [{ id: null, name: 'Any store', emoji: '🛍️' }, ...s.stores]
+    .map((x) => `<button type="button" class="chip" data-store="${x.id || ''}" style="--c:${color}" aria-pressed="${(x.id || null) === storeId}"><span>${esc(x.emoji)}</span>${esc(x.name)}</button>`)
+    .join('');
 
   const sheet = openSheet({
     title: `${p.emoji} ${p.name}`,
     content: `
+      ${grocery ? `<h3 style="margin-top:4px">Add to</h3><div class="chips pick-stores" data-role="stores">${storeChips()}</div><h3>Items</h3>` : ''}
       <div class="pick-bar">
         <span data-role="count"></span>
         <button type="button" class="mini" data-act="all">Select all</button>
@@ -925,6 +961,12 @@ export function openPackPicker(packId) {
   paint();
 
   sheet.body.addEventListener('click', (e) => {
+    const stb = e.target.closest('[data-store]');
+    if (stb) {
+      storeId = stb.dataset.store || null;
+      sheet.$('[data-role=stores]').innerHTML = storeChips();
+      return haptic('tap');
+    }
     const item = e.target.closest('[data-item]');
     if (item && !item.disabled) {
       const k = item.dataset.item;
@@ -939,12 +981,110 @@ export function openPackPicker(packId) {
     else if (act === 'none') picked.clear();
     else if (act === 'add') {
       sheet.close();
-      return addPack(packId, [...picked]);
+      return addPack(packId, [...picked], storeId);
     } else if (act === 'edit') {
       sheet.close();
       return openPack(packId);
     }
     haptic('tap');
     paint();
+  });
+}
+
+/* ---------- grocery stores ---------- */
+
+// Her stores in the order their sections show in Groceries: move with the arrows,
+// rename or change the emoji in place, add from a list of chains or by name.
+export function openStores() {
+  const s = store.state;
+  const sheet = openSheet({
+    title: 'Grocery stores',
+    className: 'stores-sheet',
+    content: `
+      <p class="hint" style="margin:0 4px 12px">Sections in Groceries follow this order. Use the arrows to move a store.</p>
+      <ul class="store-order" data-role="list"></ul>
+      <h3>Add a store</h3>
+      <div class="chips" data-role="picks"></div>
+      <form class="add-form store-new" autocomplete="off">
+        <input class="field" type="text" data-role="name" placeholder="Or type a store" maxlength="40" enterkeyhint="done" aria-label="Store name">
+        <button class="add-go" type="submit" aria-label="Add store">${ICON.plus}</button>
+      </form>
+      <button class="btn" type="button" data-act="done">Done</button>`,
+  });
+  const color = colorOf(catOf(s.categories.find(isGroceryCat)?.id || 'general').color);
+
+  const paint = () => {
+    const n = s.stores.length;
+    sheet.$('[data-role=list]').innerHTML = s.stores.length
+      ? s.stores
+          .map((x, i) => {
+            const items = s.tasks.filter((t) => t.store === x.id && t.dayKey === s.day.key).length;
+            return `<li data-id="${x.id}">
+              <input class="st-emoji-in" type="text" value="${esc(x.emoji)}" maxlength="4" aria-label="Emoji for ${esc(x.name)}">
+              <input class="st-name-in" type="text" value="${esc(x.name)}" maxlength="40" aria-label="Store name">
+              <button type="button" data-up ${i ? '' : 'disabled'} aria-label="Move ${esc(x.name)} up">↑</button>
+              <button type="button" data-down ${i < n - 1 ? '' : 'disabled'} aria-label="Move ${esc(x.name)} down">↓</button>
+              <button type="button" data-del aria-label="Delete ${esc(x.name)}${items ? `; its ${items} items move to Any store` : ''}">✕</button></li>`;
+          })
+          .join('')
+      : `<li class="muted">No stores yet. Add one below.</li>`;
+    const have = new Set(s.stores.map((x) => x.name.toLowerCase()));
+    sheet.$('[data-role=picks]').innerHTML = STORE_PICKS.filter((x) => !have.has(x.name.toLowerCase()))
+      .map((x) => `<button type="button" class="chip" data-pick="${esc(x.name)}" style="--c:${color}"><span>${x.emoji}</span>${esc(x.name)}</button>`)
+      .join('');
+  };
+  paint();
+
+  const list = sheet.$('[data-role=list]');
+  list.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-id]');
+    if (!li) return;
+    const id = li.dataset.id;
+    if (e.target.closest('[data-up]')) moveStore(id, -1);
+    else if (e.target.closest('[data-down]')) moveStore(id, 1);
+    else if (e.target.closest('[data-del]')) {
+      const st = { ...s.stores.find((x) => x.id === id), pos: [...list.children].indexOf(li) };
+      deleteStore(id);
+      toast(`Deleted ${st.name}`, {
+        action: 'Undo',
+        onAction() {
+          // Back where it was. Its items stay in Any store.
+          const at = Math.min(st.pos, s.stores.length);
+          s.stores.splice(at, 0, { id: st.id, name: st.name, emoji: st.emoji });
+          store.save();
+          render({ animate: true });
+          paint();
+        },
+      });
+    } else return;
+    paint();
+  });
+  // Renames save as she types; the list behind updates when she's done.
+  list.addEventListener('change', (e) => {
+    const li = e.target.closest('li[data-id]');
+    if (!li) return;
+    editStore(li.dataset.id, { name: li.querySelector('.st-name-in').value, emoji: li.querySelector('.st-emoji-in').value });
+  });
+  sheet.$('[data-role=picks]').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]');
+    if (!b) return;
+    const pick = STORE_PICKS.find((x) => x.name === b.dataset.pick);
+    addStore(pick.name, pick.emoji);
+    paint();
+  });
+  sheet.$('.store-new').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = sheet.$('[data-role=name]');
+    if (addStore(f.value)) {
+      f.value = '';
+      paint();
+    }
+  });
+  sheet.$('[data-act=done]').addEventListener('click', () => {
+    list.querySelectorAll('li[data-id]').forEach((li) =>
+      editStore(li.dataset.id, { name: li.querySelector('.st-name-in').value, emoji: li.querySelector('.st-emoji-in').value })
+    );
+    haptic('tap');
+    sheet.close();
   });
 }

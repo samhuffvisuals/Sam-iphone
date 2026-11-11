@@ -56,9 +56,9 @@ function topOrder(s) {
   return s.tasks.reduce((m, t) => Math.min(m, t.order || 0), 0) - 1;
 }
 
-export function addTask(text, { catId, type, days }) {
+export function addTask(text, { catId, type, days, store: storeId }) {
   const s = store.state;
-  const t = { id: uid(), text, catId, type, order: topOrder(s) };
+  const t = { id: uid(), text, catId, type, order: topOrder(s), store: storeId || null };
   if (type === 'daily') {
     t.days = days && days.length && days.length < 7 ? [...days] : null;
     t.since = s.day.key;
@@ -77,7 +77,7 @@ export function addTask(text, { catId, type, days }) {
 }
 
 // Drops the picked items of a pack onto today (skipping ones already on the list). Returns how many were added.
-export function addPack(packId, picked) {
+export function addPack(packId, picked, storeId = null) {
   const s = store.state;
   const p = s.packs.find((x) => x.id === packId);
   if (!p) return 0;
@@ -88,7 +88,7 @@ export function addPack(packId, picked) {
   let n = 0;
   for (const text of items) {
     if (onList.has(text.toLowerCase())) continue;
-    s.tasks.push({ id: uid(), text, catId: p.catId, type: 'today', order: order++, dayKey: s.day.key });
+    s.tasks.push({ id: uid(), text, catId: p.catId, type: 'today', order: order++, dayKey: s.day.key, store: storeId });
     remember(s, text, p.catId);
     onList.add(text.toLowerCase());
     n++;
@@ -106,13 +106,14 @@ export function addPack(packId, picked) {
   return n;
 }
 
-export function editTask(id, { text, catId, type, days }) {
+export function editTask(id, { text, catId, type, days, store: storeId }) {
   const s = store.state;
   const t = s.tasks.find((x) => x.id === id);
   if (!t) return;
   if (t.text !== text) remember(s, text, catId);
   t.text = text;
   t.catId = catId;
+  if (storeId !== undefined) t.store = storeId;
   if (type === 'daily') {
     if (t.type !== 'daily') t.since = s.day.key;
     t.days = days && days.length && days.length < 7 ? [...days] : null;
@@ -391,4 +392,61 @@ export function duplicateTask(id) {
     },
   });
   return copy;
+}
+
+/* ---------- grocery stores ---------- */
+
+export function toggleStoreFold(key) {
+  const c = store.state.settings.storeCollapsed;
+  if (c[key]) delete c[key];
+  else c[key] = true;
+  store.save();
+  haptic('tap');
+  renderList({ animate: true });
+}
+
+// Moves a store one place up (-1) or down (+1) in the Groceries category.
+export function moveStore(id, dir) {
+  const list = store.state.stores;
+  const i = list.findIndex((x) => x.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  store.save();
+  haptic('tap');
+  renderList({ animate: true });
+}
+
+export function addStore(name, emoji = '🛒') {
+  const s = store.state;
+  const clean = name.trim();
+  if (!clean) return null;
+  const found = s.stores.find((x) => x.name.toLowerCase() === clean.toLowerCase());
+  if (found) return found;
+  const st = { id: uid(), name: clean, emoji: emoji || '🛒' };
+  s.stores.push(st);
+  store.save();
+  haptic('success');
+  renderList({ animate: true });
+  return st;
+}
+
+export function editStore(id, { name, emoji }) {
+  const st = store.state.stores.find((x) => x.id === id);
+  if (!st) return;
+  if (name && name.trim()) st.name = name.trim();
+  if (emoji && emoji.trim()) st.emoji = emoji.trim();
+  store.save();
+  renderList();
+}
+
+// Deleting a store keeps its items: they move to "Any store".
+export function deleteStore(id) {
+  const s = store.state;
+  s.stores = s.stores.filter((x) => x.id !== id);
+  for (const t of s.tasks) if (t.store === id) t.store = null;
+  delete s.settings.storeCollapsed[id];
+  store.save();
+  haptic('tap');
+  renderList({ animate: true });
 }

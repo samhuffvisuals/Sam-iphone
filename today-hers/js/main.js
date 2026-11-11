@@ -2,10 +2,10 @@
 import { store, seed, remember, migrate } from './store.js';
 import { rollover } from './rollover.js';
 import { haptic, setHapticsEnabled, installHaptics } from './haptics.js';
-import { toggleTask, deleteTask, reorder, toggleCollapse, carryTasks, dismissCarry, toggleSub, toggleSubsOpen } from './actions.js';
+import { toggleTask, deleteTask, reorder, toggleCollapse, carryTasks, dismissCarry, toggleSub, toggleSubsOpen, toggleStoreFold } from './actions.js';
 import { render } from './ui/render.js';
 import { initGestures } from './ui/gestures.js';
-import { openQuickAdd, openEdit, openSettings, openCategory, openPack, openPackPicker, openTaskMenu, openAddSteps } from './ui/sheets.js';
+import { openQuickAdd, openEdit, openSettings, openCategory, openPack, openPackPicker, openTaskMenu, openAddSteps, openStores } from './ui/sheets.js';
 import { openHistory } from './ui/history.js';
 import { toast } from './ui/toast.js';
 import { initBuddies } from './ui/buddy.js';
@@ -53,6 +53,19 @@ function boot() {
   });
 
   groups.addEventListener('click', (e) => {
+    // Grocery store sections: fold, add to that store, edit stores.
+    const storeHead = e.target.closest('.store-head');
+    if (storeHead) return toggleStoreFold(storeHead.closest('.store-sec').dataset.store);
+    const storeAdd = e.target.closest('.store-add');
+    if (storeAdd) {
+      haptic('tap');
+      const key = storeAdd.closest('.store-sec').dataset.store;
+      return openQuickAdd({ catId: storeAdd.closest('.group').dataset.cat, type: 'today', store: key === 'any' ? null : key });
+    }
+    if (e.target.closest('.store-edit')) {
+      haptic('tap');
+      return openStores();
+    }
     const subCheck = e.target.closest('.sub-check');
     if (subCheck) return toggleSub(subCheck.closest('.task').dataset.id, subCheck.closest('.sub').dataset.sub);
     const subToggle = e.target.closest('.sub-toggle');

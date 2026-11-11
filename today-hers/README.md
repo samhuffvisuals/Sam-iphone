@@ -1,6 +1,6 @@
 # Today ♡
 
-A pastel daily task list that resets every morning, and a new Pokémon pops up to celebrate every task she finishes. It also has steps under tasks, a Groceries category, and packs she picks from.
+A pastel daily task list that resets every morning, and a new Pokémon pops up to celebrate every task she finishes. It also has steps under tasks, a Groceries category with a section for each store, and packs she picks from.
 
 It is a copy of the [Today](https://github.com/samhuffvisuals/today) app with a softer look and one new feature. Everything else works the same: daily tasks, one-tap packs, swipe to complete or delete, long-press to reorder, the history calendar, and backup and restore. It is a static PWA with no build step, no backend and no accounts. Her tasks are stored only on her phone.
 
@@ -36,11 +36,14 @@ Hold a task and let go to get **Duplicate**, **Add steps**, **Edit** and **Delet
 
 ## Groceries
 
-**Groceries** is a category like General or Home. Grocery items are ordinary tasks there: check them off, swipe, drag, and finished ones clear away overnight.
+**Groceries** is a category like General or Home, with a section for each store: Trader Joe’s, Costco, Target and Whole Foods to start. Grocery items are ordinary tasks: check them off, swipe, drag, and finished ones clear away overnight. The Groceries category always shows, even when the list is empty.
 
-- Add a whole list at once: in Groceries, `milk, eggs, bread` (or a pasted list, one per line) becomes three items. Names like *mac and cheese* stay whole.
-- The **Grocery staples** pack holds things she buys often. Edit it with a long-press.
-- For a store run, a task like *Trader Joe’s* with the items as its steps works well. Steps in Groceries split on commas too.
+- **Add to a store** with the **Add to Costco** row under that store, or pick the store in the add screen. **Add to Groceries** at the top is for things that can come from anywhere (they show under *Any store*).
+- **Several at once:** `milk, eggs, bread` (or a pasted list, one per line) becomes three items. Names like *mac and cheese* stay whole.
+- **Fold a store away** by tapping its name. The count shows how much is done there.
+- **Reorder & edit stores** (under the list, or in Settings → Grocery stores): move stores up and down with the arrows, rename them, change the emoji, delete one, or add another (Walmart, Aldi, Kroger, Publix, Sprouts and more in one tap, or any name). Deleting a store keeps its items: they move to *Any store*.
+- **Move an item** to another store by tapping it and picking the store.
+- The **Grocery staples** pack lets her choose which store its items go to.
 
 ## Packs
 

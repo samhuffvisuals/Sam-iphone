@@ -16,6 +16,24 @@ export const PALETTE = [
   { id: 'pink', hex: '#FFAFD0' },
 ];
 
+// Grocery stores, in the order their sections show in the Groceries category.
+export const STORE_PICKS = [
+  { name: 'Trader Joe’s', emoji: '🌺' },
+  { name: 'Costco', emoji: '📦' },
+  { name: 'Target', emoji: '🎯' },
+  { name: 'Whole Foods', emoji: '🥑' },
+  { name: 'Walmart', emoji: '⭐' },
+  { name: 'Aldi', emoji: '🧺' },
+  { name: 'Kroger', emoji: '🛒' },
+  { name: 'Publix', emoji: '🛒' },
+  { name: 'Safeway', emoji: '🛒' },
+  { name: 'Sprouts', emoji: '🌱' },
+  { name: 'H-E-B', emoji: '🛒' },
+  { name: 'Wegmans', emoji: '🛒' },
+  { name: 'Farmers market', emoji: '🧑‍🌾' },
+];
+const starterStores = () => STORE_PICKS.slice(0, 4).map((x, i) => ({ id: `store${i + 1}`, ...x }));
+
 export const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
 
 function defaults() {
@@ -28,10 +46,12 @@ function defaults() {
       collapsed: {},
       lastCat: 'general',
       lastType: 'today',
+      storeCollapsed: {}, // store sections folded away in Groceries
     },
     categories: [{ id: 'general', name: 'General', emoji: '💖', color: 'pink' }],
+    stores: starterStores(), // { id, name, emoji }, in display order
     // task: { id, text, catId, type: 'daily'|'today', order, days?: number[]|null, since?: dayKey, dayKey?: dayKey,
-    //         subs?: [{ id, text, done }], subsOpen?: boolean }
+    //         subs?: [{ id, text, done }], subsOpen?: boolean, store?: storeId (groceries) }
     tasks: [],
     // pack: { id, name, emoji, catId, items: string[] } — one tap drops every item onto today
     packs: [],
@@ -61,6 +81,13 @@ export function normalize(raw) {
   if (!s.categories.some((c) => c.id === 'general')) s.categories.unshift(d.categories[0]);
   const catIds = new Set(s.categories.map((c) => c.id));
 
+  if (!Array.isArray(s.stores)) s.stores = starterStores();
+  s.stores = s.stores
+    .filter((x) => x && x.id && typeof x.name === 'string' && x.name.trim())
+    .map((x) => ({ id: x.id, name: x.name.trim(), emoji: typeof x.emoji === 'string' && x.emoji ? x.emoji : '🛒' }));
+  const storeIds = new Set(s.stores.map((x) => x.id));
+  if (!s.settings.storeCollapsed || typeof s.settings.storeCollapsed !== 'object') s.settings.storeCollapsed = {};
+
   if (!Array.isArray(s.tasks)) s.tasks = [];
   s.tasks = s.tasks
     .filter((t) => t && t.id && typeof t.text === 'string')
@@ -69,6 +96,7 @@ export function normalize(raw) {
       type: t.type === 'daily' ? 'daily' : 'today',
       catId: catIds.has(t.catId) ? t.catId : 'general',
       order: Number.isFinite(t.order) ? t.order : i,
+      store: typeof t.store === 'string' && storeIds.has(t.store) ? t.store : null,
       subs: Array.isArray(t.subs)
         ? t.subs.filter((x) => x && x.id && typeof x.text === 'string' && x.text.trim()).map((x) => ({ id: x.id, text: x.text.trim(), done: !!x.done }))
         : [],
@@ -173,12 +201,18 @@ export function migrate(state, dayKey) {
     state.packs.push({ id: uid(), name: 'Grocery staples', emoji: '🛒', catId, items: ['Milk', 'Eggs', 'Bread', 'Bananas', 'Coffee', 'Paper towels'] });
   }
   const old = state.groceries;
+  if (old && Array.isArray(old.stores) && old.stores.length) {
+    state.stores = old.stores
+      .filter((x) => x && x.id && typeof x.name === 'string')
+      .map((x) => ({ id: x.id, name: x.name, emoji: x.emoji || '🛒' }));
+  }
+  const storeIds = new Set(state.stores.map((x) => x.id));
   if (old && Array.isArray(old.items)) {
     const onToday = new Set(state.tasks.filter((t) => t.type === 'daily' || t.dayKey === dayKey).map((t) => t.text.trim().toLowerCase()));
     let order = state.tasks.reduce((m, t) => Math.min(m, t.order || 0), 0) - 1;
     for (const it of old.items) {
       if (!it || it.done || typeof it.text !== 'string' || onToday.has(it.text.trim().toLowerCase())) continue;
-      state.tasks.push({ id: uid(), text: it.text.trim(), catId, type: 'today', order: order--, dayKey, subs: [] });
+      state.tasks.push({ id: uid(), text: it.text.trim(), catId, type: 'today', order: order--, dayKey, subs: [], store: storeIds.has(it.store) ? it.store : null });
       onToday.add(it.text.trim().toLowerCase());
     }
   }
