@@ -1,6 +1,6 @@
 # Today ♡
 
-A pastel daily task list that resets every morning, and a new Pokémon pops up to celebrate every task she finishes. It also has steps under tasks, a Groceries category, and packs she picks from.
+A pastel daily task list that resets every morning, and a new Pokémon pops up to celebrate every task she finishes. It also has steps under tasks, a Groceries category with a section for each store, and packs she picks from.
 
 It is a copy of the [Today](https://github.com/samhuffvisuals/today) app with a softer look and one new feature. Everything else works the same: daily tasks, one-tap packs, swipe to complete or delete, long-press to reorder, the history calendar, and backup and restore. It is a static PWA with no build step, no backend and no accounts. Her tasks are stored only on her phone.
 
@@ -16,7 +16,7 @@ Open it from the Home Screen icon before adding tasks. The Home Screen app keeps
 
 - **Pastel look.** A light pink, lavender and mint theme, the rounded Fredoka font, softer cards, and a heart for the days-done counter. The day color moves from pink (nothing done) through peach and butter to mint (all done).
 - **Pokémon friends.** Checking off a task makes a Pokémon spring up in the middle of the screen, hop around in a burst of sparkles and hearts, and say something nice. Every one is new: the app remembers who she has met, shows the cutest ones first, and repeats nobody until all 1,025 have turned up. Taps pass straight through the animation, so she never has to wait for it.
-- **Her own starter list.** Two daily tasks, a Groceries category and four packs (Self care, Clean house, Trip, Grocery staples) to start from. She can change or delete all of them.
+- **Her own starter list.** Two daily tasks, a Groceries category (she can add as many categories as she likes) and four packs (Self care, Clean house, Trip, Grocery staples) to start from. She can change or delete all of them.
 - **Separate data.** It saves under its own key, so it never mixes with the original Today app, even on the same phone.
 
 Turn the Pokémon off or on in **Settings → Feel → Pokémon friends**. The same row shows how many she has met.
@@ -36,11 +36,14 @@ Hold a task and let go to get **Duplicate**, **Add steps**, **Edit** and **Delet
 
 ## Groceries
 
-**Groceries** is a category like General or Home. Grocery items are ordinary tasks there: check them off, swipe, drag, and finished ones clear away overnight.
+**Groceries** is a category like General or Home, with a section for each store: Trader Joe’s, Costco, Target and Whole Foods to start. Grocery items are ordinary tasks: check them off, swipe, drag, and finished ones clear away overnight. The Groceries category always shows, even when the list is empty.
 
-- Add a whole list at once: in Groceries, `milk, eggs, bread` (or a pasted list, one per line) becomes three items. Names like *mac and cheese* stay whole.
-- The **Grocery staples** pack holds things she buys often. Edit it with a long-press.
-- For a store run, a task like *Trader Joe’s* with the items as its steps works well. Steps in Groceries split on commas too.
+- **Add to a store** with the **Add to Costco** row under that store, or pick the store in the add screen. **Add to Groceries** at the top is for things that can come from anywhere (they show under *Any store*).
+- **Several at once:** `milk, eggs, bread` (or a pasted list, one per line) becomes three items. Names like *mac and cheese* stay whole.
+- **Fold a store away** by tapping its name. The count shows how much is done there.
+- **Reorder & edit stores** (under the list, or in Settings → Grocery stores): move stores up and down with the arrows, rename them, change the emoji, delete one, or add another (Walmart, Aldi, Kroger, Publix, Sprouts and more in one tap, or any name). Deleting a store keeps its items: they move to *Any store*.
+- **Move an item** to another store by tapping it and picking the store.
+- The **Grocery staples** pack lets her choose which store its items go to.
 
 ## Packs
 

@@ -1,7 +1,7 @@
 // Renders the header, progress ring and the grouped task list.
 // Elements are keyed and reused so CSS transitions keep running, and moves
 // are animated with FLIP (transforms only).
-import { store, PALETTE } from '../store.js';
+import { store, PALETTE, isGroceryCat } from '../store.js';
 import { tasksFor, stats, daysDone, keyToDate, addDays } from '../rollover.js';
 import { SPRING, reduceMotion } from './effects.js';
 import { ICON, esc } from './icons.js';
@@ -192,8 +192,70 @@ function createGroup(id) {
     <div class="group-body"><div class="group-inner">
       <button class="add-inline" type="button"><span class="ai-plus">${ICON.plus}</span><span class="ai-text"></span></button>
       <ul class="tasks"></ul>
+      <div class="store-secs"></div>
     </div></div>`;
   return g;
+}
+
+/* ---------- grocery store sections ---------- */
+
+const storeSecEls = new Map(); // storeId ('any' for no store) → section element
+
+function createStoreSec(key) {
+  const sec = document.createElement('section');
+  sec.className = 'store-sec';
+  sec.dataset.store = key;
+  sec.innerHTML = `<button class="store-head" type="button"><span class="st-emoji"></span><span class="st-name"></span><span class="st-count"></span>${ICON.chev}</button>
+    <div class="store-body">
+      <ul class="tasks"></ul>
+      <button class="add-inline store-add" type="button"><span class="ai-plus">${ICON.plus}</span><span class="ai-text"></span></button>
+    </div>`;
+  return sec;
+}
+
+// One section per store, in her order, plus "Any store" when something has no store.
+// Empty stores still show, so there's always an "Add to …" row for each.
+function renderStores(g, c, list, place) {
+  const s = store.state;
+  const box = g.querySelector('.store-secs');
+  const secs = s.stores.map((x) => ({ key: x.id, name: x.name, emoji: x.emoji, items: list.filter((t) => t.store === x.id) }));
+  const loose = list.filter((t) => !t.store);
+  if (loose.length) secs.unshift({ key: 'any', name: 'Any store', emoji: '🛍️', items: loose });
+  const seen = new Set();
+  let prev = null;
+  for (const x of secs) {
+    let sec = storeSecEls.get(x.key);
+    if (!sec) {
+      sec = createStoreSec(x.key);
+      storeSecEls.set(x.key, sec);
+    }
+    const folded = !!s.settings.storeCollapsed[x.key];
+    const done = x.items.filter((t) => s.day.done[t.id]).length;
+    sec.querySelector('.st-emoji').textContent = x.emoji;
+    sec.querySelector('.st-name').textContent = x.name;
+    const count = sec.querySelector('.st-count');
+    count.textContent = x.items.length ? `${done}/${x.items.length}` : '';
+    count.classList.toggle('complete', x.items.length > 0 && done === x.items.length);
+    sec.classList.toggle('folded', folded);
+    sec.classList.toggle('no-items', !x.items.length);
+    sec.querySelector('.store-head').setAttribute('aria-expanded', String(!folded));
+    sec.querySelector('.store-body').hidden = folded;
+    sec.querySelector('.ai-text').textContent = `Add to ${x.name}`;
+    placeAfter(box, sec, prev);
+    prev = sec;
+    seen.add(x.key);
+    place(sec.querySelector('.tasks'), x.items);
+  }
+  for (const [k, sec] of storeSecEls) if (!seen.has(k)) { sec.remove(); storeSecEls.delete(k); }
+  // Reorder / rename / add stores
+  let edit = box.querySelector('.store-edit');
+  if (!edit) {
+    edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'store-edit';
+    edit.textContent = 'Reorder & edit stores';
+  }
+  box.appendChild(edit);
 }
 
 function updateGroup(g, c, list) {
@@ -215,7 +277,7 @@ function setCount(g, list) {
   const done = list.filter((t) => store.state.day.done[t.id]).length;
   const el = g.querySelector('.g-count');
   el.textContent = `${done}/${list.length}`;
-  el.classList.toggle('complete', done === list.length);
+  el.classList.toggle('complete', list.length > 0 && done === list.length);
   const pct = list.length ? Math.round((done / list.length) * 100) : 0;
   g.querySelector('.g-bar').style.setProperty('--p', `${pct}%`);
   g.querySelector('.g-bar').classList.toggle('complete', list.length > 0 && done === list.length);
@@ -319,7 +381,9 @@ export function renderList({ animate = false, clearTransforms = false } = {}) {
 
   for (const c of s.categories) {
     const list = visible.filter((t) => t.catId === c.id);
-    if (!list.length) continue;
+    // Groceries always shows: it's a running list, with a section for every store.
+    const grocery = isGroceryCat(c) && c.id === s.categories.find(isGroceryCat).id;
+    if (!list.length && !grocery) continue;
     list.sort((a, b) => !!done[a.id] - !!done[b.id] || a.order - b.order);
 
     let g = groupEls.get(c.id);
@@ -332,18 +396,29 @@ export function renderList({ animate = false, clearTransforms = false } = {}) {
     prevG = g;
     seenG.add(c.id);
 
-    const ul = g.querySelector('.tasks');
-    let prevT = null;
-    for (const t of list) {
-      let li = taskEls.get(t.id);
-      if (!li) {
-        li = createTask(t.id);
-        taskEls.set(t.id, li);
+    const place = (ul, items) => {
+      let prevT = null;
+      for (const t of items) {
+        let li = taskEls.get(t.id);
+        if (!li) {
+          li = createTask(t.id);
+          taskEls.set(t.id, li);
+        }
+        updateTask(li, t, c);
+        placeAfter(ul, li, prevT);
+        prevT = li;
+        seenT.add(t.id);
       }
-      updateTask(li, t, c);
-      placeAfter(ul, li, prevT);
-      prevT = li;
-      seenT.add(t.id);
+    };
+    g.classList.toggle('grocery', grocery);
+    if (grocery) renderStores(g, c, list, place);
+    else {
+      place(g.querySelector('.tasks'), list);
+      const box = g.querySelector('.store-secs');
+      if (box.childElementCount) {
+        box.innerHTML = '';
+        storeSecEls.clear();
+      }
     }
   }
 
