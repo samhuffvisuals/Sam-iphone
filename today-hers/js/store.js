@@ -31,7 +31,8 @@ function defaults() {
       lastType: 'today',
     },
     categories: [{ id: 'general', name: 'General', emoji: '💖', color: 'pink' }],
-    // task: { id, text, catId, type: 'daily'|'today', order, days?: number[]|null, since?: dayKey, dayKey?: dayKey }
+    // task: { id, text, catId, type: 'daily'|'today', order, days?: number[]|null, since?: dayKey, dayKey?: dayKey,
+    //         subs?: [{ id, text, done }], subsOpen?: boolean }
     tasks: [],
     // pack: { id, name, emoji, catId, items: string[] } — one tap drops every item onto today
     packs: [],
@@ -70,6 +71,9 @@ export function normalize(raw) {
       type: t.type === 'daily' ? 'daily' : 'today',
       catId: catIds.has(t.catId) ? t.catId : 'general',
       order: Number.isFinite(t.order) ? t.order : i,
+      subs: Array.isArray(t.subs)
+        ? t.subs.filter((x) => x && x.id && typeof x.text === 'string' && x.text.trim()).map((x) => ({ id: x.id, text: x.text.trim(), done: !!x.done }))
+        : [],
     }));
 
   if (!Array.isArray(s.packs)) s.packs = [];
@@ -150,6 +154,40 @@ export function seed(state, dayKey) {
     state.packs.push({ id: uid(), name: p.name, emoji: p.emoji, catId: catFor[p.cat], items: [...p.items] });
   }
   state.seeded = SEED_VERSION;
+  return true;
+}
+
+/* ---------- one-time updates ---------- */
+
+export const isGroceryCat = (c) => !!c && /grocer/i.test(c.name);
+
+// Adds the Groceries category (and a starter grocery pack) once. Anything left on the
+// old per-store grocery lists moves onto today in that category.
+export function migrate(state, dayKey) {
+  if (state.settings.groceryCat) return false;
+  let cat = state.categories.find(isGroceryCat);
+  if (!cat && state.categories.length < MAX_CATEGORIES) {
+    cat = { id: uid(), name: 'Groceries', emoji: '🛒', color: 'green' };
+    state.categories.push(cat);
+  }
+  const catId = cat ? cat.id : 'general';
+  if (!state.packs.some((p) => same(p.name, 'Grocery staples')) && state.packs.length < MAX_PACKS) {
+    state.packs.push({ id: uid(), name: 'Grocery staples', emoji: '🛒', catId, items: ['Milk', 'Eggs', 'Bread', 'Bananas', 'Coffee', 'Paper towels'] });
+  }
+  const old = state.groceries;
+  if (old && Array.isArray(old.items)) {
+    const onToday = new Set(state.tasks.filter((t) => t.type === 'daily' || t.dayKey === dayKey).map((t) => t.text.trim().toLowerCase()));
+    let order = state.tasks.reduce((m, t) => Math.min(m, t.order || 0), 0) - 1;
+    for (const it of old.items) {
+      if (!it || it.done || typeof it.text !== 'string' || onToday.has(it.text.trim().toLowerCase())) continue;
+      state.tasks.push({ id: uid(), text: it.text.trim(), catId, type: 'today', order: order--, dayKey, subs: [] });
+      onToday.add(it.text.trim().toLowerCase());
+    }
+  }
+  // Store-run tasks pointed at the old lists: they're plain tasks now.
+  for (const t of state.tasks) delete t.grocery;
+  delete state.groceries;
+  state.settings.groceryCat = 1;
   return true;
 }
 
