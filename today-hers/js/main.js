@@ -1,15 +1,14 @@
 // Entry point: boot, day rollover triggers, and top-level wiring.
-import { store, seed, remember } from './store.js';
+import { store, seed, remember, migrate } from './store.js';
 import { rollover } from './rollover.js';
 import { haptic, setHapticsEnabled, installHaptics } from './haptics.js';
-import { toggleTask, deleteTask, reorder, toggleCollapse, carryTasks, dismissCarry, addPack } from './actions.js';
+import { toggleTask, deleteTask, reorder, toggleCollapse, carryTasks, dismissCarry, toggleSub, toggleSubsOpen } from './actions.js';
 import { render } from './ui/render.js';
 import { initGestures } from './ui/gestures.js';
-import { openQuickAdd, openEdit, openSettings, openCategory, openPack } from './ui/sheets.js';
+import { openQuickAdd, openEdit, openSettings, openCategory, openPack, openPackPicker, openTaskMenu, openAddSteps } from './ui/sheets.js';
 import { openHistory } from './ui/history.js';
 import { toast } from './ui/toast.js';
 import { initBuddies } from './ui/buddy.js';
-import { openGroceries } from './ui/groceries.js';
 import { ICON } from './ui/icons.js';
 
 const $ = (s) => document.querySelector(s);
@@ -32,6 +31,7 @@ function boot() {
 
   rollover(s);
   seed(s, s.day.key);
+  migrate(s, s.day.key);
   // First run with suggestions: learn from what's already here.
   if (!Object.keys(s.recent).length) {
     for (const t of s.tasks) remember(s, t.text, t.catId, 0);
@@ -49,18 +49,25 @@ function boot() {
     onDelete: deleteTask,
     onReorder: reorder,
     onHeaderLong: (catId) => openCategory(catId),
+    onPress: (id) => openTaskMenu(id),
   });
 
   groups.addEventListener('click', (e) => {
+    const subCheck = e.target.closest('.sub-check');
+    if (subCheck) return toggleSub(subCheck.closest('.task').dataset.id, subCheck.closest('.sub').dataset.sub);
+    const subToggle = e.target.closest('.sub-toggle');
+    if (subToggle) return toggleSubsOpen(subToggle.closest('.task').dataset.id);
+    const subAdd = e.target.closest('.sub-add');
+    if (subAdd) {
+      haptic('tap');
+      return openAddSteps(subAdd.closest('.task').dataset.id);
+    }
     const check = e.target.closest('.check');
     if (check) return toggleTask(check.closest('.task').dataset.id);
     const body = e.target.closest('.task-body');
     if (body) {
       haptic('tap');
-      const id = body.closest('.task').dataset.id;
-      // A grocery run opens its store's list.
-      const t = store.state.tasks.find((x) => x.id === id);
-      return t?.grocery ? openGroceries(t.grocery) : openEdit(id);
+      return openEdit(body.closest('.task').dataset.id);
     }
     const head = e.target.closest('.group-head');
     if (head) return toggleCollapse(head.closest('.group').dataset.cat);
@@ -89,11 +96,9 @@ function boot() {
     b.classList.add('pressing');
     packHold.timer = setTimeout(() => {
       const id = b.dataset.id;
-      const grocery = 'grocery' in b.dataset;
       endHold();
       packHeldUntil = performance.now() + 600;
-      if (grocery) openGroceries();
-      else openPack(id);
+      openPack(id);
     }, 480);
   });
   packs.addEventListener('pointermove', (e) => {
@@ -106,11 +111,8 @@ function boot() {
     const b = e.target.closest('.pack');
     if (!b) return;
     if (performance.now() < packHeldUntil) return; // the tap that ended a long-press
-    if ('grocery' in b.dataset) {
-      haptic('tap');
-      return openGroceries();
-    }
-    addPack(b.dataset.id);
+    haptic('tap');
+    openPackPicker(b.dataset.id);
   });
 
   $('#carry').addEventListener('click', (e) => {

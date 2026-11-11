@@ -76,6 +76,8 @@ export function rollover(state, now = new Date()) {
   state.carry = unfinished.length ? { from: prev, ids: [...keepIds] } : null;
 
   state.day = { key, done: {} };
+  // Daily tasks start the new day with their subtasks unchecked.
+  for (const t of state.tasks) if (t.type === 'daily') for (const x of t.subs || []) x.done = false;
 
   const cutoff = addDays(key, -400);
   for (const hk of Object.keys(state.history)) if (hk < cutoff) delete state.history[hk];

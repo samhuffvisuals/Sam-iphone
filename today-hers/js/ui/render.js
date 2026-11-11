@@ -6,7 +6,6 @@ import { tasksFor, stats, daysDone, keyToDate, addDays } from '../rollover.js';
 import { SPRING, reduceMotion } from './effects.js';
 import { ICON, esc } from './icons.js';
 import { quoteForDay } from '../quotes.js';
-import { leftEverywhere } from '../grocery-data.js';
 
 const $ = (s) => document.querySelector(s);
 const taskEls = new Map();
@@ -165,11 +164,7 @@ function renderPacks() {
   const s = store.state;
   const el = $('#packs');
   const onList = new Set(tasksFor(s, s.day.key).map((t) => t.text.trim().toLowerCase()));
-  // Groceries always comes first: it opens the store lists.
-  const g = leftEverywhere(s);
-  const groceries = `<button type="button" class="pack grocery-chip" data-grocery style="--c:#a3e4b7" aria-label="Groceries${g ? `, ${g} to get` : ''}">
-        <span class="pack-emoji">🛒</span><span class="pack-name">Groceries</span><span class="pack-n">${g || ICON.plus}</span></button>`;
-  const html = groceries + s.packs
+  const html = s.packs
     .map((p) => {
       const left = p.items.filter((x) => !onList.has(x.toLowerCase())).length;
       const c = catOf(p.catId);
@@ -182,7 +177,7 @@ function renderPacks() {
     el.dataset.html = html;
     el.innerHTML = html;
   }
-  el.hidden = false;
+  el.hidden = !s.packs.length;
 }
 
 /* ---------- list ---------- */
@@ -235,7 +230,8 @@ function createTask(id) {
   const li = document.createElement('li');
   li.className = 'task';
   li.dataset.id = id;
-  li.innerHTML = `<div class="swipe-bg"><span class="sb sb-done">${ICON.check}</span><span class="sb sb-del">${ICON.trash}</span></div>
+  li.innerHTML = `<div class="task-card">
+    <div class="swipe-bg"><span class="sb sb-done">${ICON.check}</span><span class="sb sb-del">${ICON.trash}</span></div>
     <div class="task-fg">
       <button class="check" type="button">
         <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -245,7 +241,10 @@ function createTask(id) {
         </svg>
       </button>
       <div class="task-body" data-haptic><span class="task-text"></span><span class="task-meta"></span></div>
-    </div>`;
+      <button class="sub-toggle" type="button" hidden><span class="sub-count"></span>${ICON.chev}</button>
+    </div></div>
+    <div class="subs" hidden><ul class="sub-list"></ul>
+      <button class="sub-add" type="button"><span class="ai-plus">${ICON.plus}</span>Add a step</button></div>`;
   return li;
 }
 
@@ -265,6 +264,34 @@ function updateTask(li, t, c) {
   const btn = li.querySelector('.check');
   btn.setAttribute('aria-label', `${done ? 'Uncheck' : 'Complete'} ${t.text}`);
   btn.setAttribute('aria-pressed', String(done));
+  updateSubs(li, t);
+}
+
+// Subtasks: a count with an arrow on the card, and the steps underneath when open.
+function updateSubs(li, t) {
+  const subs = t.subs || [];
+  const open = subs.length > 0 && t.subsOpen !== false;
+  const toggle = li.querySelector('.sub-toggle');
+  toggle.hidden = !subs.length;
+  li.classList.toggle('has-subs', subs.length > 0);
+  li.classList.toggle('subs-open', open);
+  li.querySelector('.subs').hidden = !open;
+  if (!subs.length) return;
+  const n = subs.filter((x) => x.done).length;
+  li.querySelector('.sub-count').textContent = `${n}/${subs.length}`;
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} steps for ${t.text}, ${n} of ${subs.length} done`);
+  const list = li.querySelector('.sub-list');
+  const sig = JSON.stringify(subs);
+  if (list.dataset.sig === sig) return;
+  list.dataset.sig = sig;
+  list.innerHTML = subs
+    .map(
+      (x) => `<li class="sub${x.done ? ' done' : ''}" data-sub="${x.id}">
+        <button class="sub-check" type="button" aria-pressed="${x.done}" aria-label="${x.done ? 'Uncheck' : 'Complete'} ${esc(x.text)}">${ICON.check}</button>
+        <span class="sub-text">${esc(x.text)}</span></li>`
+    )
+    .join('');
 }
 
 function placeAfter(parent, el, prev) {

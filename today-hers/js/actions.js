@@ -22,7 +22,10 @@ export function toggleTask(id) {
   if (!t) return;
   const was = !!s.day.done[id];
   if (was) delete s.day.done[id];
-  else s.day.done[id] = Date.now();
+  else {
+    s.day.done[id] = Date.now();
+    for (const x of t.subs || []) x.done = true; // done means all of it
+  }
   store.save();
 
   const st = stats(s);
@@ -32,6 +35,7 @@ export function toggleTask(id) {
   const li = taskEl(id);
   if (li) {
     li.classList.toggle('done', !was);
+    if (!was) li.querySelectorAll('.sub').forEach((el) => el.classList.add('done'));
     if (!was) {
       li.classList.remove('pop');
       void li.offsetWidth;
@@ -72,16 +76,17 @@ export function addTask(text, { catId, type, days }) {
   return t;
 }
 
-// Drops every item of a pack onto today (skipping ones already on the list). Returns how many were added.
-export function addPack(packId) {
+// Drops the picked items of a pack onto today (skipping ones already on the list). Returns how many were added.
+export function addPack(packId, picked) {
   const s = store.state;
   const p = s.packs.find((x) => x.id === packId);
   if (!p) return 0;
+  const items = picked ? p.items.filter((x) => picked.includes(x)) : p.items;
   const onList = new Set(tasksFor(s, s.day.key).map((t) => t.text.trim().toLowerCase()));
   // Above everything already there, keeping the pack's own order (first item highest).
-  let order = topOrder(s) - p.items.length;
+  let order = topOrder(s) - items.length;
   let n = 0;
-  for (const text of p.items) {
+  for (const text of items) {
     if (onList.has(text.toLowerCase())) continue;
     s.tasks.push({ id: uid(), text, catId: p.catId, type: 'today', order: order++, dayKey: s.day.key });
     remember(s, text, p.catId);
@@ -300,4 +305,91 @@ export function deletePack(id) {
   store.save();
   haptic('tap');
   render();
+}
+
+/* ---------- subtasks ---------- */
+
+// Checking the last subtask checks the task off (and its Pokémon pops up);
+// unchecking one opens the task again.
+export function toggleSub(taskId, subId) {
+  const s = store.state;
+  const t = s.tasks.find((x) => x.id === taskId);
+  const sub = t?.subs?.find((x) => x.id === subId);
+  if (!sub) return;
+  sub.done = !sub.done;
+  store.save();
+  const all = t.subs.every((x) => x.done);
+  const parentDone = !!s.day.done[t.id];
+  if (sub.done && all && !parentDone) return toggleTask(t.id);
+  if (!sub.done && parentDone) {
+    toggleTask(t.id);
+    return renderList();
+  }
+  haptic(sub.done ? 'success' : 'tap');
+  const el = taskEl(taskId)?.querySelector(`.sub[data-sub="${subId}"]`);
+  if (el && sub.done) {
+    const r = el.querySelector('.sub-check').getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, colorOf(catOf(t.catId).color));
+  }
+  renderList();
+}
+
+export function addSubs(taskId, texts) {
+  const t = store.state.tasks.find((x) => x.id === taskId);
+  if (!t) return 0;
+  t.subs ||= [];
+  const clean = texts.map((x) => x.trim()).filter(Boolean);
+  for (const text of clean) t.subs.push({ id: uid(), text, done: false });
+  t.subsOpen = true;
+  // A new step means the task isn't finished any more.
+  if (clean.length && store.state.day.done[t.id]) delete store.state.day.done[t.id];
+  store.save();
+  render({ animate: true });
+  return clean.length;
+}
+
+export function removeSub(taskId, subId) {
+  const t = store.state.tasks.find((x) => x.id === taskId);
+  if (!t) return;
+  t.subs = (t.subs || []).filter((x) => x.id !== subId);
+  store.save();
+  render({ animate: true });
+}
+
+export function toggleSubsOpen(taskId) {
+  const t = store.state.tasks.find((x) => x.id === taskId);
+  if (!t) return;
+  t.subsOpen = t.subsOpen === false;
+  store.save();
+  haptic('tap');
+  renderList({ animate: true });
+}
+
+/* ---------- duplicate ---------- */
+
+// A copy right under the original, unchecked, with its own copies of the subtasks.
+export function duplicateTask(id) {
+  const s = store.state;
+  const t = s.tasks.find((x) => x.id === id);
+  if (!t) return null;
+  const copy = { ...t, id: uid(), subs: (t.subs || []).map((x) => ({ id: uid(), text: x.text, done: false })) };
+  if (copy.type === 'daily') copy.since = s.day.key;
+  else copy.dayKey = s.day.key;
+  // Just below the original: shift everything after it down by one slot.
+  for (const x of s.tasks) if (x.catId === t.catId && x.order > t.order) x.order += 1;
+  copy.order = t.order + 1;
+  s.tasks.push(copy);
+  store.save();
+  haptic('success');
+  render({ animate: true });
+  const label = t.text.length > 24 ? t.text.slice(0, 23) + '…' : t.text;
+  toast(`Duplicated “${label}”`, {
+    action: 'Undo',
+    onAction() {
+      store.state.tasks = store.state.tasks.filter((x) => x.id !== copy.id);
+      store.save();
+      render({ animate: true });
+    },
+  });
+  return copy;
 }

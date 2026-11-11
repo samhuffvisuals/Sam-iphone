@@ -1,7 +1,7 @@
 // Bottom sheets: quick add, edit task, category editor, settings.
-import { store, PALETTE, MAX_CATEGORIES, MAX_PACKS, suggest, exportData, importData, eraseAll } from '../store.js';
+import { store, PALETTE, MAX_CATEGORIES, MAX_PACKS, suggest, exportData, importData, eraseAll, isGroceryCat } from '../store.js';
 import { haptic, setHapticsEnabled, overlayHaptics, stats as hapticStats } from '../haptics.js';
-import { addTask, editTask, deleteTask, saveCategory, deleteCategory, savePack, deletePack, moveGroupTasks } from '../actions.js';
+import { addTask, editTask, deleteTask, saveCategory, deleteCategory, savePack, deletePack, moveGroupTasks, addPack, addSubs, removeSub, duplicateTask } from '../actions.js';
 import { colorOf, catOf, DAY_ORDER, DAY_SHORT, DAY_NAME } from './render.js';
 import { tasksFor } from '../rollover.js';
 import { openHistory } from './history.js';
@@ -203,14 +203,21 @@ export function openQuickAdd(preset = {}) {
     if (e.target.closest('button') && !e.target.closest('[data-new]')) e.preventDefault();
   });
 
+  // Groceries take a whole list at once: "milk, eggs, bread" is three items.
+  const grocery = () => isGroceryCat(catOf(ctl.st.catId));
+  const paintPlaceholder = () => (input.placeholder = grocery() ? 'Milk, eggs, bread…' : 'What needs doing?');
+  paintPlaceholder();
+  sheet.$('[data-role=chips]').addEventListener('click', () => setTimeout(paintPlaceholder));
+
   const submit = () => {
     const text = input.value.trim();
     if (!text) {
       if (added) sheet.close(); // Return on an empty field closes after a run of adds
       return;
     }
-    addTask(text, ctl.st);
-    added++;
+    const parts = grocery() ? splitList(text) : [text];
+    for (const p of parts) addTask(p, ctl.st);
+    added += parts.length;
     input.value = '';
     input.focus();
     const note = sheet.$('.add-note');
@@ -271,11 +278,40 @@ export function openEdit(id) {
         <input class="field" type="text" value="${esc(t.text)}" maxlength="140" enterkeyhint="done" aria-label="Task">
       </form>
       <div data-ctl></div>
+      <h3>Steps</h3>
+      <ul class="step-edit" data-role="steps"></ul>
+      <form class="add-form step-form" autocomplete="off">
+        <input class="field" type="text" data-role="step" placeholder="Add a step" maxlength="140" enterkeyhint="done" aria-label="New step">
+        <button class="add-go" type="submit" aria-label="Add step">${ICON.plus}</button>
+      </form>
       <button class="btn" type="button" data-save>Save</button>
       <button class="btn danger" type="button" data-del>Delete task</button>`,
   });
   sheet.$('[data-ctl]').outerHTML = ctl.html;
   ctl.mount(sheet);
+
+  const paintSteps = () => {
+    const subs = t.subs || [];
+    sheet.$('[data-role=steps]').innerHTML = subs
+      .map((x) => `<li><span class="dt-check${x.done ? ' done' : ''}" style="--c:${colorOf(catOf(t.catId).color)}">${ICON.check}</span><span>${esc(x.text)}</span>
+        <button type="button" data-rm="${x.id}" aria-label="Remove ${esc(x.text)}">✕</button></li>`)
+      .join('');
+  };
+  paintSteps();
+  sheet.$('.step-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = sheet.$('[data-role=step]');
+    if (addSubs(id, splitSteps(f.value, t))) haptic('tap');
+    f.value = '';
+    paintSteps();
+  });
+  sheet.$('[data-role=steps]').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rm]');
+    if (!b) return;
+    haptic('tap');
+    removeSub(id, b.dataset.rm);
+    paintSteps();
+  });
 
   const input = sheet.$('.field');
   const save = () => {
@@ -540,7 +576,7 @@ export function openPack(id, { onSave } = {}) {
 
 /* ---------- settings ---------- */
 
-export const APP_VERSION = 'v3.15';
+export const APP_VERSION = 'v3.16';
 
 const toMinutes = (v) => {
   const [h, m] = v.split(':').map(Number);
@@ -574,7 +610,7 @@ export function openSettings() {
 
       <h3>Packs</h3>
       <div class="set-group" data-role="packs"></div>
-      <p class="hint">A pack drops a whole set of tasks onto today in one tap. On the main screen, tap a pack to add it and long-press it to edit it.</p>
+      <p class="hint">A pack is a set of tasks you add often. On the main screen, tap a pack to pick which of its tasks go on today, and long-press it to edit it.</p>
 
       <h3>Categories</h3>
       <div class="set-group" data-role="cats"></div>
@@ -762,4 +798,159 @@ function download(file, name) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
   toast('Backup downloaded');
+}
+
+/* ---------- lists in one go ---------- */
+
+// "milk, eggs and bread" → three. New lines and commas always split; "and" only in a
+// list that already has commas, and never inside names like "mac and cheese".
+const KEEP_AND = /\b(half|mac|macaroni|salt|ham|chips|peanut butter|sweet|fish|cookies|rice|bread) (and|&) (?=half|cheese|pepper|salsa|jelly|sour|chips|cream|beans|butter)/gi;
+export function splitList(text) {
+  const t = text.replace(KEEP_AND, (m, w, and) => `${w} ${and === '&' ? '\u0001' : '\u0000'} `);
+  const by = /,|\n/.test(t) ? /\n|,|;|\s+and\s+|\s+&\s+/i : /\n|;/;
+  return t
+    .split(by)
+    .map((x) => x.replace(/\u0000/g, 'and').replace(/\u0001/g, '&').trim())
+    .filter(Boolean);
+}
+// Steps split on new lines (a pasted list); in Groceries, on commas too.
+const splitSteps = (text, t) => (isGroceryCat(catOf(t.catId)) ? splitList(text) : text.split('\n').map((x) => x.trim()).filter(Boolean));
+
+/* ---------- add steps ---------- */
+
+export function openAddSteps(id) {
+  const t = store.state.tasks.find((x) => x.id === id);
+  if (!t) return;
+  let added = 0;
+  const sheet = openSheet({
+    className: 'add-sheet',
+    content: `
+      <p class="sheet-kicker">Steps for <b>${esc(t.text)}</b></p>
+      <form class="add-form" autocomplete="off">
+        <input class="field add-input" type="text" placeholder="${isGroceryCat(catOf(t.catId)) ? 'Milk, eggs, bread…' : 'Add a step'}" maxlength="140"
+               enterkeyhint="done" autocapitalize="sentences" autocomplete="off" aria-label="New step">
+        <button class="add-go" type="submit" aria-label="Add step">${ICON.up}</button>
+      </form>
+      <p class="add-note" aria-live="polite">Return adds and keeps this open.</p>`,
+  });
+  const input = sheet.$('.add-input');
+  input.focus({ preventScroll: true });
+  sheet.$('.add-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) {
+      if (added) sheet.close();
+      return;
+    }
+    added += addSubs(id, splitSteps(text, t));
+    haptic('tap');
+    input.value = '';
+    input.focus();
+    const note = sheet.$('.add-note');
+    note.textContent = `Added ${added} ${added === 1 ? 'step' : 'steps'} ✓`;
+    note.classList.remove('bump');
+    void note.offsetWidth;
+    note.classList.add('bump');
+  });
+}
+
+/* ---------- long-press menu ---------- */
+
+export function openTaskMenu(id) {
+  const t = store.state.tasks.find((x) => x.id === id);
+  if (!t) return;
+  const sheet = openSheet({
+    className: 'menu-sheet',
+    content: `
+      <p class="sheet-kicker"><b>${esc(t.text)}</b></p>
+      <div class="set-group">
+        <button class="set-row" type="button" data-act="dup"><span class="menu-ic">⧉</span><span class="label">Duplicate</span></button>
+        <button class="set-row" type="button" data-act="steps"><span class="menu-ic">☰</span><span class="label">Add steps</span></button>
+        <button class="set-row" type="button" data-act="edit"><span class="menu-ic">✎</span><span class="label">Edit</span></button>
+      </div>
+      <button class="btn danger" type="button" data-act="delete">Delete</button>
+      <p class="hint center">Tip: hold and drag a task to move it.</p>`,
+  });
+  sheet.body.addEventListener('click', (e) => {
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (!act) return;
+    haptic('tap');
+    sheet.close();
+    if (act === 'dup') duplicateTask(id);
+    else if (act === 'steps') openAddSteps(id);
+    else if (act === 'edit') openEdit(id);
+    else if (act === 'delete') deleteTask(id);
+  });
+}
+
+/* ---------- pick from a pack ---------- */
+
+// Tapping a pack: choose which of its tasks go on today. Everything starts picked.
+export function openPackPicker(packId) {
+  const s = store.state;
+  const p = s.packs.find((x) => x.id === packId);
+  if (!p) return;
+  const color = colorOf(catOf(p.catId).color);
+  const onList = new Set(tasksFor(s, s.day.key).map((t) => t.text.trim().toLowerCase()));
+  const free = p.items.filter((x) => !onList.has(x.toLowerCase()));
+  const picked = new Set(free);
+
+  const sheet = openSheet({
+    title: `${p.emoji} ${p.name}`,
+    content: `
+      <div class="pick-bar">
+        <span data-role="count"></span>
+        <button type="button" class="mini" data-act="all">Select all</button>
+        <button type="button" class="mini" data-act="none">Unselect all</button>
+      </div>
+      <ul class="day-tasks">${p.items
+        .map((text) => {
+          const here = onList.has(text.toLowerCase());
+          return `<li><button type="button" class="day-task" data-item="${esc(text)}" style="--c:${color}" ${here ? 'disabled' : ''}>
+            <span class="dt-check">${ICON.check}</span><span class="dt-text">${esc(text)}</span>${here ? '<span class="dt-meta">on today</span>' : ''}</button></li>`;
+        })
+        .join('')}</ul>
+      <button type="button" class="btn" data-act="add"></button>
+      <button type="button" class="btn ghost small" data-act="edit">Edit pack</button>`,
+  });
+
+  const paint = () => {
+    sheet.$$('[data-item]').forEach((b) => {
+      const on = picked.has(b.dataset.item);
+      b.setAttribute('aria-pressed', String(on));
+      b.querySelector('.dt-check').classList.toggle('done', on || b.disabled);
+    });
+    const n = picked.size;
+    sheet.$('[data-role=count]').textContent = free.length ? `${n} of ${free.length} picked` : 'All on today already';
+    const add = sheet.$('[data-act=add]');
+    add.textContent = n ? `Add ${n} to today` : 'Pick some to add';
+    add.disabled = !n;
+    sheet.$('[data-act=all]').disabled = n === free.length;
+    sheet.$('[data-act=none]').disabled = !n;
+  };
+  paint();
+
+  sheet.body.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-item]');
+    if (item && !item.disabled) {
+      const k = item.dataset.item;
+      if (picked.has(k)) picked.delete(k);
+      else picked.add(k);
+      haptic('tap');
+      return paint();
+    }
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (!act) return;
+    if (act === 'all') free.forEach((x) => picked.add(x));
+    else if (act === 'none') picked.clear();
+    else if (act === 'add') {
+      sheet.close();
+      return addPack(packId, [...picked]);
+    } else if (act === 'edit') {
+      sheet.close();
+      return openPack(packId);
+    }
+    haptic('tap');
+    paint();
+  });
 }

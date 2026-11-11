@@ -473,6 +473,7 @@ label.hap > input {
 /* ============ Task ============ */
 
 .task { position: relative; border-radius: var(--radius); touch-action: pan-y; --p: 0; }
+.task-card { position: relative; border-radius: inherit; }
 
 .swipe-bg {
   position: absolute;
@@ -1072,139 +1073,120 @@ button.cell:active { transform: scale(.88); }
 
 #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 70; display: none; }
 
-/* ============ Groceries ============ */
+/* ============ Subtasks ============ */
 
-.grocery-chip .pack-n { color: var(--ink); }
-
-.g-stores {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin: 0 -20px 14px;
-  padding: 4px 20px;
-}
-.g-stores::-webkit-scrollbar { display: none; }
-.g-store {
+/* The count and arrow on the card. */
+.sub-toggle {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 46px;
-  padding: 0 14px 0 12px;
-  border-radius: 23px;
-  background: var(--field);
-  font-size: 16px;
+  gap: 4px;
+  height: 40px;
+  padding: 0 8px 0 12px;
+  margin-right: -6px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--c) 30%, transparent);
+  color: color-mix(in srgb, var(--c) 35%, var(--ink));
+  font-size: 14px;
   font-weight: 650;
-  white-space: nowrap;
-  transition: background .2s, color .2s, transform .4s var(--spring), box-shadow .2s;
+  font-variant-numeric: tabular-nums;
+  transition: transform .4s var(--spring), background .2s;
 }
-.g-store:active { transform: scale(.93); }
-.g-store > span { font-size: 19px; }
-.g-store b {
-  min-width: 24px;
-  height: 24px;
-  padding: 0 7px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  color: var(--berry);
-  font-size: 13px;
-  font-weight: 700;
+.sub-toggle[hidden] { display: none; }
+.sub-toggle:active { transform: scale(.92); }
+.sub-toggle .chev { width: 18px; height: 18px; color: currentColor; transform: rotate(-90deg); transition: transform .45s var(--spring); }
+.task.subs-open .sub-toggle .chev { transform: none; }
+.task.done .sub-toggle { background: color-mix(in srgb, var(--green) 45%, transparent); color: #3f9c74; }
+
+.subs {
+  margin: 6px 0 2px 34px;
+  padding-left: 14px;
+  border-left: 2.5px dotted color-mix(in srgb, var(--c) 70%, transparent);
+  animation: rise .4s var(--spring-soft);
 }
-.g-store[aria-pressed="true"] { background: linear-gradient(135deg, #ffb3d1, #d6bff7); color: var(--ink); box-shadow: 0 6px 16px rgba(220, 92, 147, .25); }
-.g-store-new { width: 46px; padding: 0; justify-content: center; color: var(--berry); }
-.g-store-new svg { width: 18px; height: 18px; }
-
-.g-tip { margin: 10px 4px 0; font-size: 13.5px; font-weight: 500; color: var(--text-3); }
-.g-tip b { color: var(--text-2); font-weight: 650; }
-
-.g-sec { margin-top: 18px; }
-.g-sec h4 {
+.subs[hidden] { display: none; }
+.sub-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sub {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 4px 8px;
-  font-size: 15px;
-  font-weight: 650;
-  color: var(--text-2);
+  gap: 4px;
+  min-height: 46px;
+  padding: 2px 12px 2px 2px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 3px 10px rgba(206, 120, 170, .08), inset 0 0 0 1px rgba(226, 150, 192, .16);
+  transition: background .3s;
 }
-.g-sec h4 span { font-size: 18px; }
-.g-sec h4 small {
-  margin-left: auto;
-  min-width: 26px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 11px;
-  display: grid;
-  place-items: center;
-  background: color-mix(in srgb, #ff9ec4 30%, transparent);
-  color: var(--berry);
-  font-size: 12px;
-  font-weight: 700;
-}
-.g-sec ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.g-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 54px;
-  padding: 4px 4px 4px 6px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, .85);
-  box-shadow: 0 3px 10px rgba(206, 120, 170, .1), inset 0 0 0 1px rgba(226, 150, 192, .18);
-  transition: background .3s, opacity .3s;
-}
-.g-item.fresh { animation: rise .5s var(--spring-soft); }
-.g-check {
-  width: 44px; height: 44px;
+.sub-check {
+  width: 42px; height: 42px;
   flex: none;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: transparent;
   position: relative;
+  color: transparent;
 }
-.g-check::before {
+.sub-check::before {
   content: "";
   position: absolute;
-  inset: 9px;
+  inset: 10px;
   border-radius: 50%;
-  border: 2.5px solid #f5a8c8;
-  background: #fff5f9;
+  border: 2.5px solid var(--c);
+  background: color-mix(in srgb, var(--c) 15%, #fff);
   transition: background .25s, border-color .25s, transform .4s var(--spring);
 }
-.g-check svg { position: relative; width: 16px; height: 16px; }
-.g-check:active::before { transform: scale(.85); }
-.g-item.done .g-check { color: #fff; }
-.g-item.done .g-check::before { background: #5fc99a; border-color: #5fc99a; }
-.g-text { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; word-break: break-word; transition: color .3s; }
-.g-item.done { background: color-mix(in srgb, var(--green) 22%, rgba(255, 255, 255, .7)); }
-.g-item.done .g-text { color: var(--text-3); text-decoration: line-through; text-decoration-color: #5fc99a; text-decoration-thickness: 2px; }
-.g-more { width: 40px; height: 40px; flex: none; border-radius: 50%; color: var(--text-3); font-size: 12px; letter-spacing: 1px; }
-.g-more:active { background: var(--field); }
+.sub-check svg { position: relative; width: 14px; height: 14px; }
+.sub-check:active::before { transform: scale(.82); }
+.sub.done .sub-check { color: #fff; }
+.sub.done .sub-check::before { background: #5fc99a; border-color: #5fc99a; }
+.sub-text { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; word-break: break-word; }
+.sub.done { background: color-mix(in srgb, var(--green) 20%, rgba(255, 255, 255, .7)); }
+.sub.done .sub-text { color: var(--text-3); text-decoration: line-through; text-decoration-color: #5fc99a; text-decoration-thickness: 2px; }
+.sub-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin-top: 6px;
+  padding: 0 10px 0 6px;
+  border-radius: 14px;
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+.sub-add .ai-plus { width: 26px; height: 26px; }
+.sub-add:active { background: color-mix(in srgb, var(--c) 15%, transparent); }
 
-.g-empty { text-align: center; padding: 26px 10px 6px; color: var(--text-2); font-weight: 550; }
-.g-empty div { font-size: 46px; animation: float 3.2s ease-in-out infinite; }
-.g-empty p { margin: 8px 0 0; }
+/* Steps in the edit sheet */
+.step-edit { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.step-edit:empty { display: none; }
+.step-edit li { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 4px 0 12px; border-radius: 14px; background: var(--field); font-size: 16px; font-weight: 600; }
+.step-edit li > span:nth-child(2) { flex: 1; min-width: 0; }
+.step-edit button { width: 40px; height: 40px; border-radius: 12px; color: var(--text-3); font-weight: 700; }
 
-.g-actions { margin-top: 18px; }
-.g-row { display: flex; gap: 8px; }
-.g-row .btn { flex: 1; }
+/* ============ Sheets: menu, pack picker ============ */
+
+.sheet-kicker { margin: 4px 4px 14px; font-size: 16px; font-weight: 500; color: var(--text-2); line-height: 1.35; }
+.sheet-kicker b { color: var(--text); font-weight: 700; font-size: 20px; }
+.menu-ic { width: 26px; text-align: center; font-size: 19px; color: var(--berry); }
+
+.pick-bar { display: flex; align-items: center; gap: 8px; margin: 0 2px 12px; }
+.pick-bar span { flex: 1; font-size: 14px; font-weight: 600; color: var(--text-2); }
+.mini {
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 17px;
+  background: var(--field);
+  color: var(--berry);
+  font-size: 13.5px;
+  font-weight: 650;
+  transition: transform .35s var(--spring), opacity .2s;
+}
+.mini:active { transform: scale(.92); }
+.mini:disabled { opacity: .4; }
+.btn:disabled { opacity: .45; }
 .btn.ghost { background: var(--field); color: var(--berry); margin-top: 10px; }
 .btn.small { height: 46px; font-size: 15px; }
-.g-linked { margin: 14px 0 0; text-align: center; font-size: 15px; font-weight: 600; color: #3f9c74; }
-
-.g-order { list-style: none; margin: 0; padding: 0; border-radius: 16px; background: var(--field); overflow: hidden; }
-.g-order li { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 6px 0 14px; }
-.g-order li + li { border-top: 1px solid var(--line); }
-.g-order li span { font-size: 19px; }
-.g-order li b { flex: 1; font-size: 16px; font-weight: 600; }
-.g-order button { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; font-weight: 700; color: var(--berry); }
-.g-order button:disabled { opacity: .25; }
-.g-order button:active:not(:disabled) { background: rgba(255, 255, 255, .7); }
-.grocery-sheet .sheet { min-height: 70%; }
 
 /* ============ Pokémon friend ============ */
 
