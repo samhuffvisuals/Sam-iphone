@@ -16,7 +16,7 @@ Open it from the Home Screen icon before adding tasks. The Home Screen app keeps
 
 - **Pastel look.** A light pink, lavender and mint theme, the rounded Fredoka font, softer cards, and a heart for the days-done counter. The day color moves from pink (nothing done) through peach and butter to mint (all done).
 - **Pokémon friends.** Checking off a task makes a Pokémon spring up in the middle of the screen, hop around in a burst of sparkles and hearts, and say something nice. Every one is new: the app remembers who she has met, shows the cutest ones first, and repeats nobody until all 1,025 have turned up. Taps pass straight through the animation, so she never has to wait for it.
-- **Her own starter list.** Two daily tasks, a Groceries category and four packs (Self care, Clean house, Trip, Grocery staples) to start from. She can change or delete all of them.
+- **Her own starter list.** Two daily tasks, a Groceries category (she can add as many categories as she likes) and four packs (Self care, Clean house, Trip, Grocery staples) to start from. She can change or delete all of them.
 - **Separate data.** It saves under its own key, so it never mixes with the original Today app, even on the same phone.
 
 Turn the Pokémon off or on in **Settings → Feel → Pokémon friends**. The same row shows how many she has met.

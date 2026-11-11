@@ -1,5 +1,5 @@
 // Bottom sheets: quick add, edit task, category editor, settings.
-import { store, PALETTE, MAX_CATEGORIES, MAX_PACKS, suggest, exportData, importData, eraseAll, isGroceryCat } from '../store.js';
+import { store, PALETTE, MAX_PACKS, suggest, exportData, importData, eraseAll, isGroceryCat } from '../store.js';
 import { haptic, setHapticsEnabled, overlayHaptics, stats as hapticStats } from '../haptics.js';
 import { addTask, editTask, deleteTask, saveCategory, deleteCategory, savePack, deletePack, moveGroupTasks, addPack, addSubs, removeSub, duplicateTask } from '../actions.js';
 import { colorOf, catOf, DAY_ORDER, DAY_SHORT, DAY_NAME } from './render.js';
@@ -118,7 +118,7 @@ function taskControls(init) {
             <span>${esc(c.emoji)}</span>${esc(c.name)}</button>`
         )
         .join('') +
-      (cats.length < MAX_CATEGORIES ? `<button type="button" class="chip chip-new" data-new>${ICON.plus}<span>New</span></button>` : '');
+      `<button type="button" class="chip chip-new" data-new>${ICON.plus}<span>New</span></button>`;
   }
 
   function mount(target, { onNewCategory } = {}) {
@@ -372,14 +372,10 @@ function confirmTap(btn, label, onConfirm) {
 export function openCategory(id, { onSave } = {}) {
   const s = store.state;
   const c = id ? s.categories.find((x) => x.id === id) : null;
-  if (!c && s.categories.length >= MAX_CATEGORIES) {
-    toast(`You can have up to ${MAX_CATEGORIES} categories`);
-    return;
-  }
   const used = new Set(s.categories.map((x) => x.color));
   const todayCount = c ? tasksFor(s, s.day.key).filter((t) => t.catId === c.id).length : 0;
   let emoji = c?.emoji || '⭐';
-  let color = c?.color || (PALETTE.find((p) => !used.has(p.id)) || PALETTE[0]).id;
+  let color = c?.color || (PALETTE.find((p) => !used.has(p.id)) || PALETTE[s.categories.length % PALETTE.length]).id;
 
   const sheet = openSheet({
     title: c ? 'Edit category' : 'New category',
@@ -397,7 +393,7 @@ export function openCategory(id, { onSave } = {}) {
       <div class="chips" data-role="move">${s.categories
         .filter((x) => x.id !== c.id)
         .map((x) => `<button type="button" class="chip" data-move="${x.id}" style="--c:${colorOf(x.color)}"><span>${esc(x.emoji)}</span>${esc(x.name)}</button>`)
-        .join('')}${s.categories.length < MAX_CATEGORIES ? `<button type="button" class="chip chip-new" data-move-new>${ICON.plus}<span>New group</span></button>` : ''}</div>` : ''}
+        .join('')}<button type="button" class="chip chip-new" data-move-new>${ICON.plus}<span>New group</span></button></div>` : ''}
       ${c && c.id !== 'general' ? `<button class="btn danger" type="button" data-del>Delete category</button><p class="hint">Its tasks move to ${esc(s.categories[0].name)}.</p>` : ''}`,
   });
 
@@ -576,7 +572,7 @@ export function openPack(id, { onSave } = {}) {
 
 /* ---------- settings ---------- */
 
-export const APP_VERSION = 'v3.16';
+export const APP_VERSION = 'v3.17';
 
 const toMinutes = (v) => {
   const [h, m] = v.split(':').map(Number);
@@ -651,9 +647,7 @@ export function openSettings() {
             <span class="label">${esc(c.name)}</span>${ICON.right}</button>`
         )
         .join('') +
-      (s.categories.length < MAX_CATEGORIES
-        ? `<button class="set-row add-row" type="button" data-cat-new>${ICON.plus}<span class="label">New category</span></button>`
-        : `<div class="set-row muted"><span class="label">Maximum of ${MAX_CATEGORIES} categories</span></div>`);
+      `<button class="set-row add-row" type="button" data-cat-new>${ICON.plus}<span class="label">New category</span></button>`;
   };
   const paintPacks = () => {
     const box = sheet.$('[data-role=packs]');

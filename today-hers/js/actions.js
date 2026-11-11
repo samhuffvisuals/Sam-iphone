@@ -1,6 +1,6 @@
 // State changes + the feedback (haptics, effects) that goes with them.
 // Each one is called synchronously from a gesture handler so haptics can fire.
-import { store, uid, remember, MAX_CATEGORIES, MAX_PACKS } from './store.js';
+import { store, uid, remember, MAX_PACKS } from './store.js';
 import { stats, tasksFor } from './rollover.js';
 import { haptic } from './haptics.js';
 import { renderHeader, renderList, render, taskEl, colorOf, catOf, animateCollapse } from './ui/render.js';
@@ -199,7 +199,6 @@ export function saveCategory({ id, name, emoji, color }) {
   let c = id && s.categories.find((x) => x.id === id);
   if (c) Object.assign(c, { name, emoji, color });
   else {
-    if (s.categories.length >= MAX_CATEGORIES) return null;
     c = { id: uid(), name, emoji, color };
     s.categories.push(c);
   }

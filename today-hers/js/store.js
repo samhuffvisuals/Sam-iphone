@@ -2,7 +2,6 @@
 
 // Its own key: this app shares an origin (and so localStorage) with other apps.
 const KEY = 'today-hers.v1';
-export const MAX_CATEGORIES = 6;
 export const MAX_PACKS = 8;
 
 // Curated pastel palette. Ticks and labels on top of these are drawn in plum ink.
@@ -60,7 +59,6 @@ export function normalize(raw) {
   if (!Array.isArray(s.categories)) s.categories = [];
   s.categories = s.categories.filter((c) => c && c.id && typeof c.name === 'string');
   if (!s.categories.some((c) => c.id === 'general')) s.categories.unshift(d.categories[0]);
-  s.categories = s.categories.slice(0, MAX_CATEGORIES);
   const catIds = new Set(s.categories.map((c) => c.id));
 
   if (!Array.isArray(s.tasks)) s.tasks = [];
@@ -138,7 +136,7 @@ export function seed(state, dayKey) {
   const catFor = {};
   for (const c of SEED.categories) {
     let found = state.categories.find((x) => same(x.name, c.name));
-    if (!found && state.categories.length < MAX_CATEGORIES) {
+    if (!found) {
       found = { id: uid(), name: c.name, emoji: c.emoji, color: c.color };
       state.categories.push(found);
     }
@@ -166,11 +164,11 @@ export const isGroceryCat = (c) => !!c && /grocer/i.test(c.name);
 export function migrate(state, dayKey) {
   if (state.settings.groceryCat) return false;
   let cat = state.categories.find(isGroceryCat);
-  if (!cat && state.categories.length < MAX_CATEGORIES) {
+  if (!cat) {
     cat = { id: uid(), name: 'Groceries', emoji: '🛒', color: 'green' };
     state.categories.push(cat);
   }
-  const catId = cat ? cat.id : 'general';
+  const catId = cat.id;
   if (!state.packs.some((p) => same(p.name, 'Grocery staples')) && state.packs.length < MAX_PACKS) {
     state.packs.push({ id: uid(), name: 'Grocery staples', emoji: '🛒', catId, items: ['Milk', 'Eggs', 'Bread', 'Bananas', 'Coffee', 'Paper towels'] });
   }
