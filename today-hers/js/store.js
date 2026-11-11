@@ -87,6 +87,7 @@ export function normalize(raw) {
     .map((x) => ({ id: x.id, name: x.name.trim(), emoji: typeof x.emoji === 'string' && x.emoji ? x.emoji : '🛒' }));
   const storeIds = new Set(s.stores.map((x) => x.id));
   if (!s.settings.storeCollapsed || typeof s.settings.storeCollapsed !== 'object') s.settings.storeCollapsed = {};
+  if (!catIds.has(s.settings.groceryCatId)) s.settings.groceryCatId = null;
 
   if (!Array.isArray(s.tasks)) s.tasks = [];
   s.tasks = s.tasks
@@ -185,13 +186,15 @@ export function seed(state, dayKey) {
 
 /* ---------- one-time updates ---------- */
 
-export const isGroceryCat = (c) => !!c && /grocer/i.test(c.name);
+// The one category that is her grocery list: it shows a section for each store.
+export const isGroceryCat = (c) => !!c && !!c.id && c.id === store.state.settings.groceryCatId;
+const looksGrocery = (c) => !!c && /grocer/i.test(c.name);
 
 // Adds the Groceries category (and a starter grocery pack) once. Anything left on the
 // old per-store grocery lists moves onto today in that category.
 export function migrate(state, dayKey) {
   if (state.settings.groceryCat) return false;
-  let cat = state.categories.find(isGroceryCat);
+  let cat = state.categories.find(looksGrocery);
   if (!cat) {
     cat = { id: uid(), name: 'Groceries', emoji: '🛒', color: 'green' };
     state.categories.push(cat);
@@ -220,6 +223,24 @@ export function migrate(state, dayKey) {
   for (const t of state.tasks) delete t.grocery;
   delete state.groceries;
   state.settings.groceryCat = 1;
+  return true;
+}
+
+// Makes sure there's a grocery list category for the stores to live in. Phones that
+// had the old maximum of six categories never got one, so this adds it now, and moves
+// the Grocery staples pack and anything already given a store into it.
+export function ensureGroceryCat(state) {
+  if ((state.settings.groceryCat || 0) >= 2) return false;
+  let cat = state.categories.find((c) => c.id === state.settings.groceryCatId) || state.categories.find(looksGrocery);
+  if (!cat) {
+    cat = { id: uid(), name: 'Groceries', emoji: '🛒', color: 'green' };
+    state.categories.push(cat);
+  }
+  state.settings.groceryCatId = cat.id;
+  for (const p of state.packs) if (same(p.name, 'Grocery staples')) p.catId = cat.id;
+  for (const t of state.tasks) if (t.store) t.catId = cat.id;
+  delete state.settings.collapsed[cat.id];
+  state.settings.groceryCat = 2;
   return true;
 }
 
