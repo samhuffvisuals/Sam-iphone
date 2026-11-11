@@ -6,6 +6,7 @@ import { tasksFor, stats, daysDone, keyToDate, addDays } from '../rollover.js';
 import { SPRING, reduceMotion } from './effects.js';
 import { ICON, esc } from './icons.js';
 import { quoteForDay } from '../quotes.js';
+import { leftEverywhere } from '../grocery-data.js';
 
 const $ = (s) => document.querySelector(s);
 const taskEls = new Map();
@@ -164,7 +165,11 @@ function renderPacks() {
   const s = store.state;
   const el = $('#packs');
   const onList = new Set(tasksFor(s, s.day.key).map((t) => t.text.trim().toLowerCase()));
-  const html = s.packs
+  // Groceries always comes first: it opens the store lists.
+  const g = leftEverywhere(s);
+  const groceries = `<button type="button" class="pack grocery-chip" data-grocery style="--c:#a3e4b7" aria-label="Groceries${g ? `, ${g} to get` : ''}">
+        <span class="pack-emoji">🛒</span><span class="pack-name">Groceries</span><span class="pack-n">${g || ICON.plus}</span></button>`;
+  const html = groceries + s.packs
     .map((p) => {
       const left = p.items.filter((x) => !onList.has(x.toLowerCase())).length;
       const c = catOf(p.catId);
@@ -177,7 +182,7 @@ function renderPacks() {
     el.dataset.html = html;
     el.innerHTML = html;
   }
-  el.hidden = !s.packs.length;
+  el.hidden = false;
 }
 
 /* ---------- list ---------- */

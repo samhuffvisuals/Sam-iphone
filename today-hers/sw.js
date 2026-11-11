@@ -2,7 +2,7 @@
 // Bump VERSION whenever you deploy changed files so phones pick up the update.
 // The name keeps the prefix: other apps share this origin, and only our own old caches get cleared.
 const PREFIX = 'today-hers-';
-const VERSION = PREFIX + 'v1';
+const VERSION = PREFIX + 'v2';
 
 const ASSETS = [
   './',
@@ -17,6 +17,8 @@ const ASSETS = [
   './js/actions.js',
   './js/pokemon-data.js',
   './js/ui/buddy.js',
+  './js/grocery-data.js',
+  './js/ui/groceries.js',
   './fonts/fredoka.woff2',
   './js/ui/icons.js',
   './js/ui/render.js',

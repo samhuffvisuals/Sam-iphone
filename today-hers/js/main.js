@@ -9,6 +9,7 @@ import { openQuickAdd, openEdit, openSettings, openCategory, openPack } from './
 import { openHistory } from './ui/history.js';
 import { toast } from './ui/toast.js';
 import { initBuddies } from './ui/buddy.js';
+import { openGroceries } from './ui/groceries.js';
 import { ICON } from './ui/icons.js';
 
 const $ = (s) => document.querySelector(s);
@@ -56,7 +57,10 @@ function boot() {
     const body = e.target.closest('.task-body');
     if (body) {
       haptic('tap');
-      return openEdit(body.closest('.task').dataset.id);
+      const id = body.closest('.task').dataset.id;
+      // A grocery run opens its store's list.
+      const t = store.state.tasks.find((x) => x.id === id);
+      return t?.grocery ? openGroceries(t.grocery) : openEdit(id);
     }
     const head = e.target.closest('.group-head');
     if (head) return toggleCollapse(head.closest('.group').dataset.cat);
@@ -85,9 +89,11 @@ function boot() {
     b.classList.add('pressing');
     packHold.timer = setTimeout(() => {
       const id = b.dataset.id;
+      const grocery = 'grocery' in b.dataset;
       endHold();
       packHeldUntil = performance.now() + 600;
-      openPack(id);
+      if (grocery) openGroceries();
+      else openPack(id);
     }, 480);
   });
   packs.addEventListener('pointermove', (e) => {
@@ -100,6 +106,10 @@ function boot() {
     const b = e.target.closest('.pack');
     if (!b) return;
     if (performance.now() < packHeldUntil) return; // the tap that ended a long-press
+    if ('grocery' in b.dataset) {
+      haptic('tap');
+      return openGroceries();
+    }
     addPack(b.dataset.id);
   });
 
