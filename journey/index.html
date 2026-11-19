@@ -202,6 +202,11 @@
   .chead .btns button { height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--ink); }
   .msg { margin: 0 0 14px; display: flex; }
   .msg.user { justify-content: flex-end; }
+  .msg.assistant { flex-direction: column; align-items: flex-start; }
+  .msg .bub { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+  .msg .copy { margin: 8px 0 0 14px; height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid var(--line); background: var(--card); font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; }
+  .msg .copy svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .msg .copy.done { color: var(--ink); border-color: var(--ink); }
   .msg .bub { max-width: 86%; font-size: 16px; line-height: 1.45; }
   .msg.user .bub { background: var(--ink); color: var(--paper); border-radius: 18px 18px 4px 18px; padding: 10px 14px; font-family: var(--serif); font-style: italic; font-size: 17px; white-space: pre-wrap; word-wrap: break-word; }
   .msg.assistant .bub { font-family: var(--serif); font-style: italic; font-size: 18px; line-height: 1.4; color: var(--ink); padding: 4px 0 4px 14px; border-left: 1.5px solid var(--red); word-wrap: break-word; }
@@ -1465,6 +1470,22 @@ HOW YOU WORK IN THIS APP:
     else data.ideas.push({ id: uid(), level: c.level, text: c.text, fuel: c.fuel, created: now });
     const m = data.chat[+idx]; m.added = m.added || {}; m.added[ci] = where; save(); renderChat();
   });
+  // Copy a reply as plain text, ready to paste into Notes, Messages or anywhere else.
+  function plainReply(m) { return m.content.replace(CARD_RE, (all, level, fuel, body) => body.trim()).replace(/\*\*(.+?)\*\*/g, '$1').replace(/\n{3,}/g, '\n\n').trim(); }
+  async function copyText(t) {
+    try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+    const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length);
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove(); return ok;
+  }
+  $('chatScroll').addEventListener('click', async e => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const m = data.chat[+b.dataset.copy]; if (!m) return;
+    const ok = await copyText(plainReply(m));
+    b.classList.toggle('done', ok); b.querySelector('span').textContent = ok ? 'Copied' : 'Could not copy';
+    setTimeout(() => { b.classList.remove('done'); b.querySelector('span').textContent = 'Copy'; }, 1600);
+  });
   const STARTERS = [
     'Help me work out what is actually driving me today.',
     'Take me through the six signs, one at a time.',
@@ -1486,7 +1507,7 @@ HOW YOU WORK IN THIS APP:
       const live = streaming && idx === data.chat.length - 1 && m.role === 'assistant';
       if (m.role === 'user') html += `<div class="msg user"><div class="bub">${esc(m.content)}</div></div>`;
       else if (m.role === 'sys') html += `<div class="msg assistant"><div class="sys">${esc(m.content)}${idx === data.chat.length - 1 && idx > 0 && data.chat[idx - 1].role === 'user' && cs.key ? ' <button id="chatRetry">Try again</button>' : ''}</div></div>`;
-      else html += `<div class="msg assistant"><div class="bub" data-idx="${idx}">${renderAssistant(m, idx, live)}</div></div>`;
+      else html += `<div class="msg assistant"><div class="bub" data-idx="${idx}">${renderAssistant(m, idx, live)}</div>${!live && m.content.trim() ? `<button class="copy" data-copy="${idx}"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><span>Copy</span></button>` : ''}</div>`;
     });
     box.innerHTML = html;
     $('chatNew').addEventListener('click', () => { if (streaming) streaming.abort(); if (!data.chat.length || confirm('Start a new conversation? The old one is cleared.')) { data.chat = []; save(); renderChat(); } });
