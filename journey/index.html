@@ -211,7 +211,10 @@
   .msg.assistant .bub b { font-weight: 600; }
   .msg.assistant .bub .cursor { display: inline-block; width: 8px; height: 16px; background: var(--red); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(2) infinite; }
   @keyframes blink { to { opacity: 0; } }
-  .msg .sys { color: var(--red); font-size: 13px; font-family: var(--ui); padding: 6px 0 0 14px; }
+  .msg .sys { color: var(--red); font-size: 13px; font-family: var(--ui); padding: 6px 0 0 14px; line-height: 1.4; }
+  .msg .sys button { margin-left: 6px; height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid var(--red); background: var(--card); color: var(--red); font-family: var(--serif); font-style: italic; font-size: 14px; }
+  .msg.assistant .bub .wait { color: var(--ink-soft); }
+  #chat::before { content: ''; position: absolute; left: 0; right: 0; top: 0; z-index: 1; height: calc(var(--safe-top) + 84px); background: linear-gradient(var(--paper) 78%, rgba(251,250,246,0)); pointer-events: none; }
   .ecard { margin: 10px 0 4px; border: 1px dashed var(--ink-soft); border-radius: 12px; padding: 10px 12px; background: #fff; font-style: normal; }
   .ecard .et { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.3; }
   .ecard .em { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font: 11px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
@@ -235,7 +238,7 @@
   .composer button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .composer button.stop { background: var(--red); }
   .composer button:disabled { opacity: .4; }
-  .bottom.chatmode { bottom: var(--kb, 0px); }
+  .bottom.chatmode { bottom: var(--kb, 0px); padding-top: 26px; background: linear-gradient(rgba(251,250,246,0), var(--paper) 26px); }
   .sheet input[type=password], .sheet input[type=text], .sheet select {
     width: 100%; border: 1px solid var(--ink); border-radius: 12px; background: #fff; padding: 10px 12px; font-size: 16px; outline: none; -webkit-appearance: none;
   }
@@ -1277,6 +1280,9 @@
   const CS_KEY = 'journey-chat-settings-v1';
   let cs = { key: '', model: 'claude-opus-5-5', share: true, teach: '' };
   try { Object.assign(cs, JSON.parse(localStorage.getItem(CS_KEY) || '{}')); } catch (e) {}
+  // A pasted key can pick up spaces, line breaks or invisible characters, which make the request fail before it is sent.
+  const cleanKey = k => String(k || '').replace(/[^\x21-\x7e]/g, '');
+  cs.key = cleanKey(cs.key);
   function saveCs() { try { localStorage.setItem(CS_KEY, JSON.stringify(cs)); } catch (e) {} }
 
   const GUIDE_SYSTEM = `You are the guide inside "Journey to Clean Fuel", a private iPhone journaling app. The person talking to you is a high achiever using the app to uncover their dirty fuel and move toward clean fuel. You are warm, direct, unhurried and plain-spoken, like a good coach talking to a friend over coffee. No hype, no therapy jargon, no lectures. You are not Jude Fredman and never claim to be him; you teach his method faithfully and credit it as his when relevant.
@@ -1338,6 +1344,7 @@ HOW YOU WORK IN THIS APP:
     const out = [];
     const src = data.chat.slice(-40);
     for (const m of src) {
+      if (m.role !== 'user' && m.role !== 'assistant') continue; // error notices stay on the phone
       if (!m.content || !m.content.trim()) continue;
       if (out.length && out[out.length - 1].role === m.role) out[out.length - 1].content += '\n\n' + m.content;
       else out.push({ role: m.role, content: m.content });
@@ -1352,20 +1359,21 @@ HOW YOU WORK IN THIS APP:
     const body = { model: cs.model, max_tokens: 8000, stream: true, system: sys, messages: apiMessages(), output_config: { effort: 'medium' } };
     const headers = { 'content-type': 'application/json', 'x-api-key': cs.key, 'anthropic-version': '2026-10-21', 'anthropic-dangerous-direct-browser-access': 'true' };
     if (cs.model !== 'claude-haiku-5-5') { body.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
-    streaming = new AbortController();
-    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal: streaming.signal });
+    const unreachable = e => { if (e.name === 'AbortError') throw e; throw new Error('Lost the connection to Claude. Check your signal and try again.'); };
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal: streaming.signal }).catch(unreachable);
     if (!res.ok) {
       let msg = res.status + ' ' + res.statusText;
       try { const j = await res.json(); if (j.error && j.error.message) msg = j.error.message; } catch (e) {}
       if (res.status === 401) msg = 'That API key was rejected. Check it in Chat settings.';
       if (res.status === 429) msg = 'Rate limit or credit limit reached on your Anthropic account. Try again in a moment.';
+      if (res.status >= 500) msg = 'Claude is busy right now. Try again in a moment.';
       throw new Error(msg);
     }
     const reader = res.body.getReader(), dec = new TextDecoder();
     let buf = '', text = '', stop = null;
     const last = data.chat[data.chat.length - 1];
     while (true) {
-      const { value, done } = await reader.read(); if (done) break;
+      const { value, done } = await reader.read().catch(unreachable); if (done) break;
       buf += dec.decode(value, { stream: true });
       const parts = buf.split('\n\n'); buf = parts.pop();
       for (const part of parts) {
@@ -1378,6 +1386,7 @@ HOW YOU WORK IN THIS APP:
         }
       }
     }
+    if (stop !== 'refusal' && !text.trim()) throw new Error('The guide came back with nothing. Try again.');
     if (stop === 'refusal' && !text.trim()) throw new Error('The model declined to answer that one. Try putting it another way.');
     if (stop === 'max_tokens') text += '\n\n(…I ran out of room there. Say "go on" if you want the rest.)';
     last.content = text.trim();
@@ -1387,8 +1396,20 @@ HOW YOU WORK IN THIS APP:
     if (!text || streaming) return;
     if (!cs.key) { show('chatSettingsSheet'); return; }
     $('chatInput').value = ''; autoGrow();
+    while (data.chat.length && data.chat[data.chat.length - 1].role === 'sys') data.chat.pop();
     data.chat.push({ role: 'user', content: text, t: Date.now() });
+    await runGuide();
+  }
+  // Ask again for the message that failed, without typing it a second time.
+  async function retryChat() {
+    if (streaming) return;
+    while (data.chat.length && data.chat[data.chat.length - 1].role === 'sys') data.chat.pop();
+    if (!data.chat.length || data.chat[data.chat.length - 1].role !== 'user') { save(); renderChat(true); return; }
+    await runGuide();
+  }
+  async function runGuide() {
     data.chat.push({ role: 'assistant', content: '', t: Date.now() });
+    streaming = new AbortController();
     save(); renderChat(true); setSending(true);
     try {
       if (!navigator.onLine) throw new Error('No connection. Chat needs internet; everything else in the app works offline.');
@@ -1421,7 +1442,7 @@ HOW YOU WORK IN THIS APP:
       if (lines.length > 1 && lines.every(l => /^\s*[-•]\s+/.test(l))) return '<ul>' + lines.map(l => '<li>' + inline(l.replace(/^\s*[-•]\s+/, '')) + '</li>').join('') + '</ul>';
       return '<p>' + inline(p).replace(/\n/g, '<br>') + '</p>';
     }).join('');
-    let html = paras + (live ? '<span class="cursor"></span>' : '');
+    let html = live && !text.trim() ? '<p class="wait">Thinking<span class="cursor"></span></p>' : paras + (live ? '<span class="cursor"></span>' : '');
     cards.forEach((c, i) => {
       const L = LEVELS[c.level] || LEVELS.state; const added = (m.added || {})[i];
       html += `<div class="ecard"><div class="et">${esc(c.text)}</div><div class="em"><span>${L.n}. ${L.where}${c.fuel ? ' · ' + c.fuel + ' fuel' : ''}</span>` +
@@ -1464,13 +1485,14 @@ HOW YOU WORK IN THIS APP:
     data.chat.forEach((m, idx) => {
       const live = streaming && idx === data.chat.length - 1 && m.role === 'assistant';
       if (m.role === 'user') html += `<div class="msg user"><div class="bub">${esc(m.content)}</div></div>`;
-      else if (m.role === 'sys') html += `<div class="msg assistant"><div class="sys">${esc(m.content)}</div></div>`;
+      else if (m.role === 'sys') html += `<div class="msg assistant"><div class="sys">${esc(m.content)}${idx === data.chat.length - 1 && idx > 0 && data.chat[idx - 1].role === 'user' && cs.key ? ' <button id="chatRetry">Try again</button>' : ''}</div></div>`;
       else html += `<div class="msg assistant"><div class="bub" data-idx="${idx}">${renderAssistant(m, idx, live)}</div></div>`;
     });
     box.innerHTML = html;
     $('chatNew').addEventListener('click', () => { if (streaming) streaming.abort(); if (!data.chat.length || confirm('Start a new conversation? The old one is cleared.')) { data.chat = []; save(); renderChat(); } });
     $('chatSettings').addEventListener('click', openChatSettings);
     const su = $('chatSetup'); if (su) su.addEventListener('click', openChatSettings);
+    const rt = $('chatRetry'); if (rt) rt.addEventListener('click', retryChat);
     box.querySelectorAll('[data-starter]').forEach(b => b.addEventListener('click', () => sendChat(STARTERS[+b.dataset.starter])));
     if (!data.chat.length) box.scrollTop = 0; else if (toBottom || nearBottom) scrollChat(toBottom);
   }
@@ -1489,7 +1511,7 @@ HOW YOU WORK IN THIS APP:
   }
   $('csCancel').addEventListener('click', closeSheets);
   $('csSave').addEventListener('click', () => {
-    cs.key = $('csKey').value.trim(); cs.model = $('csModel').value; cs.share = $('csShare').checked; cs.teach = $('csTeach').value;
+    cs.key = cleanKey($('csKey').value); cs.model = $('csModel').value; cs.share = $('csShare').checked; cs.teach = $('csTeach').value;
     saveCs(); closeSheets(); if (tab === 'chat') renderChat();
   });
   window.addEventListener('online', () => { if (tab === 'chat') renderChat(); });
