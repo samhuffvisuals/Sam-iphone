@@ -1,20 +1,21 @@
 // Offline support for Journey to Clean Fuel.
 // The app shell is served from the phone first (works with no WiFi at all),
 // then quietly refreshed from the network when one is available.
-const CACHE = 'journey-v7';
+const CACHE = 'journey-v8';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'sw.js', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 const MARK = '<title>Journey to Clean Fuel</title>';
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // Fetch past the browser's own cache, so a new version is never built from stale files.
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+  e.waitUntil((async () => {
+    const old = (await caches.keys()).filter(k => k.startsWith('journey-') && k !== CACHE);
+    await Promise.all(old.map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
 // Only keep responses that really are the app. A captive portal (airline or
@@ -43,7 +44,7 @@ self.addEventListener('fetch', e => {
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const cached = await cache.match(key, { ignoreSearch: true });
-    const refresh = fetch(e.request).then(async res => {
+    const refresh = fetch(e.request, { cache: 'no-cache' }).then(async res => {
       if (await looksGenuine(e.request, res)) await cache.put(key, res.clone());
       return res;
     }).catch(() => null);
