@@ -49,6 +49,7 @@ Four tabs at the bottom: **Map**, **Journal**, **Brainstorm** and **Chat**.
 - With **Let the guide read my map, journal and brainstorm** on (default), the guide sees your entries and ideas and can connect them. Turn it off to keep the chat separate.
 - **Extra teachings**: paste captions or quotes (for example from @diewithoutregretss) and the guide draws on them too.
 - When something surfaces, the guide offers an **entry card**. Tap **Add to map** or **Brainstorm** to keep it.
+- Tap **Copy** under any reply to copy it, then paste it into Notes, Messages or anywhere else. You can also press and hold a message to select part of it.
 - Chat needs a connection. Everything else in the app works offline.
 
 **Menu (⋯)**
